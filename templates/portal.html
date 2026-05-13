@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inmersiva — Propiedades en Perú</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: '#1B2A4A', 800: '#243660', 900: '#0f1a2e' },
+            gold: { DEFAULT: '#C9A84C', light: '#E8C96A', dark: '#a88a3a' },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .hero-dots {
+      background-image: radial-gradient(circle, rgba(201,168,76,0.10) 1px, transparent 1px);
+      background-size: 28px 28px;
+    }
+    .card-prop {
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+    }
+    .card-prop:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 24px 48px rgba(0,0,0,0.14);
+    }
+    .card-prop:hover .card-img {
+      transform: scale(1.05);
+    }
+    .card-img {
+      transition: transform 0.5s ease;
+    }
+    .gold-bar {
+      background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%);
+    }
+    .search-input:focus { outline: none; border-color: #C9A84C; box-shadow: 0 0 0 3px rgba(201,168,76,0.15); }
+    .filter-active { background-color: #1B2A4A; color: #fff; }
+    .filter-gold { background-color: #C9A84C; color: #1B2A4A; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- ══════════════════════ NAVBAR ══════════════════════ -->
+<nav class="sticky top-0 z-50 shadow-xl" style="background-color: #1B2A4A;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+
+    <!-- Logo -->
+    <a href="/" class="flex items-center gap-3 flex-shrink-0">
+      <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" class="w-8 h-8 object-contain"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+        <span class="hidden w-8 h-8 items-center justify-center font-black text-sm" style="color:#1B2A4A">I</span>
+      </div>
+      <div class="hidden sm:block">
+        <div class="text-white font-black text-sm tracking-widest leading-none">INMERSIVA</div>
+        <div class="font-semibold tracking-widest leading-none" style="font-size:8px; color:#C9A84C;">GRUPO INMOBILIARIO</div>
+      </div>
+    </a>
+
+    <!-- Nav links -->
+    <div class="hidden md:flex items-center gap-8 text-sm">
+      <a href="/" class="text-white font-semibold">Inicio</a>
+      <a href="/#propiedades" class="text-gray-400 hover:text-white transition-colors">Propiedades</a>
+      <a href="/#contacto" class="text-gray-400 hover:text-white transition-colors">Contacto</a>
+    </div>
+
+    <!-- Auth -->
+    <div class="flex items-center gap-3 flex-shrink-0">
+      {% if user %}
+        <span class="hidden md:block text-gray-400 text-xs truncate max-w-[120px]">{{ user.get('sub', '') }}</span>
+        {% if user.get('role') == 'empresa' %}
+          <a href="/dashboard" class="text-gray-300 text-sm hover:text-white transition-colors">Panel</a>
+        {% else %}
+          <a href="/corredor/dashboard" class="text-gray-300 text-sm hover:text-white transition-colors">Mi Dashboard</a>
+        {% endif %}
+        <a href="/logout" class="text-gray-400 text-xs hover:text-white transition-colors">Salir</a>
+      {% else %}
+        <a href="/login" class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-90 text-navy" style="background-color:#C9A84C;">
+          Ingresar
+        </a>
+      {% endif %}
+    </div>
+  </div>
+</nav>
+
+<!-- ══════════════════════ HERO ══════════════════════ -->
+<section class="relative overflow-hidden" style="background-color:#1B2A4A; min-height:420px;">
+  <div class="absolute inset-0 hero-dots"></div>
+  <div class="absolute left-0 top-0 w-1 h-full gold-bar"></div>
+
+  <div class="relative max-w-3xl mx-auto px-6 py-20 text-center">
+    <div class="inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-widest uppercase"
+         style="background:rgba(201,168,76,0.15); color:#C9A84C; border:1px solid rgba(201,168,76,0.3);">
+      ✦ Portal Inmobiliario Oficial
+    </div>
+
+    <h1 class="text-white text-4xl md:text-5xl font-black leading-tight mb-4 tracking-tight">
+      Encuentra tu próximo<br>
+      <span style="color:#C9A84C;">hogar en Perú</span>
+    </h1>
+    <p class="text-gray-400 text-lg mb-10 font-light">
+      Las mejores propiedades en venta y renta, seleccionadas por expertos
+    </p>
+
+    <!-- Search bar -->
+    <form method="GET" action="/"
+          class="bg-white rounded-2xl shadow-2xl p-2 flex flex-col sm:flex-row gap-2 max-w-2xl mx-auto">
+      <input
+        type="text" name="ciudad" value="{{ filtros.ciudad }}"
+        placeholder="Ciudad, zona o distrito..."
+        class="search-input flex-1 px-4 py-3 text-gray-800 text-sm rounded-xl border border-transparent transition-all"
+      >
+      <select name="tipo"
+              class="px-3 py-3 text-gray-700 text-sm rounded-xl border border-gray-200 bg-gray-50 outline-none focus:border-gold">
+        <option value="">Tipo</option>
+        {% for t in ["Casa","Departamento","Terreno","Penthouse","Local","Oficina"] %}
+        <option value="{{ t }}" {% if filtros.tipo == t %}selected{% endif %}>{{ t }}</option>
+        {% endfor %}
+      </select>
+      <select name="operacion"
+              class="px-3 py-3 text-gray-700 text-sm rounded-xl border border-gray-200 bg-gray-50 outline-none focus:border-gold">
+        <option value="">Operación</option>
+        <option value="Venta" {% if filtros.operacion == 'Venta' %}selected{% endif %}>Venta</option>
+        <option value="Renta" {% if filtros.operacion == 'Renta' %}selected{% endif %}>Renta</option>
+      </select>
+      <button type="submit"
+              class="px-6 py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90 flex-shrink-0"
+              style="background-color:#C9A84C; color:#1B2A4A;">
+        Buscar
+      </button>
+    </form>
+  </div>
+
+  <!-- Wave divider -->
+  <div class="absolute bottom-0 left-0 right-0 leading-none">
+    <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
+         style="display:block; width:100%; height:48px;">
+      <path d="M0 48 L0 28 Q360 4 720 24 Q1080 44 1440 20 L1440 48 Z" fill="#F9FAFB"/>
+    </svg>
+  </div>
+</section>
+
+<!-- ══════════════════════ PROPIEDADES ══════════════════════ -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" id="propiedades">
+
+  <!-- Header + quick filters -->
+  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
+    <div>
+      <h2 class="text-2xl font-bold text-gray-900">
+        {% if propiedades %}
+          {{ propiedades|length }} propiedad{% if propiedades|length != 1 %}es{% endif %} disponible{% if propiedades|length != 1 %}s{% endif %}
+        {% else %}
+          Propiedades disponibles
+        {% endif %}
+      </h2>
+
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+      <div class="flex flex-wrap gap-2 mt-2 items-center">
+        {% if filtros.tipo %}
+        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">
+          {{ filtros.tipo }}
+        </span>
+        {% endif %}
+        {% if filtros.operacion %}
+        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">
+          {{ filtros.operacion }}
+        </span>
+        {% endif %}
+        {% if filtros.ciudad %}
+        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">
+          {{ filtros.ciudad }}
+        </span>
+        {% endif %}
+        <a href="/" class="text-xs font-semibold hover:underline" style="color:#C9A84C;">✕ Limpiar</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Quick filter pills -->
+    <div class="flex flex-wrap gap-2">
+      <a href="/"
+         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
+                {% if not filtros.operacion and not filtros.tipo %}filter-active{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
+        Todas
+      </a>
+      <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
+                {% if filtros.operacion == 'Venta' %}filter-gold border-gold{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
+        Venta
+      </a>
+      <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
+                {% if filtros.operacion == 'Renta' %}filter-active border-navy{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
+        Renta
+      </a>
+    </div>
+  </div>
+
+  <!-- Grid -->
+  {% if propiedades %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for p in propiedades %}
+    <a href="/propiedad/{{ p.id }}"
+       class="card-prop group bg-white rounded-2xl overflow-hidden shadow-md block no-underline">
+
+      <!-- Image -->
+      <div class="relative overflow-hidden bg-gray-200" style="height:220px; background-color:#1B2A4A;">
+        {% if p.foto_portada %}
+        <img src="/uploads/{{ p.foto_portada }}"
+             alt="{{ p.titulo }}"
+             class="card-img w-full h-full object-cover"
+             onerror="this.style.display='none'">
+        {% endif %}
+        <div class="absolute inset-0 flex items-center justify-center {% if p.foto_portada %}hidden{% endif %}">
+          <span style="font-size:48px; opacity:0.3;">🏠</span>
+        </div>
+
+        <!-- Badges top-left -->
+        <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
+          <span class="text-xs font-bold px-3 py-1 rounded-full
+                       {% if p.operacion == 'Venta' %}text-navy{% else %}text-white{% endif %}"
+                style="{% if p.operacion == 'Venta' %}background:#C9A84C;{% else %}background:#1B2A4A; border:1px solid #C9A84C;{% endif %}">
+            En {{ p.operacion }}
+          </span>
+          {% if p.tour_360_url %}
+          <span class="text-white text-xs font-semibold px-3 py-1 rounded-full"
+                style="background:rgba(0,0,0,0.65);">
+            🔮 360°
+          </span>
+          {% endif %}
+          {% if p.destacado %}
+          <span class="text-xs font-bold px-3 py-1 rounded-full text-navy" style="background:#C9A84C;">
+            ★ Destacada
+          </span>
+          {% endif %}
+        </div>
+
+        <!-- Gradient -->
+        <div class="absolute bottom-0 left-0 right-0 h-16"
+             style="background:linear-gradient(to top, rgba(0,0,0,0.4), transparent);"></div>
+      </div>
+
+      <!-- Content -->
+      <div class="p-5">
+        <div class="text-2xl font-black mb-1" style="color:#C9A84C;">
+          {{ p.precio_fmt }}
+        </div>
+        <div class="font-semibold text-gray-900 text-sm mb-1">
+          {{ p.tipo }} en {{ p.operacion }}
+        </div>
+        <div class="text-gray-500 text-xs mb-4 flex items-center gap-1">
+          <span>📍</span>
+          <span class="truncate">{{ p.ciudad }}, {{ p.estado }}</span>
+        </div>
+
+        <!-- Specs + arrow -->
+        <div class="flex items-center gap-3 text-gray-500 text-xs border-t border-gray-100 pt-3">
+          {% if p.habitaciones %}
+          <span class="flex items-center gap-1">🛏 {{ p.habitaciones }}</span>
+          {% endif %}
+          {% if p.banos %}
+          <span class="flex items-center gap-1">🚿 {{ p.banos }}</span>
+          {% endif %}
+          {% if p.m2_construidos %}
+          <span class="flex items-center gap-1">📐 {{ p.m2_construidos }}m²</span>
+          {% endif %}
+          {% if p.estacionamientos %}
+          <span class="flex items-center gap-1">🚗 {{ p.estacionamientos }}</span>
+          {% endif %}
+          <span class="ml-auto font-bold transition-transform group-hover:translate-x-1" style="color:#C9A84C;">
+            Ver →
+          </span>
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="text-center py-24">
+    <div style="font-size:64px; margin-bottom:16px;">🏠</div>
+    <h3 class="text-xl font-bold text-gray-700 mb-2">
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+        No encontramos propiedades con esos filtros
+      {% else %}
+        Próximamente tendremos propiedades increíbles
+      {% endif %}
+    </h3>
+    <p class="text-gray-500 text-sm mb-6">
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+        Prueba con otros criterios de búsqueda
+      {% else %}
+        Estamos captando las mejores propiedades de la región
+      {% endif %}
+    </p>
+    {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+    <a href="/"
+       class="inline-block font-semibold px-6 py-3 rounded-xl text-sm text-white"
+       style="background-color:#1B2A4A;">
+      Ver todas las propiedades
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+</section>
+
+<!-- ══════════════════════ CTA ══════════════════════ -->
+<section class="relative overflow-hidden mt-4" id="contacto" style="background-color:#1B2A4A;">
+  <div class="absolute inset-0 hero-dots"></div>
+  <div class="absolute left-0 top-0 w-1 h-full gold-bar"></div>
+  <div class="relative max-w-7xl mx-auto px-6 py-16 text-center">
+    <h2 class="text-white text-3xl font-bold mb-3">¿Buscas algo en especial?</h2>
+    <p class="text-gray-400 mb-8 text-lg font-light">
+      Nuestros corredores expertos te ayudan a encontrar la propiedad perfecta
+    </p>
+    <div class="flex flex-col sm:flex-row gap-4 justify-center">
+      <a href="https://wa.me/51999999999" target="_blank"
+         class="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl text-sm transition-all hover:opacity-90 text-white"
+         style="background:#22C55E;">
+        📱 Contactar por WhatsApp
+      </a>
+      <a href="/login"
+         class="inline-flex items-center justify-center gap-2 font-bold px-6 py-3 rounded-xl text-sm transition-all hover:opacity-90 text-navy"
+         style="background:#C9A84C;">
+        Soy corredor → Ingresar
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- ══════════════════════ FOOTER ══════════════════════ -->
+<footer style="background:#111827;" class="text-gray-400 py-10">
+  <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
+    <div class="flex items-center gap-3">
+      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
+        <img src="/static/img/logo.jpeg" alt="" class="w-7 h-7 object-contain"
+             onerror="this.style.display='none'">
+      </div>
+      <div>
+        <div class="text-white font-bold text-sm tracking-wider">INMERSIVA</div>
+        <div class="tracking-widest" style="font-size:9px; color:#C9A84C;">GRUPO INMOBILIARIO</div>
+      </div>
+    </div>
+
+    <div class="text-center text-xs">
+      © 2026 Inmersiva Grupo Inmobiliario ·
+      <span style="color:#C9A84C;">inmobiliariainmersiva.com</span>
+    </div>
+
+    <div class="flex items-center gap-4 text-xs">
+      <a href="/login" class="hover:text-white transition-colors">Corredores</a>
+      <span>·</span>
+      <a href="/login" class="hover:text-white transition-colors">Administración</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

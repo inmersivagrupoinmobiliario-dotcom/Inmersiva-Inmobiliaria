@@ -1,5 +1,6 @@
-from sqlalchemy import Column, Integer, String, DateTime, Boolean
+from sqlalchemy import Column, Integer, String, DateTime, Boolean, Text, Float, ForeignKey
 from datetime import datetime
+import json as _json
 from database import Base
 
 
@@ -13,3 +14,42 @@ class Corredor(Base):
     hashed_password = Column(String(200), nullable=False)
     activo = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+
+
+class PropiedadPublica(Base):
+    __tablename__ = "propiedades_publicas"
+    id = Column(Integer, primary_key=True)
+    listing_id = Column(String(36), unique=True, nullable=False)
+    titulo = Column(String(200), nullable=False)
+    tipo = Column(String(50), nullable=False)
+    operacion = Column(String(20), nullable=False)
+    precio = Column(Integer, nullable=False)
+    moneda = Column(String(10), default="PEN")
+    ciudad = Column(String(100), nullable=False)
+    estado = Column(String(100), nullable=False)
+    direccion = Column(String(200), nullable=False)
+    descripcion = Column(Text, default="")
+    habitaciones = Column(Integer, nullable=True)
+    banos = Column(Float, nullable=True)
+    m2_construidos = Column(Integer, nullable=True)
+    m2_terreno = Column(Integer, nullable=True)
+    estacionamientos = Column(Integer, nullable=True)
+    foto_portada = Column(String(300), default="")
+    fotos_extras = Column(Text, default="[]")
+    tour_360_url = Column(String(500), default="")
+    corredor_id = Column(Integer, ForeignKey("corredores.id"), nullable=True)
+    publicado = Column(Boolean, default=True)
+    destacado = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+    @property
+    def fotos_list(self):
+        try:
+            return _json.loads(self.fotos_extras or "[]")
+        except Exception:
+            return []
+
+    @property
+    def precio_fmt(self):
+        sym = "S/." if self.moneda == "PEN" else ("USD" if self.moneda == "USD" else self.moneda)
+        return f"{sym} {self.precio:,}"

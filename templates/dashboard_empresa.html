@@ -586,6 +586,7 @@
   <div class="header-spacer"></div>
 
   <div class="header-right">
+    <a href="/" target="_blank" style="color:#C9A84C;font-size:12px;font-weight:600;text-decoration:none;background:rgba(201,168,76,0.12);border:1px solid rgba(201,168,76,0.3);padding:6px 14px;border-radius:20px;">🌐 Ver Portal</a>
     <span class="user-badge">{{ empresa_user }}</span>
     <a href="/logout" class="btn-logout">Cerrar sesión</a>
 
@@ -668,6 +669,7 @@
             <th>Precio</th>
             <th>Corredor</th>
             <th>Acciones</th>
+            <th>Portal</th>
           </tr>
         </thead>
         <tbody>
@@ -687,6 +689,14 @@
             <td>
               <a href="/pdf/{{ f.id }}" class="action-btn action-pdf" target="_blank">PDF</a>
               <a href="/imagen/{{ f.id }}" class="action-btn action-img" target="_blank">IMG</a>
+            </td>
+            <td>
+              <form method="POST" action="/admin/publicar-ficha/{{ f.id }}" style="display:inline;">
+                <button type="submit" class="action-btn"
+                        style="background:#C9A84C;color:#1B2A4A;border:none;cursor:pointer;font-size:11px;padding:4px 10px;border-radius:6px;font-weight:700;">
+                  🌐 Publicar
+                </button>
+              </form>
             </td>
           </tr>
           {% endfor %}

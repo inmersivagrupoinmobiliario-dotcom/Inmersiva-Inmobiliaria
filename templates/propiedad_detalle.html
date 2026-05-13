@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ p.titulo }} — Inmersiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: '#1B2A4A',
+            gold: '#C9A84C',
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .gold-bar { background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%); }
+    .hero-dots { background-image: radial-gradient(circle,rgba(201,168,76,.10) 1px,transparent 1px); background-size:28px 28px; }
+    .swiper-button-next, .swiper-button-prev { color: #C9A84C !important; }
+    .swiper-pagination-bullet-active { background: #C9A84C !important; }
+    .spec-item { display:flex; flex-direction:column; align-items:center; gap:4px; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- ══ NAVBAR ══ -->
+<nav class="sticky top-0 z-50 shadow-xl" style="background-color:#1B2A4A;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-3 flex-shrink-0">
+      <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" class="w-8 h-8 object-contain"
+             onerror="this.style.display='none'">
+      </div>
+      <div class="hidden sm:block">
+        <div class="text-white font-black text-sm tracking-widest leading-none">INMERSIVA</div>
+        <div class="font-semibold tracking-widest leading-none" style="font-size:8px;color:#C9A84C;">GRUPO INMOBILIARIO</div>
+      </div>
+    </a>
+    <a href="/" class="text-gray-400 hover:text-white text-sm transition-colors flex items-center gap-1">
+      ← Volver al portal
+    </a>
+    <div class="flex-1"></div>
+    {% if user %}
+      {% if user.get('role') == 'empresa' %}
+        <a href="/dashboard" class="text-gray-300 text-sm hover:text-white">Panel</a>
+      {% else %}
+        <a href="/corredor/dashboard" class="text-gray-300 text-sm hover:text-white">Mi Dashboard</a>
+      {% endif %}
+    {% else %}
+      <a href="/login" class="text-sm font-bold px-4 py-2 rounded-lg hover:opacity-90 text-navy"
+         style="background-color:#C9A84C;">Ingresar</a>
+    {% endif %}
+  </div>
+</nav>
+
+<!-- ══ BREADCRUMB ══ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3">
+  <nav class="text-xs text-gray-500 flex items-center gap-2">
+    <a href="/" class="hover:text-navy transition-colors">Inicio</a>
+    <span>/</span>
+    <a href="/?tipo={{ p.tipo }}" class="hover:text-navy transition-colors">{{ p.tipo }}</a>
+    <span>/</span>
+    <span class="text-gray-700 font-medium">{{ p.ciudad }}</span>
+  </nav>
+</div>
+
+<!-- ══ MAIN CONTENT ══ -->
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16">
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+    <!-- ── Left column (gallery + info) ── -->
+    <div class="lg:col-span-2 space-y-6">
+
+      <!-- Gallery -->
+      <div class="relative bg-gray-900 rounded-2xl overflow-hidden" style="height:420px;">
+        {% set all_fotos = ([p.foto_portada] if p.foto_portada else []) + p.fotos_list %}
+        {% if all_fotos|length > 1 %}
+        <div class="swiper h-full">
+          <div class="swiper-wrapper">
+            {% for foto in all_fotos %}
+            {% if foto %}
+            <div class="swiper-slide">
+              <img src="/uploads/{{ foto }}" alt="Foto {{ loop.index }}"
+                   class="w-full h-full object-cover"
+                   onerror="this.parentElement.style.background='#1B2A4A'">
+            </div>
+            {% endif %}
+            {% endfor %}
+          </div>
+          <div class="swiper-button-next"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-pagination"></div>
+        </div>
+        {% elif p.foto_portada %}
+        <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}"
+             class="w-full h-full object-cover"
+             onerror="this.style.display='none'">
+        {% else %}
+        <div class="w-full h-full flex items-center justify-center" style="background:#1B2A4A;">
+          <span style="font-size:80px;opacity:0.3;">🏠</span>
+        </div>
+        {% endif %}
+
+        <!-- Badges over image -->
+        <div class="absolute top-4 left-4 flex gap-2 z-10">
+          <span class="text-xs font-bold px-3 py-1.5 rounded-full
+                       {% if p.operacion == 'Venta' %}text-navy{% else %}text-white{% endif %}"
+                style="{% if p.operacion == 'Venta' %}background:#C9A84C;{% else %}background:#1B2A4A;border:1px solid #C9A84C;{% endif %}">
+            En {{ p.operacion }}
+          </span>
+          {% if p.tour_360_url %}
+          <span class="text-white text-xs font-semibold px-3 py-1.5 rounded-full"
+                style="background:rgba(0,0,0,0.65);">
+            🔮 Tour 360°
+          </span>
+          {% endif %}
+          {% if p.destacado %}
+          <span class="text-xs font-bold px-3 py-1.5 rounded-full text-navy" style="background:#C9A84C;">
+            ★ Destacada
+          </span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Title + price -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+          <div>
+            <h1 class="text-2xl font-black text-gray-900 mb-1">{{ p.titulo }}</h1>
+            <div class="flex items-center gap-2 text-gray-500 text-sm">
+              <span>📍</span>
+              <span>{{ p.direccion }}, {{ p.ciudad }}, {{ p.estado }}</span>
+            </div>
+          </div>
+          <div class="text-right flex-shrink-0">
+            <div class="text-3xl font-black" style="color:#C9A84C;">{{ p.precio_fmt }}</div>
+            <div class="text-gray-500 text-xs mt-0.5">Precio de {{ p.operacion }}</div>
+          </div>
+        </div>
+
+        <!-- Specs bar -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-gray-100">
+          {% if p.habitaciones %}
+          <div class="spec-item">
+            <span class="text-2xl">🛏</span>
+            <span class="font-bold text-gray-900">{{ p.habitaciones }}</span>
+            <span class="text-gray-500 text-xs">Habitaciones</span>
+          </div>
+          {% endif %}
+          {% if p.banos %}
+          <div class="spec-item">
+            <span class="text-2xl">🚿</span>
+            <span class="font-bold text-gray-900">{{ p.banos }}</span>
+            <span class="text-gray-500 text-xs">Baños</span>
+          </div>
+          {% endif %}
+          {% if p.m2_construidos %}
+          <div class="spec-item">
+            <span class="text-2xl">📐</span>
+            <span class="font-bold text-gray-900">{{ p.m2_construidos }} m²</span>
+            <span class="text-gray-500 text-xs">Área construida</span>
+          </div>
+          {% endif %}
+          {% if p.m2_terreno %}
+          <div class="spec-item">
+            <span class="text-2xl">🌳</span>
+            <span class="font-bold text-gray-900">{{ p.m2_terreno }} m²</span>
+            <span class="text-gray-500 text-xs">Terreno</span>
+          </div>
+          {% endif %}
+          {% if p.estacionamientos %}
+          <div class="spec-item">
+            <span class="text-2xl">🚗</span>
+            <span class="font-bold text-gray-900">{{ p.estacionamientos }}</span>
+            <span class="text-gray-500 text-xs">Estacionamientos</span>
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Description -->
+      {% if p.descripcion %}
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 class="font-bold text-gray-900 text-sm uppercase tracking-widest mb-4 pb-3 border-b-2"
+            style="border-color:#C9A84C;">Descripción</h2>
+        <p class="text-gray-700 leading-relaxed text-sm whitespace-pre-line">{{ p.descripcion }}</p>
+      </div>
+      {% endif %}
+
+      <!-- Tour 360° -->
+      {% if p.tour_360_url %}
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 class="font-bold text-gray-900 text-sm uppercase tracking-widest mb-4 pb-3 border-b-2"
+            style="border-color:#C9A84C;">Tour Virtual 360°</h2>
+        <div class="rounded-xl overflow-hidden" style="height:400px;">
+          <iframe src="{{ p.tour_360_url }}" width="100%" height="100%"
+                  frameborder="0" allowfullscreen
+                  allow="xr-spatial-tracking; gyroscope; accelerometer"
+                  class="w-full h-full"></iframe>
+        </div>
+      </div>
+      {% endif %}
+
+    </div>
+
+    <!-- ── Right column (agent card + share) ── -->
+    <div class="space-y-4">
+
+      <!-- Agent card -->
+      <div class="bg-white rounded-2xl overflow-hidden shadow-sm sticky top-20">
+        <div class="p-5 text-white text-center" style="background:#1B2A4A;">
+          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center font-black text-2xl"
+               style="background:#C9A84C; color:#1B2A4A;">
+            {% if corredor %}{{ corredor.nombre[0]|upper }}{% else %}I{% endif %}
+          </div>
+          <div class="font-bold text-sm">
+            {% if corredor %}{{ corredor.nombre }}{% else %}Inmersiva Grupo Inmobiliario{% endif %}
+          </div>
+          <div class="text-xs mt-0.5" style="color:#C9A84C;">Corredor Inmersiva</div>
+        </div>
+
+        <div class="p-5 space-y-3">
+          {% if corredor and corredor.telefono %}
+          <a href="https://wa.me/51{{ corredor.telefono|replace(' ','')|replace('-','') }}"
+             target="_blank"
+             class="flex items-center justify-center gap-2 w-full font-bold text-sm py-3 rounded-xl transition-all hover:opacity-90 text-white"
+             style="background:#22C55E;">
+            📱 WhatsApp
+          </a>
+          <a href="tel:{{ corredor.telefono }}"
+             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border-2 transition-all hover:bg-gray-50"
+             style="border-color:#1B2A4A; color:#1B2A4A;">
+            📞 Llamar
+          </a>
+          {% endif %}
+          {% if corredor and corredor.email %}
+          <a href="mailto:{{ corredor.email }}?subject=Consulta: {{ p.titulo }}"
+             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border transition-all hover:bg-gray-50 text-gray-600 border-gray-200">
+            ✉️ Enviar email
+          </a>
+          {% else %}
+          <a href="mailto:inmersivagrupoinmobiliario@gmail.com?subject=Consulta: {{ p.titulo }}"
+             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border transition-all hover:bg-gray-50 text-gray-600 border-gray-200">
+            ✉️ Contactar
+          </a>
+          {% endif %}
+        </div>
+
+        <div class="px-5 pb-5">
+          <div class="rounded-xl p-4 text-xs text-gray-600 leading-relaxed"
+               style="background:#F9FAFB; border:1px solid #e5e7eb;">
+            <strong class="text-gray-900">Referencia:</strong> #{{ p.id }}<br>
+            <strong class="text-gray-900">Publicada:</strong>
+            {{ p.created_at.strftime('%d/%m/%Y') if p.created_at else 'N/A' }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Share -->
+      <div class="bg-white rounded-2xl p-5 shadow-sm">
+        <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Compartir</div>
+        <div class="flex gap-2">
+          <button onclick="navigator.clipboard.writeText(window.location.href).then(()=>this.textContent='¡Copiado!')"
+                  class="flex-1 text-xs font-semibold py-2.5 rounded-xl border border-gray-200 hover:bg-gray-50 transition-colors text-gray-600">
+            🔗 Copiar enlace
+          </button>
+          <a href="https://wa.me/?text={{ p.titulo | urlencode }}%20{{ request.url | string | urlencode }}"
+             target="_blank"
+             class="flex-1 text-xs font-semibold py-2.5 rounded-xl border text-center transition-colors text-white hover:opacity-90"
+             style="background:#22C55E; border-color:#22C55E;">
+            WhatsApp
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ══ FOOTER ══ -->
+<footer style="background:#111827;" class="text-gray-400 py-8 mt-8">
+  <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-4 text-xs">
+    <span>© 2026 Inmersiva Grupo Inmobiliario</span>
+    <a href="/" class="hover:text-white transition-colors">← Ver más propiedades</a>
+  </div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script>
+  const swiperEl = document.querySelector('.swiper');
+  if (swiperEl) {
+    new Swiper(swiperEl, {
+      loop: true,
+      navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
+      pagination: { el: '.swiper-pagination', clickable: true },
+    });
+  }
+</script>
+</body>
+</html>

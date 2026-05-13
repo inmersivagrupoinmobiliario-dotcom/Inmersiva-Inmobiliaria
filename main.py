@@ -17,11 +17,12 @@ from models.listing import Listing
 from services.ai_service import generar_contenido
 from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session, oauth
 from database import engine, SessionLocal, Base
+from typing import Optional as Opt
 
 load_dotenv()
 
 # DB init
-from models.db_models import Corredor as CorredorModel
+from models.db_models import Corredor as CorredorModel, PropiedadPublica
 
 def _init_db():
     try:
@@ -97,12 +98,147 @@ def fichas_stats(fichas: list) -> dict:
     return {"total": len(fichas), "fichas_mes": fichas_mes, "pdfs": pdfs}
 
 
-# ── Auth routes ───────────────────────────────────────────────────────────────
+# ── Portal público ────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
-async def root(request: Request):
-    if get_empresa_session(request):
-        return RedirectResponse("/dashboard", status_code=302)
-    return RedirectResponse("/login", status_code=302)
+async def portal(
+    request: Request,
+    tipo: Opt[str] = None,
+    operacion: Opt[str] = None,
+    ciudad: Opt[str] = None,
+):
+    db = SessionLocal()
+    try:
+        q = db.query(PropiedadPublica).filter(PropiedadPublica.publicado == True)
+        if tipo:
+            q = q.filter(PropiedadPublica.tipo == tipo)
+        if operacion:
+            q = q.filter(PropiedadPublica.operacion == operacion)
+        if ciudad:
+            q = q.filter(PropiedadPublica.ciudad.ilike(f"%{ciudad}%"))
+        propiedades = q.order_by(
+            PropiedadPublica.destacado.desc(),
+            PropiedadPublica.created_at.desc()
+        ).all()
+    finally:
+        db.close()
+
+    empresa = get_empresa_session(request)
+    corredor = get_corredor_session(request)
+    user = empresa or corredor
+    return templates.TemplateResponse(request, "portal.html", {
+        "propiedades": propiedades,
+        "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or ""},
+        "user": user,
+    })
+
+
+@app.get("/propiedad/{propiedad_id}", response_class=HTMLResponse)
+async def detalle_propiedad(request: Request, propiedad_id: int):
+    db = SessionLocal()
+    try:
+        propiedad = db.query(PropiedadPublica).filter(
+            PropiedadPublica.id == propiedad_id,
+            PropiedadPublica.publicado == True,
+        ).first()
+        if not propiedad:
+            return RedirectResponse("/", status_code=302)
+        corredor_obj = db.query(CorredorModel).filter(
+            CorredorModel.id == propiedad.corredor_id
+        ).first() if propiedad.corredor_id else None
+    finally:
+        db.close()
+
+    empresa = get_empresa_session(request)
+    corredor_session = get_corredor_session(request)
+    return templates.TemplateResponse(request, "propiedad_detalle.html", {
+        "p": propiedad,
+        "corredor": corredor_obj,
+        "user": empresa or corredor_session,
+    })
+
+
+# ── Admin: publicar ficha en portal ───────────────────────────────────────────
+@app.post("/admin/publicar-ficha/{listing_id}")
+async def publicar_ficha_portal(request: Request, listing_id: str):
+    empresa = get_empresa_session(request)
+    if not empresa:
+        return RedirectResponse("/login", status_code=302)
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return RedirectResponse("/dashboard?error=Ficha+no+encontrada", status_code=302)
+
+    db = SessionLocal()
+    try:
+        existing = db.query(PropiedadPublica).filter(
+            PropiedadPublica.listing_id == listing_id
+        ).first()
+        if existing:
+            existing.publicado = True
+        else:
+            corredor_obj = db.query(CorredorModel).filter(
+                CorredorModel.email == listing.agente_email
+            ).first()
+            db.add(PropiedadPublica(
+                listing_id=listing_id,
+                titulo=f"{listing.tipo} en {listing.operacion} — {listing.ciudad}",
+                tipo=listing.tipo,
+                operacion=listing.operacion,
+                precio=listing.precio,
+                moneda=getattr(listing, "moneda", "PEN"),
+                ciudad=listing.ciudad,
+                estado=listing.estado,
+                direccion=listing.direccion,
+                descripcion=listing.descripcion_generada or listing.descripcion_agente,
+                habitaciones=listing.recamaras,
+                banos=listing.banos,
+                m2_construidos=listing.m2_construidos,
+                m2_terreno=listing.m2_terreno,
+                estacionamientos=listing.estacionamientos,
+                foto_portada=listing.foto_portada,
+                fotos_extras=json.dumps(listing.fotos_extras or []),
+                tour_360_url=getattr(listing, "tour_360_url", ""),
+                corredor_id=corredor_obj.id if corredor_obj else None,
+            ))
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+@app.post("/admin/propiedad/{propiedad_id}/despublicar")
+async def despublicar_propiedad(request: Request, propiedad_id: int):
+    empresa = get_empresa_session(request)
+    if not empresa:
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        p = db.query(PropiedadPublica).filter(PropiedadPublica.id == propiedad_id).first()
+        if p:
+            p.publicado = False
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+@app.post("/admin/propiedad/{propiedad_id}/destacar")
+async def destacar_propiedad(request: Request, propiedad_id: int):
+    empresa = get_empresa_session(request)
+    if not empresa:
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        p = db.query(PropiedadPublica).filter(PropiedadPublica.id == propiedad_id).first()
+        if p:
+            p.destacado = not p.destacado
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+# ── Auth routes ────────────────────────────────────────────────────────────────
 
 
 @app.get("/login", response_class=HTMLResponse)
