@@ -105,6 +105,7 @@ async def portal(
     tipo: Opt[str] = None,
     operacion: Opt[str] = None,
     ciudad: Opt[str] = None,
+    tour: Opt[str] = None,
 ):
     db = SessionLocal()
     try:
@@ -115,6 +116,8 @@ async def portal(
             q = q.filter(PropiedadPublica.operacion == operacion)
         if ciudad:
             q = q.filter(PropiedadPublica.ciudad.ilike(f"%{ciudad}%"))
+        if tour:
+            q = q.filter(PropiedadPublica.tour_360_url != "")
         propiedades = q.order_by(
             PropiedadPublica.destacado.desc(),
             PropiedadPublica.created_at.desc()
@@ -128,7 +131,7 @@ async def portal(
     user = empresa or corredor or usuario
     return templates.TemplateResponse(request, "portal.html", {
         "propiedades": propiedades,
-        "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or ""},
+        "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or "", "tour": tour or ""},
         "user": user,
         "usuario": usuario,
     })
