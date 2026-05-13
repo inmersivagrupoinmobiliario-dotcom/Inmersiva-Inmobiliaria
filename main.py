@@ -22,7 +22,10 @@ from typing import Optional as Opt
 load_dotenv()
 
 # DB init
-from models.db_models import Corredor as CorredorModel, PropiedadPublica, UsuarioPublico
+from models.db_models import (
+    Corredor as CorredorModel, PropiedadPublica, UsuarioPublico,
+    Contacto, Cita, DocumentoCorredor, PostRRSS,
+)
 
 def _init_db():
     try:
@@ -497,32 +500,285 @@ async def corredor_logout():
     return resp
 
 
-@app.get("/corredor/dashboard", response_class=HTMLResponse)
-async def dashboard_corredor(request: Request):
-    corredor_session = get_corredor_session(request)
-    if not corredor_session:
+def _corredor_or_redirect(request: Request):
+    """Returns (corredor_obj, None) or (None, RedirectResponse)."""
+    session = get_corredor_session(request)
+    if not session:
         if get_empresa_session(request):
-            return RedirectResponse("/dashboard", status_code=302)
-        return RedirectResponse("/login", status_code=302)
-
+            return None, RedirectResponse("/dashboard", status_code=302)
+        return None, RedirectResponse("/login", status_code=302)
     db = SessionLocal()
     try:
-        corredor = db.query(CorredorModel).filter(CorredorModel.username == corredor_session["sub"]).first()
+        corredor = db.query(CorredorModel).filter(CorredorModel.username == session["sub"]).first()
     finally:
         db.close()
-
     if not corredor:
         resp = RedirectResponse("/login", status_code=302)
         resp.delete_cookie("corredor_token")
-        return resp
+        return None, resp
+    return corredor, None
 
-    fichas = list_fichas(corredor_email=corredor.email)
-    s = fichas_stats(fichas)
+
+@app.get("/corredor/dashboard", response_class=HTMLResponse)
+async def dashboard_corredor(request: Request, seccion: str = "resumen"):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+
+    db = SessionLocal()
+    try:
+        fichas = list_fichas(corredor_email=corredor.email)
+        s = fichas_stats(fichas)
+        contactos = db.query(Contacto).filter(Contacto.corredor_id == corredor.id)\
+                      .order_by(Contacto.updated_at.desc()).all()
+        citas = db.query(Cita).filter(Cita.corredor_id == corredor.id)\
+                  .order_by(Cita.fecha.asc()).all()
+        documentos = db.query(DocumentoCorredor).filter(DocumentoCorredor.corredor_id == corredor.id)\
+                       .order_by(DocumentoCorredor.created_at.desc()).all()
+        posts = db.query(PostRRSS).filter(PostRRSS.corredor_id == corredor.id)\
+                  .order_by(PostRRSS.fecha_publicacion.desc()).all()
+        contactos_map = {c.id: c for c in contactos}
+    finally:
+        db.close()
+
+    pipeline = {
+        "Nuevo":        [c for c in contactos if c.estado == "Nuevo"],
+        "Contactado":   [c for c in contactos if c.estado == "Contactado"],
+        "Negociacion":  [c for c in contactos if c.estado == "Negociacion"],
+        "Ganado":       [c for c in contactos if c.estado == "Ganado"],
+        "Perdido":      [c for c in contactos if c.estado == "Perdido"],
+    }
+
     return templates.TemplateResponse(request, "dashboard_corredor.html", {
         "corredor": corredor,
         "fichas": fichas,
-        "stats": {"mis_fichas": s["total"], "fichas_mes": s["fichas_mes"], "pdfs": s["pdfs"]},
+        "seccion": seccion,
+        "stats": {
+            "mis_fichas": s["total"],
+            "fichas_mes": s["fichas_mes"],
+            "pdfs": s["pdfs"],
+            "contactos": len(contactos),
+            "citas_pendientes": sum(1 for c in citas if c.estado == "Pendiente"),
+        },
+        "contactos": contactos,
+        "pipeline": pipeline,
+        "citas": citas,
+        "documentos": documentos,
+        "posts": posts,
+        "contactos_map": contactos_map,
     })
+
+
+# ── CRM: Contactos ────────────────────────────────────────────────────────────
+@app.post("/corredor/contacto/nuevo")
+async def nuevo_contacto(
+    request: Request,
+    nombre: str = Form(...),
+    email: str = Form(default=""),
+    telefono: str = Form(default=""),
+    origen: str = Form(default="Web"),
+    interes: str = Form(default=""),
+    notas: str = Form(default=""),
+):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        c = Contacto(corredor_id=corredor.id, nombre=nombre, email=email,
+                     telefono=telefono, origen=origen, interes=interes, notas=notas)
+        db.add(c)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=contactos", status_code=302)
+
+
+@app.post("/corredor/contacto/{cid}/estado")
+async def actualizar_estado_contacto(request: Request, cid: int, estado: str = Form(...)):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        c = db.query(Contacto).filter(Contacto.id == cid, Contacto.corredor_id == corredor.id).first()
+        if c:
+            c.estado = estado
+            c.updated_at = datetime.utcnow()
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=pipeline", status_code=302)
+
+
+@app.post("/corredor/contacto/{cid}/eliminar")
+async def eliminar_contacto(request: Request, cid: int):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        c = db.query(Contacto).filter(Contacto.id == cid, Contacto.corredor_id == corredor.id).first()
+        if c:
+            db.delete(c)
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=contactos", status_code=302)
+
+
+# ── CRM: Citas ────────────────────────────────────────────────────────────────
+@app.post("/corredor/cita/nueva")
+async def nueva_cita(
+    request: Request,
+    titulo: str = Form(...),
+    fecha: str = Form(...),
+    lugar: str = Form(default=""),
+    descripcion: str = Form(default=""),
+    contacto_id: str = Form(default=""),
+):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        cid = int(contacto_id) if contacto_id.strip() else None
+        fecha_dt = datetime.fromisoformat(fecha)
+        cita = Cita(corredor_id=corredor.id, contacto_id=cid, titulo=titulo,
+                    fecha=fecha_dt, lugar=lugar, descripcion=descripcion)
+        db.add(cita)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=agenda", status_code=302)
+
+
+@app.post("/corredor/cita/{cid}/estado")
+async def actualizar_cita(request: Request, cid: int, estado: str = Form(...)):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        cita = db.query(Cita).filter(Cita.id == cid, Cita.corredor_id == corredor.id).first()
+        if cita:
+            cita.estado = estado
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=agenda", status_code=302)
+
+
+@app.post("/corredor/cita/{cid}/eliminar")
+async def eliminar_cita(request: Request, cid: int):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        cita = db.query(Cita).filter(Cita.id == cid, Cita.corredor_id == corredor.id).first()
+        if cita:
+            db.delete(cita)
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=agenda", status_code=302)
+
+
+# ── CRM: Documentos ───────────────────────────────────────────────────────────
+@app.post("/corredor/documento/subir")
+async def subir_documento(
+    request: Request,
+    nombre: str = Form(...),
+    tipo: str = Form(default="Otro"),
+    notas: str = Form(default=""),
+    archivo: UploadFile = File(default=None),
+):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    archivo_nombre = ""
+    if archivo and archivo.filename:
+        ext = Path(archivo.filename).suffix
+        archivo_nombre = f"doc_{uuid.uuid4().hex}{ext}"
+        dest = Path("uploads") / archivo_nombre
+        dest.parent.mkdir(exist_ok=True)
+        with open(dest, "wb") as f:
+            shutil.copyfileobj(archivo.file, f)
+    db = SessionLocal()
+    try:
+        doc = DocumentoCorredor(corredor_id=corredor.id, nombre=nombre,
+                                tipo=tipo, archivo=archivo_nombre, notas=notas)
+        db.add(doc)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=documentos", status_code=302)
+
+
+@app.post("/corredor/documento/{did}/eliminar")
+async def eliminar_documento(request: Request, did: int):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        doc = db.query(DocumentoCorredor).filter(
+            DocumentoCorredor.id == did, DocumentoCorredor.corredor_id == corredor.id
+        ).first()
+        if doc:
+            if doc.archivo:
+                try:
+                    Path("uploads", doc.archivo).unlink(missing_ok=True)
+                except Exception:
+                    pass
+            db.delete(doc)
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=documentos", status_code=302)
+
+
+# ── CRM: Posts RRSS ───────────────────────────────────────────────────────────
+@app.post("/corredor/post/nuevo")
+async def nuevo_post(
+    request: Request,
+    red: str = Form(...),
+    contenido: str = Form(default=""),
+    url: str = Form(default=""),
+    fecha_publicacion: str = Form(default=""),
+):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        fecha_dt = datetime.fromisoformat(fecha_publicacion) if fecha_publicacion else datetime.utcnow()
+        post = PostRRSS(corredor_id=corredor.id, red=red, contenido=contenido,
+                        url=url, fecha_publicacion=fecha_dt)
+        db.add(post)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=rrss", status_code=302)
+
+
+@app.post("/corredor/post/{pid}/eliminar")
+async def eliminar_post(request: Request, pid: int):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        post = db.query(PostRRSS).filter(
+            PostRRSS.id == pid, PostRRSS.corredor_id == corredor.id
+        ).first()
+        if post:
+            db.delete(post)
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=rrss", status_code=302)
 
 
 # ── Nueva ficha (protected) ───────────────────────────────────────────────────

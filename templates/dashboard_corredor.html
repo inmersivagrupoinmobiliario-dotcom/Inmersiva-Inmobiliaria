@@ -3,446 +3,700 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inmersiva — Mi Dashboard</title>
+  <title>Inmersiva CRM — {{ corredor.nombre }}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{navy:'#1B2A4A',gold:'#C9A84C'},fontFamily:{sans:['Inter','system-ui','sans-serif']}}}}</script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    body {
-      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
-      background: #f0f2f5;
-      color: #1a202c;
-      min-height: 100vh;
-    }
-
-    /* ── Header ── */
-    .header {
-      position: sticky;
-      top: 0;
-      z-index: 100;
-      background: #1B2A4A;
-      border-bottom: 3px solid #C9A84C;
-      padding: 0 24px;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
-
-    .header-brand {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-decoration: none;
-      flex-shrink: 0;
-    }
-
-    .header-logo-box {
-      width: 40px;
-      height: 40px;
-      background: #fff;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      overflow: hidden;
-    }
-
-    .header-logo-box img {
-      width: 32px;
-      height: 32px;
-      object-fit: contain;
-    }
-
-    .header-title {
-      color: #fff;
-      font-size: 15px;
-      font-weight: 800;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-      line-height: 1.1;
-    }
-
-    .header-subtitle {
-      color: #C9A84C;
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 1.5px;
-      text-transform: uppercase;
-    }
-
-    .header-spacer { flex: 1; }
-
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex-shrink: 0;
-    }
-
-    .corredor-avatar-sm {
-      width: 34px;
-      height: 34px;
-      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #fff;
-      font-size: 14px;
-      font-weight: 800;
-      flex-shrink: 0;
-    }
-
-    .corredor-name-sm {
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      line-height: 1.1;
-    }
-
-    .corredor-role-sm {
-      color: #C9A84C;
-      font-size: 9px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-    }
-
-    .btn-outline-header {
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 6px;
-      padding: 6px 12px;
-      color: #e2e8f0;
-      font-size: 12px;
-      font-weight: 600;
-      text-decoration: none;
-      transition: color 0.2s, border-color 0.2s;
-    }
-
-    .btn-outline-header:hover { color: #fff; border-color: rgba(255,255,255,0.6); }
-
-    /* ── Main ── */
-    .main {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 28px 24px;
-    }
-
-    /* Welcome banner */
-    .welcome-banner {
-      background: linear-gradient(135deg, #0a1628 0%, #1B2A4A 100%);
-      border-left: 5px solid #C9A84C;
-      border-radius: 10px;
-      padding: 24px 28px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 20px;
-      margin-bottom: 24px;
-      box-shadow: 0 4px 20px rgba(27,42,74,0.3);
-    }
-
-    .welcome-text {}
-
-    .welcome-greeting {
-      color: #fff;
-      font-size: 24px;
-      font-weight: 800;
-      margin-bottom: 6px;
-    }
-
-    .welcome-sub {
-      color: #a0b4d0;
-      font-size: 14px;
-    }
-
-    .btn-nueva-ficha {
-      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
-      border: none;
-      border-radius: 8px;
-      padding: 14px 24px;
-      color: #fff;
-      font-size: 15px;
-      font-weight: 800;
-      text-decoration: none;
-      white-space: nowrap;
-      box-shadow: 0 4px 16px rgba(201,168,76,0.4);
-      transition: opacity 0.2s, transform 0.1s;
-      letter-spacing: 0.3px;
-    }
-
-    .btn-nueva-ficha:hover { opacity: 0.9; transform: translateY(-1px); }
-
-    /* Stats */
-    .stats-grid {
-      display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 16px;
-      margin-bottom: 28px;
-    }
-
-    @media (max-width: 700px) { .stats-grid { grid-template-columns: 1fr; } }
-
-    .stat-card {
-      background: #fff;
-      border-radius: 10px;
-      padding: 20px 20px 18px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      position: relative;
-      overflow: hidden;
-      border-top: 3px solid var(--accent);
-    }
-
-    .stat-card--navy  { --accent: #1B2A4A; }
-    .stat-card--gold  { --accent: #C9A84C; }
-    .stat-card--green { --accent: #38a169; }
-
-    .stat-icon {
-      position: absolute;
-      right: 12px;
-      bottom: 8px;
-      font-size: 44px;
-      opacity: 0.12;
-      line-height: 1;
-    }
-
-    .stat-value {
-      font-size: 36px;
-      font-weight: 900;
-      color: #1a202c;
-      line-height: 1;
-      margin-bottom: 6px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      font-weight: 600;
-      letter-spacing: 0.8px;
-      text-transform: uppercase;
-      color: #718096;
-    }
-
-    /* Section */
-    .section {
-      background: #fff;
-      border-radius: 10px;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-      overflow: hidden;
-    }
-
-    .section-header {
-      padding: 16px 20px;
-      background: #1B2A4A;
-      border-left: 4px solid #C9A84C;
-    }
-
-    .section-title {
-      color: #fff;
-      font-size: 14px;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
-
-    .table-wrap { overflow-x: auto; }
-
-    table { width: 100%; border-collapse: collapse; }
-
-    th {
-      background: #f7f8fa;
-      padding: 10px 16px;
-      text-align: left;
-      font-size: 10px;
-      font-weight: 700;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      color: #4a5568;
-      border-bottom: 1px solid #e2e8f0;
-    }
-
-    td {
-      padding: 12px 16px;
-      font-size: 13px;
-      color: #2d3748;
-      border-bottom: 1px solid #f0f2f5;
-    }
-
-    tr:last-child td { border-bottom: none; }
-    tr:hover td { background: #fafbfd; }
-
-    .badge-op {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 4px;
-      font-size: 10px;
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-
-    .badge-venta { background: #ebf8ff; color: #2b6cb0; }
-    .badge-renta { background: #f0fff4; color: #276749; }
-    .badge-alquiler { background: #f0fff4; color: #276749; }
-
-    .price-col { color: #C9A84C; font-weight: 700; font-size: 14px; }
-
-    .loc-main { font-weight: 600; }
-    .loc-sub { color: #718096; font-size: 11px; }
-
-    .action-btn {
-      display: inline-block;
-      padding: 4px 10px;
-      border-radius: 5px;
-      font-size: 11px;
-      font-weight: 600;
-      text-decoration: none;
-      margin-right: 4px;
-      border: 1px solid;
-      transition: opacity 0.15s;
-    }
-
-    .action-btn:hover { opacity: 0.8; }
-    .action-pdf { color: #c53030; border-color: #fed7d7; background: #fff5f5; }
-    .action-img { color: #2b6cb0; border-color: #bee3f8; background: #ebf8ff; }
-
-    /* Empty state */
-    .empty-state {
-      text-align: center;
-      padding: 60px 20px;
-    }
-
-    .empty-state h3 {
-      color: #2d3748;
-      font-size: 18px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .empty-state p {
-      color: #718096;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    .btn-empty {
-      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
-      border: none;
-      border-radius: 7px;
-      padding: 10px 22px;
-      color: #fff;
-      font-size: 13px;
-      font-weight: 700;
-      text-decoration: none;
-      box-shadow: 0 2px 10px rgba(201,168,76,0.3);
-    }
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .sidebar-link { display:flex; align-items:center; gap:10px; padding:10px 16px; border-radius:10px; font-size:13px; font-weight:600; color:#94a3b8; text-decoration:none; transition:all .18s; cursor:pointer; }
+    .sidebar-link:hover { background:rgba(201,168,76,.08); color:#C9A84C; }
+    .sidebar-link.active { background:rgba(201,168,76,.15); color:#C9A84C; border-left:3px solid #C9A84C; }
+    .sidebar-link .icon { font-size:17px; width:22px; flex-shrink:0; }
+    .section { display:none; }
+    .section.active { display:block; }
+    .badge { display:inline-flex; align-items:center; padding:2px 10px; border-radius:20px; font-size:11px; font-weight:700; }
+    .badge-nuevo      { background:#dbeafe; color:#1d4ed8; }
+    .badge-contactado { background:#fef9c3; color:#854d0e; }
+    .badge-negociacion{ background:#fde8d0; color:#9a3412; }
+    .badge-ganado     { background:#dcfce7; color:#166534; }
+    .badge-perdido    { background:#fee2e2; color:#991b1b; }
+    .badge-pendiente  { background:#fef9c3; color:#854d0e; }
+    .badge-completada { background:#dcfce7; color:#166534; }
+    .badge-cancelada  { background:#fee2e2; color:#991b1b; }
+    .card-section { background:#fff; border-radius:16px; box-shadow:0 2px 12px rgba(0,0,0,.06); }
+    .kanban-col { min-width:200px; flex:1; background:#f8fafc; border-radius:12px; padding:12px; }
+    .kanban-card { background:#fff; border-radius:8px; padding:12px; box-shadow:0 1px 4px rgba(0,0,0,.07); margin-bottom:8px; font-size:13px; }
+    .inp { width:100%; padding:9px 12px; border:2px solid #e5e7eb; border-radius:8px; font-size:13px; font-family:inherit; outline:none; transition:border-color .2s; background:#f9fafb; }
+    .inp:focus { border-color:#C9A84C; background:#fff; }
+    .btn-gold { background:#C9A84C; color:#1B2A4A; font-weight:700; padding:9px 20px; border-radius:8px; border:none; cursor:pointer; font-size:13px; font-family:inherit; transition:opacity .2s; }
+    .btn-gold:hover { opacity:.88; }
+    .btn-navy { background:#1B2A4A; color:#fff; font-weight:700; padding:9px 20px; border-radius:8px; border:none; cursor:pointer; font-size:13px; font-family:inherit; transition:opacity .2s; }
+    .btn-navy:hover { opacity:.85; }
+    .btn-del { background:#fee2e2; color:#991b1b; font-weight:600; padding:5px 12px; border-radius:6px; border:none; cursor:pointer; font-size:12px; font-family:inherit; }
+    .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,.45); z-index:200; display:none; align-items:center; justify-content:center; }
+    .modal-overlay.open { display:flex; }
+    .modal { background:#fff; border-radius:16px; padding:28px; width:100%; max-width:480px; box-shadow:0 20px 60px rgba(0,0,0,.25); }
+    .modal-title { font-size:16px; font-weight:800; color:#1B2A4A; margin-bottom:20px; }
+    select.inp { color:#374151; }
+    .table-row { display:grid; align-items:center; padding:12px 16px; border-bottom:1px solid #f1f5f9; font-size:13px; }
+    .table-row:last-child { border-bottom:none; }
+    .stat-mini { background:#fff; border-radius:12px; padding:16px 20px; box-shadow:0 2px 8px rgba(0,0,0,.06); }
+    .red-ig { color:#e1306c; } .red-fb { color:#1877f2; } .red-wa { color:#25d366; } .red-tt { color:#000; }
+    textarea.inp { min-height:80px; resize:vertical; }
   </style>
 </head>
-<body>
+<body class="bg-gray-100 text-gray-900">
 
-<!-- Header -->
-<header class="header">
-  <a class="header-brand" href="/corredor/dashboard">
-    <div class="header-logo-box">
-      <img src="/static/img/logo.jpeg" alt="Inmersiva" onerror="this.style.display='none'">
+<!-- ══════ TOP NAVBAR ══════ -->
+<header class="sticky top-0 z-50 h-14 flex items-center justify-between px-4 sm:px-6 shadow-lg" style="background:#1B2A4A; border-bottom:3px solid #C9A84C;">
+  <a href="/" class="flex items-center gap-2.5 no-underline">
+    <div class="w-8 h-8 bg-white rounded-full overflow-hidden flex items-center justify-center flex-shrink-0">
+      <img src="/static/img/logo.jpeg" class="w-7 h-7 object-contain" onerror="this.style.display='none'">
     </div>
-    <div>
-      <div class="header-title">Inmersiva</div>
-      <div class="header-subtitle">Grupo Inmobiliario &middot; Panel Corredor</div>
+    <div class="hidden sm:block">
+      <div class="text-white font-black text-xs tracking-widest">INMERSIVA</div>
+      <div class="font-semibold tracking-widest" style="font-size:7px;color:#C9A84C;">CRM · CORREDOR</div>
     </div>
   </a>
 
-  <div class="header-spacer"></div>
-
-  <div class="header-right">
-    <div class="corredor-avatar-sm">{{ corredor.nombre[0] | upper }}</div>
-    <div>
-      <div class="corredor-name-sm">{{ corredor.nombre }}</div>
-      <div class="corredor-role-sm">Corredor</div>
+  <div class="flex items-center gap-3">
+    <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
+         style="background:#C9A84C; color:#1B2A4A;">{{ corredor.nombre[0]|upper }}</div>
+    <div class="hidden sm:block">
+      <div class="text-white text-xs font-bold leading-none">{{ corredor.nombre }}</div>
+      <div class="text-xs leading-none mt-0.5" style="color:#C9A84C;">Corredor</div>
     </div>
-    <a href="/dashboard" class="btn-outline-header">Panel Empresa</a>
-    <a href="/logout" class="btn-outline-header">Cerrar sesión</a>
+    <a href="/" class="text-gray-400 text-xs hover:text-white transition-colors ml-2">Portal</a>
+    <a href="/corredor/logout" class="text-gray-400 text-xs hover:text-white transition-colors">Salir</a>
   </div>
 </header>
 
-<!-- Main -->
-<main class="main">
-  <!-- Welcome Banner -->
-  <div class="welcome-banner">
-    <div class="welcome-text">
-      <div class="welcome-greeting">Bienvenido, {{ corredor.nombre.split()[0] }}</div>
-      <div class="welcome-sub">Gestiona tus fichas de captación</div>
-    </div>
-    <a href="/nueva-ficha" class="btn-nueva-ficha">&#xff0b; Nueva Ficha</a>
-  </div>
+<!-- ══════ LAYOUT ══════ -->
+<div class="flex min-h-screen">
 
-  <!-- Stats -->
-  {% set sym = {"PEN": "S/", "USD": "US$", "MXN": "$"} %}
-  <div class="stats-grid">
-    <div class="stat-card stat-card--navy">
-      <div class="stat-value">{{ stats.mis_fichas }}</div>
-      <div class="stat-label">Mis Fichas</div>
-      <div class="stat-icon">📋</div>
-    </div>
-    <div class="stat-card stat-card--gold">
-      <div class="stat-value">{{ stats.fichas_mes }}</div>
-      <div class="stat-label">Fichas Este Mes</div>
-      <div class="stat-icon">📅</div>
-    </div>
-    <div class="stat-card stat-card--green">
-      <div class="stat-value">{{ stats.pdfs }}</div>
-      <div class="stat-label">PDFs Generados</div>
-      <div class="stat-icon">📄</div>
-    </div>
-  </div>
+  <!-- SIDEBAR -->
+  <aside class="w-52 flex-shrink-0 hidden md:flex flex-col py-4 px-3 gap-1 sticky top-14 h-[calc(100vh-56px)] overflow-y-auto" style="background:#0f1a2e;">
+    <div class="px-2 py-2 text-xs font-bold tracking-widest uppercase text-gray-500 mb-1">Menú</div>
 
-  <!-- Mis Fichas -->
-  <div class="section">
-    <div class="section-header">
-      <span class="section-title">Mis Fichas</span>
+    <a class="sidebar-link" onclick="nav('resumen')" id="nav-resumen">
+      <span class="icon">📊</span> Resumen
+    </a>
+    <a class="sidebar-link" onclick="nav('fichas')" id="nav-fichas">
+      <span class="icon">📋</span> Mis Fichas
+    </a>
+    <a class="sidebar-link" onclick="nav('contactos')" id="nav-contactos">
+      <span class="icon">👥</span> Contactos
+      {% if stats.contactos %}<span class="ml-auto bg-blue-600 text-white text-xs px-2 py-0.5 rounded-full">{{ stats.contactos }}</span>{% endif %}
+    </a>
+    <a class="sidebar-link" onclick="nav('pipeline')" id="nav-pipeline">
+      <span class="icon">📈</span> Pipeline
+    </a>
+    <a class="sidebar-link" onclick="nav('agenda')" id="nav-agenda">
+      <span class="icon">📅</span> Agenda
+      {% if stats.citas_pendientes %}<span class="ml-auto bg-yellow-400 text-gray-900 text-xs px-2 py-0.5 rounded-full">{{ stats.citas_pendientes }}</span>{% endif %}
+    </a>
+    <a class="sidebar-link" onclick="nav('documentos')" id="nav-documentos">
+      <span class="icon">📁</span> Documentos
+    </a>
+    <a class="sidebar-link" onclick="nav('rrss')" id="nav-rrss">
+      <span class="icon">📱</span> Redes Sociales
+    </a>
+
+    <div class="mt-auto pt-4 border-t border-gray-800">
+      <a href="/nueva-ficha" class="sidebar-link" style="color:#C9A84C; font-weight:700;">
+        <span class="icon">＋</span> Nueva Ficha
+      </a>
     </div>
-    <div class="table-wrap">
-      {% if fichas %}
-      <table>
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Tipo / Operación</th>
-            <th>Ubicación</th>
-            <th>Precio</th>
-            <th>Acciones</th>
-          </tr>
-        </thead>
-        <tbody>
-          {% for f in fichas %}
-          <tr>
-            <td style="color:#a0aec0; font-size:12px;">{{ loop.index }}</td>
-            <td>
-              <div style="font-weight:600; font-size:13px;">{{ f.tipo }}</div>
-              <span class="badge-op badge-{{ f.operacion | lower }}">{{ f.operacion }}</span>
-            </td>
-            <td>
-              <div class="loc-main">{{ f.direccion }}</div>
-              <div class="loc-sub">{{ f.ciudad }}{% if f.estado %}, {{ f.estado }}{% endif %}</div>
-            </td>
-            <td class="price-col">{{ sym.get(f.moneda, f.moneda) }} {{ "{:,.0f}".format(f.precio) }}</td>
-            <td>
-              <a href="/pdf/{{ f.id }}" class="action-btn action-pdf" target="_blank">PDF</a>
-              <a href="/imagen/{{ f.id }}" class="action-btn action-img" target="_blank">IMG</a>
-            </td>
-          </tr>
-          {% endfor %}
-        </tbody>
-      </table>
-      {% else %}
-      <div class="empty-state">
-        <h3>Aun no tienes fichas registradas</h3>
-        <p>Comienza creando tu primera ficha de captación para un inmueble.</p>
-        <a href="/nueva-ficha" class="btn-empty">&#xff0b; Crear mi primera ficha</a>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-4 sm:p-6 overflow-x-hidden">
+
+    <!-- ══ RESUMEN ══ -->
+    <div class="section" id="sec-resumen">
+      <h2 class="text-xl font-black text-gray-900 mb-4">Bienvenido, {{ corredor.nombre.split()[0] }} 👋</h2>
+
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black" style="color:#C9A84C;">{{ stats.mis_fichas }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">Mis Fichas</div>
+        </div>
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black" style="color:#1B2A4A;">{{ stats.fichas_mes }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">Este Mes</div>
+        </div>
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black text-blue-600">{{ stats.contactos }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">Contactos</div>
+        </div>
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black text-yellow-600">{{ stats.citas_pendientes }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">Citas pendientes</div>
+        </div>
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black text-green-600">{{ stats.pdfs }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">PDFs</div>
+        </div>
+      </div>
+
+      <!-- Próximas citas -->
+      {% set prox = citas | selectattr("estado","eq","Pendiente") | list %}
+      {% if prox %}
+      <div class="card-section p-5 mb-4">
+        <div class="font-bold text-gray-800 text-sm mb-3">📅 Próximas citas</div>
+        {% for cita in prox[:3] %}
+        <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 text-sm">
+          <div>
+            <div class="font-semibold text-gray-800">{{ cita.titulo }}</div>
+            <div class="text-gray-400 text-xs">{{ cita.fecha.strftime('%d/%m/%Y %H:%M') }} — {{ cita.lugar or 'Sin lugar' }}</div>
+          </div>
+          <span class="badge badge-pendiente">Pendiente</span>
+        </div>
+        {% endfor %}
+      </div>
+      {% endif %}
+
+      <!-- Últimos contactos -->
+      {% if contactos %}
+      <div class="card-section p-5">
+        <div class="font-bold text-gray-800 text-sm mb-3">👥 Últimos contactos</div>
+        {% for c in contactos[:5] %}
+        <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 text-sm">
+          <div>
+            <div class="font-semibold text-gray-800">{{ c.nombre }}</div>
+            <div class="text-gray-400 text-xs">{{ c.telefono or c.email or '—' }}</div>
+          </div>
+          <span class="badge badge-{{ c.estado|lower|replace(' ','') }}">{{ c.estado }}</span>
+        </div>
+        {% endfor %}
       </div>
       {% endif %}
     </div>
-  </div>
-</main>
 
+    <!-- ══ FICHAS ══ -->
+    <div class="section" id="sec-fichas">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900">📋 Mis Fichas</h2>
+        <a href="/nueva-ficha" class="btn-gold no-underline">+ Nueva ficha</a>
+      </div>
+
+      <div class="card-section overflow-hidden">
+        {% if fichas %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <th class="px-5 py-3">#</th>
+              <th class="px-5 py-3">Propiedad</th>
+              <th class="px-5 py-3">Ubicación</th>
+              <th class="px-5 py-3">Precio</th>
+              <th class="px-5 py-3">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% set sym = {"PEN":"S/","USD":"US$","MXN":"$"} %}
+            {% for f in fichas %}
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+              <td class="px-5 py-3 text-gray-400">{{ loop.index }}</td>
+              <td class="px-5 py-3">
+                <div class="font-semibold text-gray-800">{{ f.tipo }}</div>
+                <span class="badge {% if f.operacion=='Venta' %}badge-ganado{% else %}badge-contactado{% endif %}">{{ f.operacion }}</span>
+              </td>
+              <td class="px-5 py-3">
+                <div class="text-gray-700">{{ f.direccion }}</div>
+                <div class="text-gray-400 text-xs">{{ f.ciudad }}{% if f.estado %}, {{ f.estado }}{% endif %}</div>
+              </td>
+              <td class="px-5 py-3 font-bold" style="color:#C9A84C;">{{ sym.get(f.moneda, f.moneda) }} {{ "{:,.0f}".format(f.precio) }}</td>
+              <td class="px-5 py-3">
+                <div class="flex gap-2">
+                  <a href="/pdf/{{ f.id }}" target="_blank" class="badge bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer no-underline">PDF</a>
+                  <a href="/imagen/{{ f.id }}" target="_blank" class="badge bg-blue-50 text-blue-600 hover:bg-blue-100 cursor-pointer no-underline">IMG</a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-16 text-gray-400">
+          <div class="text-5xl mb-3">📋</div>
+          <div class="font-semibold">Aún no tienes fichas</div>
+          <a href="/nueva-ficha" class="btn-gold mt-4 inline-block no-underline">+ Crear primera ficha</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ══ CONTACTOS ══ -->
+    <div class="section" id="sec-contactos">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900">👥 Contactos / Leads</h2>
+        <button onclick="openModal('modal-contacto')" class="btn-gold">+ Nuevo contacto</button>
+      </div>
+
+      <div class="card-section overflow-hidden">
+        {% if contactos %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <th class="px-5 py-3">Nombre</th>
+              <th class="px-5 py-3">Contacto</th>
+              <th class="px-5 py-3">Origen</th>
+              <th class="px-5 py-3">Estado</th>
+              <th class="px-5 py-3">Interés</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for c in contactos %}
+            <tr class="border-b border-gray-50 hover:bg-gray-50">
+              <td class="px-5 py-3 font-semibold text-gray-800">{{ c.nombre }}</td>
+              <td class="px-5 py-3 text-gray-500">
+                {% if c.telefono %}<div>📱 {{ c.telefono }}</div>{% endif %}
+                {% if c.email %}<div class="text-xs text-gray-400">✉ {{ c.email }}</div>{% endif %}
+              </td>
+              <td class="px-5 py-3">
+                <span class="badge bg-gray-100 text-gray-600">{{ c.origen }}</span>
+              </td>
+              <td class="px-5 py-3">
+                <form method="POST" action="/corredor/contacto/{{ c.id }}/estado" class="flex gap-1">
+                  <select name="estado" class="inp" style="padding:4px 8px; font-size:12px; width:auto;" onchange="this.form.submit()">
+                    {% for est in ["Nuevo","Contactado","Negociacion","Ganado","Perdido"] %}
+                    <option value="{{ est }}" {% if c.estado == est %}selected{% endif %}>{{ est }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </td>
+              <td class="px-5 py-3 text-gray-500 text-xs max-w-xs truncate">{{ c.interes or '—' }}</td>
+              <td class="px-5 py-3">
+                <form method="POST" action="/corredor/contacto/{{ c.id }}/eliminar" onsubmit="return confirm('¿Eliminar contacto?')">
+                  <button class="btn-del">✕</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-16 text-gray-400">
+          <div class="text-5xl mb-3">👥</div>
+          <div class="font-semibold mb-1">Sin contactos aún</div>
+          <div class="text-sm mb-4">Agrega leads para hacer seguimiento</div>
+          <button onclick="openModal('modal-contacto')" class="btn-gold">+ Agregar primer contacto</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ══ PIPELINE ══ -->
+    <div class="section" id="sec-pipeline">
+      <h2 class="text-xl font-black text-gray-900 mb-4">📈 Pipeline de Ventas</h2>
+
+      <div class="flex gap-3 overflow-x-auto pb-4">
+        {% set cols = [
+          ("Nuevo","🔵","badge-nuevo"),
+          ("Contactado","🟡","badge-contactado"),
+          ("Negociacion","🟠","badge-negociacion"),
+          ("Ganado","🟢","badge-ganado"),
+          ("Perdido","🔴","badge-perdido"),
+        ] %}
+        {% for estado, icon, badge_cls in cols %}
+        <div class="kanban-col">
+          <div class="flex items-center gap-2 mb-3">
+            <span>{{ icon }}</span>
+            <span class="font-bold text-gray-700 text-sm">{{ estado }}</span>
+            <span class="ml-auto text-xs font-bold text-gray-400">{{ pipeline[estado]|length }}</span>
+          </div>
+          {% for c in pipeline[estado] %}
+          <div class="kanban-card">
+            <div class="font-semibold text-gray-800 mb-1">{{ c.nombre }}</div>
+            {% if c.telefono %}<div class="text-gray-400 text-xs">📱 {{ c.telefono }}</div>{% endif %}
+            {% if c.interes %}<div class="text-gray-400 text-xs mt-1 truncate">🏠 {{ c.interes }}</div>{% endif %}
+            <div class="text-gray-300 text-xs mt-2">{{ c.created_at.strftime('%d/%m/%y') }}</div>
+            <div class="mt-2 flex gap-1 flex-wrap">
+              {% for est in ["Nuevo","Contactado","Negociacion","Ganado","Perdido"] %}
+              {% if est != estado %}
+              <form method="POST" action="/corredor/contacto/{{ c.id }}/estado" class="inline">
+                <input type="hidden" name="estado" value="{{ est }}">
+                <button class="badge bg-gray-100 text-gray-500 hover:bg-gray-200 cursor-pointer border-0 text-xs" style="font-size:10px;padding:2px 7px;" title="Mover a {{ est }}">→ {{ est[:4] }}</button>
+              </form>
+              {% endif %}
+              {% endfor %}
+            </div>
+          </div>
+          {% endfor %}
+          {% if not pipeline[estado] %}
+          <div class="text-center text-gray-300 text-xs py-6">Sin leads</div>
+          {% endif %}
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- ══ AGENDA ══ -->
+    <div class="section" id="sec-agenda">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900">📅 Agenda / Citas</h2>
+        <button onclick="openModal('modal-cita')" class="btn-gold">+ Nueva cita</button>
+      </div>
+
+      <div class="card-section overflow-hidden">
+        {% if citas %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <th class="px-5 py-3">Título</th>
+              <th class="px-5 py-3">Fecha</th>
+              <th class="px-5 py-3">Lugar</th>
+              <th class="px-5 py-3">Contacto</th>
+              <th class="px-5 py-3">Estado</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for cita in citas %}
+            <tr class="border-b border-gray-50 hover:bg-gray-50">
+              <td class="px-5 py-3 font-semibold text-gray-800">{{ cita.titulo }}</td>
+              <td class="px-5 py-3 text-gray-600">{{ cita.fecha.strftime('%d/%m/%Y') }}<div class="text-xs text-gray-400">{{ cita.fecha.strftime('%H:%M') }}</div></td>
+              <td class="px-5 py-3 text-gray-500 text-xs">{{ cita.lugar or '—' }}</td>
+              <td class="px-5 py-3 text-gray-500 text-xs">
+                {% if cita.contacto_id and cita.contacto_id in contactos_map %}
+                  {{ contactos_map[cita.contacto_id].nombre }}
+                {% else %}—{% endif %}
+              </td>
+              <td class="px-5 py-3">
+                <form method="POST" action="/corredor/cita/{{ cita.id }}/estado" class="flex gap-1">
+                  <select name="estado" class="inp" style="padding:4px 8px; font-size:12px; width:auto;" onchange="this.form.submit()">
+                    {% for est in ["Pendiente","Completada","Cancelada"] %}
+                    <option value="{{ est }}" {% if cita.estado == est %}selected{% endif %}>{{ est }}</option>
+                    {% endfor %}
+                  </select>
+                </form>
+              </td>
+              <td class="px-5 py-3">
+                <form method="POST" action="/corredor/cita/{{ cita.id }}/eliminar" onsubmit="return confirm('¿Eliminar cita?')">
+                  <button class="btn-del">✕</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-16 text-gray-400">
+          <div class="text-5xl mb-3">📅</div>
+          <div class="font-semibold mb-1">Sin citas programadas</div>
+          <button onclick="openModal('modal-cita')" class="btn-gold mt-2">+ Agendar primera cita</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ══ DOCUMENTOS ══ -->
+    <div class="section" id="sec-documentos">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900">📁 Documentos</h2>
+        <button onclick="openModal('modal-doc')" class="btn-gold">+ Subir documento</button>
+      </div>
+
+      <div class="card-section overflow-hidden">
+        {% if documentos %}
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="text-left text-xs text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <th class="px-5 py-3">Nombre</th>
+              <th class="px-5 py-3">Tipo</th>
+              <th class="px-5 py-3">Notas</th>
+              <th class="px-5 py-3">Fecha</th>
+              <th class="px-5 py-3">Archivo</th>
+              <th class="px-5 py-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for doc in documentos %}
+            <tr class="border-b border-gray-50 hover:bg-gray-50">
+              <td class="px-5 py-3 font-semibold text-gray-800">{{ doc.nombre }}</td>
+              <td class="px-5 py-3"><span class="badge bg-gray-100 text-gray-600">{{ doc.tipo }}</span></td>
+              <td class="px-5 py-3 text-gray-400 text-xs max-w-xs truncate">{{ doc.notas or '—' }}</td>
+              <td class="px-5 py-3 text-gray-400 text-xs">{{ doc.created_at.strftime('%d/%m/%Y') }}</td>
+              <td class="px-5 py-3">
+                {% if doc.archivo %}
+                <a href="/uploads/{{ doc.archivo }}" target="_blank"
+                   class="badge bg-blue-50 text-blue-600 hover:bg-blue-100 no-underline cursor-pointer">
+                  ⬇ Descargar
+                </a>
+                {% else %}
+                <span class="text-gray-300 text-xs">Sin archivo</span>
+                {% endif %}
+              </td>
+              <td class="px-5 py-3">
+                <form method="POST" action="/corredor/documento/{{ doc.id }}/eliminar" onsubmit="return confirm('¿Eliminar documento?')">
+                  <button class="btn-del">✕</button>
+                </form>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        {% else %}
+        <div class="text-center py-16 text-gray-400">
+          <div class="text-5xl mb-3">📁</div>
+          <div class="font-semibold mb-1">Sin documentos</div>
+          <button onclick="openModal('modal-doc')" class="btn-gold mt-2">+ Subir primer documento</button>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- ══ REDES SOCIALES ══ -->
+    <div class="section" id="sec-rrss">
+      <div class="flex items-center justify-between mb-4">
+        <h2 class="text-xl font-black text-gray-900">📱 Historial Redes Sociales</h2>
+        <button onclick="openModal('modal-post')" class="btn-gold">+ Registrar publicación</button>
+      </div>
+
+      {% if posts %}
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+        {% for post in posts %}
+        {% set red_lower = post.red | lower %}
+        <div class="card-section p-4">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-2">
+              <span class="text-xl">
+                {% if red_lower == 'instagram' %}📸
+                {% elif red_lower == 'facebook' %}👥
+                {% elif red_lower == 'whatsapp' %}💬
+                {% elif red_lower == 'tiktok' %}🎵
+                {% else %}📲{% endif %}
+              </span>
+              <span class="font-bold text-sm text-gray-800">{{ post.red }}</span>
+            </div>
+            <span class="text-gray-400 text-xs">{{ post.fecha_publicacion.strftime('%d/%m/%Y') }}</span>
+          </div>
+          {% if post.contenido %}
+          <p class="text-gray-600 text-sm leading-relaxed mb-2 line-clamp-3">{{ post.contenido }}</p>
+          {% endif %}
+          {% if post.url %}
+          <a href="{{ post.url }}" target="_blank" class="text-xs text-blue-500 hover:underline break-all">🔗 Ver publicación</a>
+          {% endif %}
+          <div class="mt-3 pt-2 border-t border-gray-100">
+            <form method="POST" action="/corredor/post/{{ post.id }}/eliminar" onsubmit="return confirm('¿Eliminar post?')">
+              <button class="btn-del text-xs">✕ Eliminar</button>
+            </form>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="card-section text-center py-16 text-gray-400">
+        <div class="text-5xl mb-3">📱</div>
+        <div class="font-semibold mb-1">Sin publicaciones registradas</div>
+        <div class="text-sm mb-4">Lleva el historial de lo que publicas en redes</div>
+        <button onclick="openModal('modal-post')" class="btn-gold">+ Registrar primera publicación</button>
+      </div>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+
+
+<!-- ══════ MODAL: Nuevo Contacto ══════ -->
+<div class="modal-overlay" id="modal-contacto" onclick="closeOnBg(event,'modal-contacto')">
+  <div class="modal">
+    <div class="modal-title">👥 Nuevo Contacto</div>
+    <form method="POST" action="/corredor/contacto/nuevo" class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre *</label>
+          <input name="nombre" class="inp" placeholder="Juan Pérez" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Teléfono</label>
+          <input name="telefono" class="inp" placeholder="999 000 111">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Email</label>
+        <input name="email" type="email" class="inp" placeholder="juan@email.com">
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Origen</label>
+          <select name="origen" class="inp">
+            {% for o in ["Web","WhatsApp","Referido","Portal","Llamada","Otro"] %}
+            <option>{{ o }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Estado inicial</label>
+          <select name="estado" class="inp">
+            {% for e in ["Nuevo","Contactado","Negociacion","Ganado","Perdido"] %}
+            <option>{{ e }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Interés / Propiedad</label>
+        <input name="interes" class="inp" placeholder="Casa en Trujillo, 3 hab, hasta S/ 250,000">
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Notas</label>
+        <textarea name="notas" class="inp" placeholder="Observaciones adicionales..."></textarea>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-gold flex-1">Guardar contacto</button>
+        <button type="button" onclick="closeModal('modal-contacto')" class="btn-navy flex-1">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MODAL: Nueva Cita ══════ -->
+<div class="modal-overlay" id="modal-cita" onclick="closeOnBg(event,'modal-cita')">
+  <div class="modal">
+    <div class="modal-title">📅 Nueva Cita</div>
+    <form method="POST" action="/corredor/cita/nueva" class="space-y-3">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Título *</label>
+        <input name="titulo" class="inp" placeholder="Visita propiedad Av. Lima 123" required>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fecha y hora *</label>
+          <input name="fecha" type="datetime-local" class="inp" required>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Lugar</label>
+          <input name="lugar" class="inp" placeholder="Av. Lima 123, Trujillo">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contacto asociado</label>
+        <select name="contacto_id" class="inp">
+          <option value="">— Sin contacto —</option>
+          {% for c in contactos %}
+          <option value="{{ c.id }}">{{ c.nombre }}{% if c.telefono %} ({{ c.telefono }}){% endif %}</option>
+          {% endfor %}
+        </select>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Descripción</label>
+        <textarea name="descripcion" class="inp" placeholder="Detalles de la cita..."></textarea>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-gold flex-1">Agendar cita</button>
+        <button type="button" onclick="closeModal('modal-cita')" class="btn-navy flex-1">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MODAL: Subir Documento ══════ -->
+<div class="modal-overlay" id="modal-doc" onclick="closeOnBg(event,'modal-doc')">
+  <div class="modal">
+    <div class="modal-title">📁 Subir Documento</div>
+    <form method="POST" action="/corredor/documento/subir" enctype="multipart/form-data" class="space-y-3">
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Nombre *</label>
+        <input name="nombre" class="inp" placeholder="Contrato venta Av. Lima" required>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Tipo</label>
+          <select name="tipo" class="inp">
+            {% for t in ["Contrato","Tasación","Plano","Fotografías","Oferta","Otro"] %}
+            <option>{{ t }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Archivo</label>
+          <input type="file" name="archivo" class="inp" style="padding:6px;">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Notas</label>
+        <textarea name="notas" class="inp" placeholder="Descripción del documento..."></textarea>
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-gold flex-1">Subir documento</button>
+        <button type="button" onclick="closeModal('modal-doc')" class="btn-navy flex-1">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ══════ MODAL: Registrar Post RRSS ══════ -->
+<div class="modal-overlay" id="modal-post" onclick="closeOnBg(event,'modal-post')">
+  <div class="modal">
+    <div class="modal-title">📱 Registrar Publicación</div>
+    <form method="POST" action="/corredor/post/nuevo" class="space-y-3">
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Red social *</label>
+          <select name="red" class="inp" required>
+            {% for r in ["Instagram","Facebook","WhatsApp","TikTok","LinkedIn","Otro"] %}
+            <option>{{ r }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Fecha publicación</label>
+          <input name="fecha_publicacion" type="datetime-local" class="inp">
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">Contenido / Caption</label>
+        <textarea name="contenido" class="inp" placeholder="¡Nueva propiedad disponible! 🏠 Casa en Trujillo..."></textarea>
+      </div>
+      <div>
+        <label class="block text-xs font-bold text-gray-500 uppercase mb-1">URL de la publicación</label>
+        <input name="url" type="url" class="inp" placeholder="https://instagram.com/p/...">
+      </div>
+      <div class="flex gap-3 pt-2">
+        <button type="submit" class="btn-gold flex-1">Guardar</button>
+        <button type="button" onclick="closeModal('modal-post')" class="btn-navy flex-1">Cancelar</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Mobile bottom nav -->
+<nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 flex border-t border-gray-200 bg-white text-xs">
+  <button onclick="nav('resumen')"    class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-resumen">📊<span>Inicio</span></button>
+  <button onclick="nav('contactos')"  class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-contactos">👥<span>Leads</span></button>
+  <button onclick="nav('pipeline')"   class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-pipeline">📈<span>Pipeline</span></button>
+  <button onclick="nav('agenda')"     class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-agenda">📅<span>Agenda</span></button>
+  <button onclick="nav('rrss')"       class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-rrss">📱<span>RRSS</span></button>
+</nav>
+<div class="h-16 md:hidden"></div>
+
+<script>
+  const SECS = ['resumen','fichas','contactos','pipeline','agenda','documentos','rrss'];
+
+  function nav(id) {
+    SECS.forEach(s => {
+      const sec = document.getElementById('sec-' + s);
+      const lnk = document.getElementById('nav-' + s);
+      const mob = document.getElementById('mob-' + s);
+      if (sec) sec.classList.toggle('active', s === id);
+      if (lnk) lnk.classList.toggle('active', s === id);
+      if (mob) mob.style.color = s === id ? '#C9A84C' : '';
+    });
+    history.replaceState(null, '', '?seccion=' + id);
+  }
+
+  function openModal(id)  { document.getElementById(id).classList.add('open'); }
+  function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+  function closeOnBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+  // Init from server-side seccion param
+  const initSec = "{{ seccion }}";
+  nav(SECS.includes(initSec) ? initSec : 'resumen');
+</script>
 </body>
 </html>
