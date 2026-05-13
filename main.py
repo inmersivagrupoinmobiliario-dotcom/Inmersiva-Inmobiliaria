@@ -39,7 +39,7 @@ def load_listing(listing_id: str) -> Listing:
 
 @app.get("/", response_class=HTMLResponse)
 async def form(request: Request):
-    return templates.TemplateResponse("form.html", {"request": request})
+    return templates.TemplateResponse(request, "form.html")
 
 
 @app.post("/generar", response_class=HTMLResponse)
@@ -96,14 +96,14 @@ async def generar(
         descripcion, copy_ig = generar_contenido(listing)
     except Exception as e:
         return templates.TemplateResponse(
-            "form.html", {"request": request, "error": f"Error al generar contenido: {e}"}
+            request, "form.html", {"error": f"Error al generar contenido: {e}"}
         )
 
     listing.descripcion_generada = descripcion
     listing.copy_instagram = copy_ig
     save_listing(listing)
 
-    return templates.TemplateResponse("results.html", {"request": request, "listing": listing})
+    return templates.TemplateResponse(request, "results.html", {"listing": listing})
 
 
 # ── Phase 2: PDF ─────────────────────────────────────────────────────────────
