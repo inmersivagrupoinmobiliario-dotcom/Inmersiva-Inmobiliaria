@@ -21,23 +21,24 @@ load_dotenv()
 
 # DB init
 from models.db_models import Corredor as CorredorModel
-Base.metadata.create_all(bind=engine)
 
-
-def _seed():
-    db = SessionLocal()
+def _init_db():
     try:
-        if db.query(CorredorModel).count() == 0:
-            db.add(CorredorModel(
-                nombre="Corredor Demo", email="corredor@inmersiva.com",
-                username="corredor1", hashed_password=hash_password("corredor123"),
-            ))
-            db.commit()
-    finally:
-        db.close()
+        Base.metadata.create_all(bind=engine)
+        db = SessionLocal()
+        try:
+            if db.query(CorredorModel).count() == 0:
+                db.add(CorredorModel(
+                    nombre="Corredor Demo", email="corredor@inmersiva.com",
+                    username="corredor1", hashed_password=hash_password("corredor123"),
+                ))
+                db.commit()
+        finally:
+            db.close()
+    except Exception as e:
+        print(f"[WARN] DB init: {e}")
 
-
-_seed()
+_init_db()
 
 EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
 EMPRESA_PASS = os.getenv("EMPRESA_PASS", "Inmersiva2025")
