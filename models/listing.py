@@ -22,8 +22,16 @@ class Listing(BaseModel):
     agente_nombre: str
     agente_telefono: str
     agente_email: str
+    antiguedad: Optional[int] = None
+    vista: Optional[str] = None
+    estado_inmueble: Optional[str] = None
+    modalidad: Optional[str] = None
+    forma_pago: List[str] = []
+    servicios: List[str] = []
     foto_portada: str = ""
     fotos_extras: List[str] = []
+    video_propiedad: str = ""
+    tour_360_url: str = ""
     descripcion_generada: str = ""
     copy_instagram: str = ""
     created_at: str = Field(default_factory=lambda: datetime.now().isoformat())

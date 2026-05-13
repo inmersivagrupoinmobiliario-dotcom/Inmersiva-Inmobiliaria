@@ -16,7 +16,7 @@ from services.ai_service import generar_contenido
 
 load_dotenv()
 
-app = FastAPI(title="ListaPro — Inmersiva")
+app = FastAPI(title="Inmersiva Grupo Inmobiliario — Generador de Contenido")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
@@ -57,12 +57,20 @@ async def generar(
     m2_terreno: Optional[int] = Form(None),
     estacionamientos: Optional[int] = Form(None),
     amenidades: List[str] = Form(default=[]),
+    antiguedad: Optional[int] = Form(None),
+    vista: Optional[str] = Form(None),
+    estado_inmueble: Optional[str] = Form(None),
+    modalidad: Optional[str] = Form(None),
+    forma_pago: List[str] = Form(default=[]),
+    servicios: List[str] = Form(default=[]),
     descripcion_agente: str = Form(...),
     agente_nombre: str = Form(...),
     agente_telefono: str = Form(...),
     agente_email: str = Form(...),
     foto_portada: UploadFile = File(...),
     fotos_extras: List[UploadFile] = File(default=[]),
+    video_propiedad: Optional[UploadFile] = File(None),
+    tour_360_url: Optional[str] = Form(None),
 ):
     listing_id = str(uuid.uuid4())
     upload_dir = UPLOADS / listing_id
@@ -80,16 +88,28 @@ async def generar(
                 shutil.copyfileobj(extra.file, f)
             extras_names.append(f"{listing_id}/{name}")
 
+    video_path_rel = ""
+    if video_propiedad and video_propiedad.filename:
+        video_name = f"video_{video_propiedad.filename}"
+        with open(upload_dir / video_name, "wb") as f:
+            shutil.copyfileobj(video_propiedad.file, f)
+        video_path_rel = f"{listing_id}/{video_name}"
+
     listing = Listing(
         id=listing_id, tipo=tipo, operacion=operacion,
         direccion=direccion, ciudad=ciudad, estado=estado, precio=precio,
         recamaras=recamaras, banos=banos, m2_construidos=m2_construidos,
         m2_terreno=m2_terreno, estacionamientos=estacionamientos,
-        amenidades=amenidades, descripcion_agente=descripcion_agente,
+        amenidades=amenidades, antiguedad=antiguedad, vista=vista,
+        estado_inmueble=estado_inmueble, modalidad=modalidad,
+        forma_pago=forma_pago, servicios=servicios,
+        descripcion_agente=descripcion_agente,
         agente_nombre=agente_nombre, agente_telefono=agente_telefono,
         agente_email=agente_email,
         foto_portada=f"{listing_id}/{portada_name}",
         fotos_extras=extras_names,
+        video_propiedad=video_path_rel,
+        tour_360_url=tour_360_url or "",
     )
 
     try:

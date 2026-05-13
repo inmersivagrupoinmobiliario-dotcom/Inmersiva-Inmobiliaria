@@ -3,38 +3,203 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>ListaPro — Inmersiva Grupo Inmobiliario</title>
+  <title>Ficha de Captación — Inmersiva Grupo Inmobiliario</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .ficha-header {
+      background: #1B2A4A;
+      padding: 0;
+      display: flex;
+      align-items: stretch;
+      border-bottom: 4px solid #C9A84C;
+    }
+    .ficha-logo-block {
+      background: white;
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      min-width: 180px;
+    }
+    .ficha-logo-block img {
+      height: 80px;
+      width: auto;
+      display: block;
+    }
+    .ficha-title-block {
+      padding: 20px 32px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+    .ficha-title-block h1 {
+      color: white;
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      margin: 0 0 4px 0;
+      line-height: 1.1;
+    }
+    .ficha-title-block p {
+      color: #C9A84C;
+      font-size: 0.85rem;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin: 0;
+    }
+    .section-header {
+      background: #1B2A4A;
+      color: white;
+      padding: 10px 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      border-left: 4px solid #C9A84C;
+      margin-bottom: 20px;
+    }
+    .section-num {
+      color: #C9A84C;
+      margin-right: 8px;
+    }
+    .corredor-bar {
+      background: #f0f2f5;
+      border-bottom: 2px solid #C9A84C;
+      padding: 14px 32px;
+      display: flex;
+      gap: 32px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .corredor-bar .cb-field {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex: 1;
+      min-width: 200px;
+    }
+    .corredor-bar label {
+      font-size: 0.82rem;
+      font-weight: 600;
+      color: #1B2A4A;
+      white-space: nowrap;
+    }
+    .corredor-bar input {
+      border: none;
+      border-bottom: 1.5px solid #C9A84C;
+      background: transparent;
+      padding: 4px 6px;
+      font-size: 0.9rem;
+      flex: 1;
+      outline: none;
+    }
+    .services-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .service-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.88rem;
+      color: #333;
+      cursor: pointer;
+    }
+    .service-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      accent-color: #1B2A4A;
+      cursor: pointer;
+    }
+    .cols-2 { grid-template-columns: 1fr 1fr; }
+    .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
+    .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
+    .video-upload-area {
+      border: 2px dashed #C9A84C;
+      border-radius: 8px;
+      padding: 28px;
+      text-align: center;
+      cursor: pointer;
+      background: #fffdf5;
+      transition: border-color 0.2s, background 0.2s;
+    }
+    .video-upload-area:hover { background: #fff8e8; }
+    .video-upload-area input[type="file"] { display: none; }
+    .upload-icon { font-size: 2.2rem; margin-bottom: 6px; }
+    .upload-label { font-weight: 600; color: #1B2A4A; font-size: 0.95rem; }
+    .upload-hint { color: #888; font-size: 0.8rem; margin-top: 4px; }
+    .video-preview { margin-top: 12px; }
+    .video-preview video { max-width: 100%; max-height: 200px; border-radius: 6px; }
+    .url-field { margin-top: 14px; }
+    .url-field label { display: block; font-size: 0.82rem; font-weight: 600; color: #1B2A4A; margin-bottom: 6px; }
+    .url-field input { width: 100%; padding: 10px 14px; border: 1.5px solid #d0d0d0; border-radius: 6px; font-size: 0.9rem; box-sizing: border-box; }
+    .footer-inmersiva {
+      text-align: center;
+      padding: 24px;
+      color: #888;
+      font-size: 0.78rem;
+      border-top: 1px solid #eee;
+      margin-top: 24px;
+    }
+    .footer-inmersiva span { color: #C9A84C; font-weight: 600; }
+    @media (max-width: 600px) {
+      .ficha-header { flex-direction: column; }
+      .ficha-logo-block { min-width: unset; justify-content: center; }
+      .corredor-bar { flex-direction: column; gap: 12px; }
+      .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+    }
+  </style>
 </head>
 <body>
 
-<header class="header">
-  <div class="header-text">
-    <h1>ListaPro</h1>
-    <p>Inmersiva Grupo Inmobiliario</p>
+<!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
+<header class="ficha-header">
+  <div class="ficha-logo-block">
+    <img src="/static/img/logo.jpeg" alt="Inmersiva Grupo Inmobiliario">
+  </div>
+  <div class="ficha-title-block">
+    <h1>FICHA DE CAPTACIÓN</h1>
+    <p>Generador de contenido con inteligencia artificial</p>
   </div>
 </header>
 
+{% if error %}
+<div class="alert alert-error" style="margin:16px 24px">{{ error }}</div>
+{% endif %}
+
+<!-- ── CORREDOR BAR ────────────────────────────────────────────────────────── -->
+<div class="corredor-bar">
+  <div class="cb-field">
+    <label>Corredor/a:</label>
+    <input type="text" name="agente_nombre" id="agente_nombre" placeholder="Nombre completo" required form="fichaForm">
+  </div>
+  <div class="cb-field">
+    <label>WhatsApp:</label>
+    <input type="text" name="agente_telefono" id="agente_telefono" placeholder="5512345678" required form="fichaForm">
+  </div>
+  <div class="cb-field">
+    <label>Email:</label>
+    <input type="email" name="agente_email" id="agente_email" placeholder="corredor@inmersiva.com" required form="fichaForm">
+  </div>
+</div>
+
 <div class="container">
+  <form id="fichaForm" action="/generar" method="post" enctype="multipart/form-data">
 
-  {% if error %}
-  <div class="alert alert-error">{{ error }}</div>
-  {% endif %}
-
-  <form id="listingForm" action="/generar" method="post" enctype="multipart/form-data">
-
-    <!-- Datos de la Propiedad -->
+    <!-- ── 1. DATOS DEL INMUEBLE ──────────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Datos de la Propiedad</div>
-      <div class="form-grid">
+      <div class="section-header"><span class="section-num">1.</span> DATOS DEL INMUEBLE</div>
+      <div class="form-grid cols-2">
         <div class="form-group">
-          <label for="tipo">Tipo de propiedad *</label>
+          <label for="tipo">Tipo *</label>
           <select name="tipo" id="tipo" required>
             <option value="">Selecciona...</option>
             <option value="Casa">Casa</option>
             <option value="Departamento">Departamento</option>
             <option value="Terreno">Terreno</option>
             <option value="Penthouse">Penthouse</option>
+            <option value="Local comercial">Local comercial</option>
+            <option value="Oficina">Oficina</option>
           </select>
         </div>
         <div class="form-group">
@@ -43,10 +208,11 @@
             <option value="">Selecciona...</option>
             <option value="Venta">Venta</option>
             <option value="Renta">Renta</option>
+            <option value="Venta o renta">Venta o renta</option>
           </select>
         </div>
         <div class="form-group full">
-          <label for="direccion">Dirección / Ubicación *</label>
+          <label for="direccion">Dirección exacta *</label>
           <input type="text" name="direccion" id="direccion" placeholder="Ej. Av. Insurgentes Sur 1234, Col. Del Valle" required>
         </div>
         <div class="form-group">
@@ -57,17 +223,21 @@
           <label for="estado">Estado *</label>
           <input type="text" name="estado" id="estado" placeholder="Ej. CDMX" required>
         </div>
-        <div class="form-group">
-          <label for="precio">Precio (MXN) *</label>
-          <input type="number" name="precio" id="precio" placeholder="Ej. 3500000" min="0" required>
-        </div>
       </div>
     </div>
 
-    <!-- Características -->
+    <!-- ── 2. CARACTERÍSTICAS ─────────────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Características</div>
-      <div class="form-grid cols-3">
+      <div class="section-header"><span class="section-num">2.</span> CARACTERÍSTICAS</div>
+      <div class="form-grid cols-4">
+        <div class="form-group">
+          <label for="m2_construidos">M² Construidos</label>
+          <input type="number" name="m2_construidos" id="m2_construidos" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="m2_terreno">M² Terreno</label>
+          <input type="number" name="m2_terreno" id="m2_terreno" placeholder="0" min="0">
+        </div>
         <div class="form-group">
           <label for="recamaras">Recámaras</label>
           <input type="number" name="recamaras" id="recamaras" placeholder="0" min="0">
@@ -77,99 +247,152 @@
           <input type="number" name="banos" id="banos" placeholder="0" min="0" step="0.5">
         </div>
         <div class="form-group">
-          <label for="estacionamientos">Estacionamientos</label>
+          <label for="estacionamientos">Cocheras</label>
           <input type="number" name="estacionamientos" id="estacionamientos" placeholder="0" min="0">
         </div>
         <div class="form-group">
-          <label for="m2_construidos">M² Construidos</label>
-          <input type="number" name="m2_construidos" id="m2_construidos" placeholder="0" min="0">
+          <label for="antiguedad">Antigüedad (años)</label>
+          <input type="number" name="antiguedad" id="antiguedad" placeholder="0" min="0">
         </div>
         <div class="form-group">
-          <label for="m2_terreno">M² Terreno</label>
-          <input type="number" name="m2_terreno" id="m2_terreno" placeholder="0" min="0">
+          <label for="precio">Precio (MXN) *</label>
+          <input type="number" name="precio" id="precio" placeholder="3500000" min="0" required>
+        </div>
+        <div class="form-group">
+          <label for="vista">Vista / Orientación</label>
+          <input type="text" name="vista" id="vista" placeholder="Ej. Norte, Parque">
+        </div>
+      </div>
+      <div class="form-group" style="margin-top:12px">
+        <label>Estado del inmueble</label>
+        <div class="services-grid" style="margin-top:8px">
+          {% for est in ["A estrenar", "Conservado", "Requiere mantenimiento", "Requiere remodelación"] %}
+          <label class="service-item">
+            <input type="radio" name="estado_inmueble" value="{{ est }}"> {{ est }}
+          </label>
+          {% endfor %}
         </div>
       </div>
     </div>
 
-    <!-- Amenidades -->
+    <!-- ── 3. SERVICIOS Y AMENIDADES ─────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Amenidades</div>
+      <div class="section-header"><span class="section-num">3.</span> SERVICIOS Y AMENIDADES</div>
+      <label style="font-size:.82rem;font-weight:600;color:#1B2A4A;display:block;margin-bottom:10px">Servicios incluidos</label>
+      <div class="services-grid" style="margin-bottom:20px">
+        {% for srv in ["Agua", "Luz", "Gas natural", "Internet / cable", "Desagüe", "Pozo séptico"] %}
+        <label class="service-item">
+          <input type="checkbox" name="servicios" value="{{ srv }}"> {{ srv }}
+        </label>
+        {% endfor %}
+      </div>
+      <label style="font-size:.82rem;font-weight:600;color:#1B2A4A;display:block;margin-bottom:10px">Amenidades</label>
       <div class="amenidades-grid">
-        {% for amenidad in ["Alberca", "Jardín", "Seguridad 24h", "Gimnasio", "Salón de eventos", "Área de juegos", "Roof garden", "Elevador", "Bodega", "Cuarto de servicio", "Estudio", "Cisterna propia", "Paneles solares", "Vista al mar", "Frente a parque"] %}
+        {% for a in ["Alberca", "Jardín", "Seguridad 24h", "Gimnasio", "Salón de eventos", "Área de juegos", "Roof garden", "Elevador", "Bodega", "Cuarto de servicio", "Estudio", "Cisterna propia", "Paneles solares", "Vista al mar", "Frente a parque", "Cocina integral", "Closets", "Aire acondicionado", "Amueblado", "Terraza", "Chimenea"] %}
         <label class="amenidad-item">
-          <input type="checkbox" name="amenidades" value="{{ amenidad }}">
-          {{ amenidad }}
+          <input type="checkbox" name="amenidades" value="{{ a }}"> {{ a }}
         </label>
         {% endfor %}
       </div>
     </div>
 
-    <!-- Notas del Agente -->
+    <!-- ── 4. INFORMACIÓN COMERCIAL ──────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Notas del Agente</div>
-      <div class="form-group">
-        <label for="descripcion_agente">¿Qué destaca de esta propiedad? (2-3 líneas) *</label>
-        <textarea name="descripcion_agente" id="descripcion_agente" rows="3"
-          placeholder="Ej. Ubicación privilegiada frente al parque, acabados de lujo, recién remodelada..." required></textarea>
+      <div class="section-header"><span class="section-num">4.</span> INFORMACIÓN COMERCIAL</div>
+      <div class="form-grid cols-2">
+        <div class="form-group">
+          <label>Modalidad</label>
+          <div class="services-grid" style="margin-top:8px">
+            {% for mod in ["Solo venta", "Venta o alquiler", "Permuta"] %}
+            <label class="service-item">
+              <input type="radio" name="modalidad" value="{{ mod }}"> {{ mod }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Forma de pago aceptada</label>
+          <div class="services-grid" style="margin-top:8px">
+            {% for fp in ["Contado", "Crédito hipotecario", "Infonavit / Fovissste", "Permuta"] %}
+            <label class="service-item">
+              <input type="checkbox" name="forma_pago" value="{{ fp }}"> {{ fp }}
+            </label>
+            {% endfor %}
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Fotos -->
+    <!-- ── 5. FOTOS DE LA PROPIEDAD ──────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Fotos de la Propiedad</div>
-      <div class="form-group" style="margin-bottom:1rem">
-        <label>Foto de portada * (aparece grande en el PDF e imagen de Instagram)</label>
+      <div class="section-header"><span class="section-num">5.</span> FOTOS DE LA PROPIEDAD</div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Foto de portada * <span style="font-weight:400;color:#888;font-size:.78rem">(aparece en el PDF e imagen de Instagram)</span></label>
         <div class="file-upload-area" onclick="document.getElementById('foto_portada').click()">
           <input type="file" id="foto_portada" name="foto_portada" accept="image/*" required onchange="previewPortada(this)">
-          <div class="upload-label">📷 Seleccionar foto de portada</div>
-          <div class="upload-hint">JPG, PNG — recomendado mínimo 1200×800px</div>
+          <div class="upload-icon">📷</div>
+          <div class="upload-label">Seleccionar foto de portada</div>
+          <div class="upload-hint">JPG, PNG — mínimo 1200×800 px recomendado</div>
           <div id="portada-preview" class="preview-grid"></div>
         </div>
       </div>
       <div class="form-group">
-        <label>Fotos adicionales (opcional)</label>
+        <label>Fotos adicionales <span style="font-weight:400;color:#888;font-size:.78rem">(opcional — se usan en el reel de video)</span></label>
         <div class="file-upload-area" onclick="document.getElementById('fotos_extras').click()">
           <input type="file" id="fotos_extras" name="fotos_extras" accept="image/*" multiple onchange="previewExtras(this)">
-          <div class="upload-label">📷 Agregar más fotos</div>
+          <div class="upload-icon">🖼️</div>
+          <div class="upload-label">Agregar más fotos</div>
           <div class="upload-hint">Puedes seleccionar varias a la vez</div>
           <div id="extras-preview" class="preview-grid"></div>
         </div>
       </div>
     </div>
 
-    <!-- Datos del Agente -->
+    <!-- ── 6. VIDEO / TOUR VIRTUAL ───────────────────────────────────────── -->
     <div class="card">
-      <div class="card-title">Datos del Agente</div>
-      <div class="form-grid">
-        <div class="form-group">
-          <label for="agente_nombre">Nombre completo *</label>
-          <input type="text" name="agente_nombre" id="agente_nombre" placeholder="Ej. Carlos López" required>
+      <div class="section-header"><span class="section-num">6.</span> VIDEO / TOUR VIRTUAL</div>
+      <div class="form-group" style="margin-bottom:16px">
+        <label>Video de la propiedad <span style="font-weight:400;color:#888;font-size:.78rem">(opcional — MP4, MOV, AVI)</span></label>
+        <div class="video-upload-area" onclick="document.getElementById('video_propiedad').click()">
+          <input type="file" id="video_propiedad" name="video_propiedad" accept="video/*" onchange="previewVideo(this)">
+          <div class="upload-icon">🎬</div>
+          <div class="upload-label">Seleccionar video</div>
+          <div class="upload-hint">Se adjuntará como material de referencia</div>
+          <div class="video-preview" id="video-preview"></div>
         </div>
-        <div class="form-group">
-          <label for="agente_telefono">Teléfono / WhatsApp *</label>
-          <input type="text" name="agente_telefono" id="agente_telefono" placeholder="Ej. 5512345678" required>
-        </div>
-        <div class="form-group full">
-          <label for="agente_email">Email *</label>
-          <input type="email" name="agente_email" id="agente_email" placeholder="carlos@inmersiva.com" required>
-        </div>
+      </div>
+      <div class="url-field">
+        <label>Link de Tour 360° <span style="font-weight:400;color:#888;font-size:.78rem">(opcional)</span></label>
+        <input type="url" name="tour_360_url" id="tour_360_url" placeholder="https://...">
+      </div>
+    </div>
+
+    <!-- ── 7. NOTAS DEL CORREDOR ─────────────────────────────────────────── -->
+    <div class="card">
+      <div class="section-header"><span class="section-num">7.</span> NOTAS DEL CORREDOR</div>
+      <div class="form-group">
+        <label for="descripcion_agente">¿Qué destaca de esta propiedad? *
+          <span style="font-weight:400;color:#888;font-size:.78rem">(la IA usará esto para generar la descripción)</span>
+        </label>
+        <textarea name="descripcion_agente" id="descripcion_agente" rows="4"
+          placeholder="Ej. Ubicación privilegiada frente al parque, acabados de lujo, recién remodelada, excelente iluminación natural..." required></textarea>
       </div>
     </div>
 
     <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
       ✨ Generar Contenido con IA
     </button>
-  </form>
 
+  </form>
 </div>
 
-<footer class="footer">
-  Powered by <span>Inmersiva Grupo Inmobiliario</span> · ListaPro v1.0
-</footer>
+<div class="footer-inmersiva">
+  <span>Inmersiva Grupo Inmobiliario</span> · Sistema Generador de Contenido IA
+</div>
 
 <script src="/static/js/main.js"></script>
 <script>
-  document.getElementById('listingForm').addEventListener('submit', function() {
+  document.getElementById('fichaForm').addEventListener('submit', function() {
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.textContent = '⏳ Generando contenido...';
@@ -193,6 +416,21 @@
       img.src = URL.createObjectURL(file);
       preview.appendChild(img);
     });
+  }
+
+  function previewVideo(input) {
+    const preview = document.getElementById('video-preview');
+    preview.innerHTML = '';
+    if (input.files && input.files[0]) {
+      const video = document.createElement('video');
+      video.src = URL.createObjectURL(input.files[0]);
+      video.controls = true;
+      preview.appendChild(video);
+      const name = document.createElement('p');
+      name.style.cssText = 'font-size:.8rem;color:#666;margin-top:6px';
+      name.textContent = input.files[0].name;
+      preview.appendChild(name);
+    }
   }
 </script>
 </body>
