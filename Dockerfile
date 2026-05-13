@@ -14,7 +14,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     libjpeg-dev libpng-dev libfreetype6-dev \
     # WeasyPrint
     libpango-1.0-0 libpangoft2-1.0-0 libpangocairo-1.0-0 \
-    libcairo2 libgdk-pixbuf2.0-0 libffi-dev \
+    libcairo2 libgdk-pixbuf-xlib-2.0-0 libffi-dev \
     libxml2 libxslt1.1 shared-mime-info \
     && rm -rf /var/lib/apt/lists/*
 
