@@ -1,0 +1,15 @@
+venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+.git/
+.omc/
+.pytest_cache/
+node_modules/
+uploads/*
+generated/*
+docs/
+tests/
+*.md
+.DS_Store
