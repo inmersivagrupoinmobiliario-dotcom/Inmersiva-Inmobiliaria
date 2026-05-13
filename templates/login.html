@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inmersiva — Panel Administrativo</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, #0a1628 0%, #1B2A4A 60%, #0d1f3a 100%);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      position: relative;
+      overflow: hidden;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: radial-gradient(circle, rgba(201,168,76,0.08) 1px, transparent 1px);
+      background-size: 28px 28px;
+      pointer-events: none;
+    }
+
+    /* Gold left border accent */
+    body::after {
+      content: '';
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 4px;
+      height: 100%;
+      background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%);
+    }
+
+    .card {
+      width: 420px;
+      max-width: calc(100vw - 32px);
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Card header */
+    .card-header {
+      background: linear-gradient(135deg, #0a1628 0%, #1B2A4A 100%);
+      border-bottom: 3px solid #C9A84C;
+      padding: 32px 24px 28px;
+      text-align: center;
+    }
+
+    .logo-circle {
+      width: 80px;
+      height: 80px;
+      background: #fff;
+      border-radius: 50%;
+      margin: 0 auto 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      overflow: hidden;
+    }
+
+    .logo-circle img {
+      width: 64px;
+      height: 64px;
+      object-fit: contain;
+    }
+
+    .logo-circle .logo-fallback {
+      font-size: 28px;
+      font-weight: 800;
+      color: #1B2A4A;
+      letter-spacing: -1px;
+    }
+
+    .brand-name {
+      color: #fff;
+      font-size: 22px;
+      font-weight: 800;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .brand-sub {
+      color: #C9A84C;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 2.5px;
+      text-transform: uppercase;
+      margin-bottom: 14px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: rgba(201,168,76,0.15);
+      border: 1px solid rgba(201,168,76,0.4);
+      color: #C9A84C;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      padding: 4px 14px;
+      border-radius: 20px;
+    }
+
+    /* Card body */
+    .card-body {
+      padding: 32px 32px 24px;
+    }
+
+    .form-group {
+      margin-bottom: 20px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: #4a5568;
+      margin-bottom: 8px;
+    }
+
+    .form-group input {
+      width: 100%;
+      padding: 12px 16px;
+      border: 2px solid #e2e8f0;
+      border-radius: 8px;
+      font-size: 15px;
+      color: #1a202c;
+      background: #f8fafc;
+      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
+      outline: none;
+    }
+
+    .form-group input:focus {
+      border-color: #C9A84C;
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+    }
+
+    .form-group input::placeholder {
+      color: #a0aec0;
+    }
+
+    .error-box {
+      background: #fff5f5;
+      border: 1px solid #fc8181;
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #c53030;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .error-box::before {
+      content: '✕';
+      width: 18px;
+      height: 18px;
+      background: #fed7d7;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-weight: 700;
+      flex-shrink: 0;
+      text-align: center;
+      line-height: 18px;
+    }
+
+    .btn-submit {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, #C9A84C 0%, #e0bc6e 100%);
+      border: none;
+      border-radius: 8px;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      cursor: pointer;
+      box-shadow: 0 4px 16px rgba(201,168,76,0.35);
+      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
+      margin-top: 4px;
+    }
+
+    .btn-submit:hover {
+      opacity: 0.92;
+      box-shadow: 0 6px 24px rgba(201,168,76,0.45);
+      transform: translateY(-1px);
+    }
+
+    .btn-submit:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(201,168,76,0.3);
+    }
+
+    /* Card footer */
+    .card-footer {
+      background: #f7f8fa;
+      border-top: 1px solid #e2e8f0;
+      padding: 12px 24px;
+      text-align: center;
+      color: #718096;
+      font-size: 11px;
+      letter-spacing: 0.3px;
+    }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <div class="card-header">
+      <div class="logo-circle">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
+        <span class="logo-fallback" style="display:none">I</span>
+      </div>
+      <div class="brand-name">Inmersiva</div>
+      <div class="brand-sub">Grupo Inmobiliario</div>
+      <span class="badge">Panel Administrativo</span>
+    </div>
+
+    <div class="card-body">
+      {% if error %}
+      <div class="error-box">{{ error }}</div>
+      {% endif %}
+
+      <form method="POST" action="/login">
+        <div class="form-group">
+          <label for="username">Usuario</label>
+          <input type="text" id="username" name="username" placeholder="Ingresa tu usuario" required autocomplete="username">
+        </div>
+        <div class="form-group">
+          <label for="password">Contraseña</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        </div>
+        <button type="submit" class="btn-submit">Ingresar</button>
+      </form>
+    </div>
+
+    <div class="card-footer">
+      Inmersiva Grupo Inmobiliario &middot; inmobiliariainmersiva.com
+    </div>
+  </div>
+</body>
+</html>

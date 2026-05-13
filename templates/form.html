@@ -126,9 +126,9 @@
 
 <!-- ═══ CORREDOR BAR ══════════════════════════════════════════════════════ -->
 <div class="corredor-bar">
-  <div class="cb-field"><label>Corredor/a:</label><input type="text" name="agente_nombre" placeholder="Nombre completo" required form="fichaForm"></div>
-  <div class="cb-field"><label>WhatsApp:</label><input type="text" name="agente_telefono" placeholder="999 000 000" required form="fichaForm"></div>
-  <div class="cb-field"><label>Email:</label><input type="email" name="agente_email" placeholder="corredor@inmersiva.com" required form="fichaForm"></div>
+  <div class="cb-field"><label>Corredor/a:</label><input type="text" name="agente_nombre" placeholder="Nombre completo" value="{{ agente_nombre_default | default('') }}" required form="fichaForm"></div>
+  <div class="cb-field"><label>WhatsApp:</label><input type="text" name="agente_telefono" placeholder="999 000 000" value="{{ agente_telefono_default | default('') }}" required form="fichaForm"></div>
+  <div class="cb-field"><label>Email:</label><input type="email" name="agente_email" placeholder="corredor@inmersiva.com" value="{{ agente_email_default | default('') }}" required form="fichaForm"></div>
   <div class="cb-field"><label>Origen:</label><input type="text" name="origen_contacto" placeholder="Ej. Portal, Referido" form="fichaForm"></div>
 </div>
 

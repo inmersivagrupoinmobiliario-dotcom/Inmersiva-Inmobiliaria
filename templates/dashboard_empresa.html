@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Inmersiva — Panel Empresa</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #f0f2f5;
+      color: #1a202c;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: #1B2A4A;
+      border-bottom: 3px solid #C9A84C;
+      padding: 0 24px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .header-brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      text-decoration: none;
+      flex-shrink: 0;
+    }
+
+    .header-logo-box {
+      width: 40px;
+      height: 40px;
+      background: #fff;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .header-logo-box img {
+      width: 32px;
+      height: 32px;
+      object-fit: contain;
+    }
+
+    .header-title {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .header-subtitle {
+      color: #C9A84C;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    .header-spacer { flex: 1; }
+
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-shrink: 0;
+    }
+
+    .user-badge {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 20px;
+      padding: 4px 12px;
+      color: #e2e8f0;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .btn-logout {
+      color: #a0aec0;
+      font-size: 12px;
+      font-weight: 600;
+      text-decoration: none;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 6px;
+      padding: 6px 12px;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .btn-logout:hover { color: #fff; border-color: rgba(255,255,255,0.5); }
+
+    /* Corredor Widget */
+    .corredor-widget {
+      min-width: 240px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(201,168,76,0.4);
+      border-radius: 10px;
+      padding: 10px 14px;
+    }
+
+    .widget-title {
+      font-size: 8px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: #C9A84C;
+      margin-bottom: 8px;
+    }
+
+    .widget-form {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .widget-input {
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 5px;
+      padding: 5px 8px;
+      color: #fff;
+      font-size: 12px;
+      width: 90px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .widget-input::placeholder { color: rgba(255,255,255,0.4); font-size: 11px; }
+    .widget-input:focus { border-color: #C9A84C; }
+
+    .widget-btn {
+      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
+      border: none;
+      border-radius: 5px;
+      padding: 5px 10px;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+    }
+
+    .widget-btn:hover { opacity: 0.9; }
+
+    .widget-error {
+      color: #fc8181;
+      font-size: 10px;
+      margin-bottom: 6px;
+    }
+
+    /* Active corredor */
+    .corredor-active {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .corredor-avatar {
+      width: 32px;
+      height: 32px;
+      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 800;
+      flex-shrink: 0;
+    }
+
+    .corredor-info { flex: 1; min-width: 0; }
+
+    .corredor-name {
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .corredor-role {
+      color: #C9A84C;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+
+    .corredor-actions {
+      display: flex;
+      gap: 5px;
+    }
+
+    .btn-corredor-dash {
+      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
+      border: none;
+      border-radius: 5px;
+      padding: 4px 9px;
+      color: #fff;
+      font-size: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-corredor-out {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 5px;
+      padding: 4px 9px;
+      color: #e2e8f0;
+      font-size: 10px;
+      font-weight: 600;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+
+    .btn-corredor-out:hover { border-color: rgba(255,255,255,0.6); color: #fff; }
+
+    /* ── Main ── */
+    .main {
+      max-width: 1300px;
+      margin: 0 auto;
+      padding: 28px 24px;
+    }
+
+    .page-header {
+      margin-bottom: 24px;
+    }
+
+    .page-title {
+      font-size: 26px;
+      font-weight: 800;
+      color: #1B2A4A;
+      letter-spacing: -0.5px;
+    }
+
+    .page-subtitle {
+      color: #718096;
+      font-size: 14px;
+      margin-top: 4px;
+    }
+
+    /* Stats grid */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 28px;
+    }
+
+    @media (max-width: 900px) { .stats-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 500px) { .stats-grid { grid-template-columns: 1fr; } }
+
+    .stat-card {
+      background: #fff;
+      border-radius: 10px;
+      padding: 20px 20px 18px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      position: relative;
+      overflow: hidden;
+      border-top: 3px solid var(--accent);
+    }
+
+    .stat-card--navy { --accent: #1B2A4A; }
+    .stat-card--gold  { --accent: #C9A84C; }
+    .stat-card--green { --accent: #38a169; }
+    .stat-card--blue  { --accent: #3182ce; }
+
+    .stat-icon {
+      position: absolute;
+      right: 12px;
+      bottom: 8px;
+      font-size: 44px;
+      opacity: 0.12;
+      line-height: 1;
+    }
+
+    .stat-value {
+      font-size: 36px;
+      font-weight: 900;
+      color: #1a202c;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #718096;
+    }
+
+    /* Sections */
+    .section {
+      background: #fff;
+      border-radius: 10px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #1B2A4A;
+      border-left: 4px solid #C9A84C;
+    }
+
+    .section-title {
+      color: #fff;
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
+      border: none;
+      border-radius: 6px;
+      padding: 7px 16px;
+      color: #fff;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      text-decoration: none;
+      letter-spacing: 0.3px;
+    }
+
+    .btn-gold:hover { opacity: 0.9; }
+
+    /* Table */
+    .table-wrap { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    th {
+      background: #f7f8fa;
+      padding: 10px 16px;
+      text-align: left;
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      color: #4a5568;
+      border-bottom: 1px solid #e2e8f0;
+    }
+
+    td {
+      padding: 12px 16px;
+      font-size: 13px;
+      color: #2d3748;
+      border-bottom: 1px solid #f0f2f5;
+    }
+
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: #fafbfd; }
+
+    /* Badges */
+    .badge-op {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .badge-venta { background: #ebf8ff; color: #2b6cb0; }
+    .badge-renta { background: #f0fff4; color: #276749; }
+    .badge-alquiler { background: #f0fff4; color: #276749; }
+
+    .price-col { color: #C9A84C; font-weight: 700; font-size: 14px; }
+
+    .loc-main { font-weight: 600; }
+    .loc-sub { color: #718096; font-size: 11px; }
+
+    .action-btn {
+      display: inline-block;
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 11px;
+      font-weight: 600;
+      text-decoration: none;
+      margin-right: 4px;
+      border: 1px solid;
+      transition: opacity 0.15s;
+    }
+
+    .action-btn:hover { opacity: 0.8; }
+    .action-pdf { color: #c53030; border-color: #fed7d7; background: #fff5f5; }
+    .action-img { color: #2b6cb0; border-color: #bee3f8; background: #ebf8ff; }
+
+    /* Status dots */
+    .dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: middle;
+    }
+
+    .dot-green { background: #38a169; }
+    .dot-red { background: #e53e3e; }
+
+    .mono { font-family: 'Courier New', monospace; font-size: 12px; color: #4a5568; }
+
+    .empty-state {
+      text-align: center;
+      padding: 40px 20px;
+      color: #a0aec0;
+    }
+
+    .empty-state p { font-size: 14px; }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.55);
+      z-index: 200;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.open { display: flex; }
+
+    .modal {
+      background: #fff;
+      border-radius: 12px;
+      width: 520px;
+      max-width: calc(100vw - 32px);
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.4);
+    }
+
+    .modal-header {
+      background: #1B2A4A;
+      padding: 16px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-radius: 12px 12px 0 0;
+    }
+
+    .modal-title {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: #a0aec0;
+      font-size: 20px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 2px 6px;
+    }
+
+    .modal-close:hover { color: #fff; }
+
+    .modal-body { padding: 24px 24px 0; }
+
+    .modal-error {
+      background: #fff5f5;
+      border: 1px solid #fc8181;
+      border-radius: 6px;
+      padding: 10px 14px;
+      margin-bottom: 16px;
+      color: #c53030;
+      font-size: 13px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 14px;
+    }
+
+    .form-grid .full { grid-column: 1 / -1; }
+
+    .modal .form-group { margin-bottom: 0; }
+
+    .modal .form-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.8px;
+      text-transform: uppercase;
+      color: #4a5568;
+      margin-bottom: 6px;
+    }
+
+    .modal .form-group input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1.5px solid #e2e8f0;
+      border-radius: 7px;
+      font-size: 14px;
+      color: #1a202c;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .modal .form-group input:focus { border-color: #C9A84C; }
+
+    .modal-footer {
+      padding: 20px 24px;
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+    }
+
+    .btn-cancel {
+      background: #f7f8fa;
+      border: 1px solid #e2e8f0;
+      border-radius: 7px;
+      padding: 9px 18px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #4a5568;
+      cursor: pointer;
+    }
+
+    .btn-cancel:hover { background: #edf2f7; }
+
+    .btn-create {
+      background: linear-gradient(135deg, #C9A84C, #e0bc6e);
+      border: none;
+      border-radius: 7px;
+      padding: 9px 20px;
+      font-size: 13px;
+      font-weight: 700;
+      color: #fff;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(201,168,76,0.3);
+    }
+
+    .btn-create:hover { opacity: 0.9; }
+
+    .date-col { color: #718096; font-size: 12px; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="header">
+  <a class="header-brand" href="/dashboard">
+    <div class="header-logo-box">
+      <img src="/static/img/logo.jpeg" alt="Inmersiva" onerror="this.style.display='none'">
+    </div>
+    <div>
+      <div class="header-title">Inmersiva</div>
+      <div class="header-subtitle">Grupo Inmobiliario &middot; Panel Empresa</div>
+    </div>
+  </a>
+
+  <div class="header-spacer"></div>
+
+  <div class="header-right">
+    <span class="user-badge">{{ empresa_user }}</span>
+    <a href="/logout" class="btn-logout">Cerrar sesión</a>
+
+    <!-- Corredor Widget -->
+    <div class="corredor-widget">
+      <div class="widget-title">Acceso Corredor</div>
+
+      {% if corredor is none %}
+        {% if corredor_error %}
+        <div class="widget-error">{{ corredor_error }}</div>
+        {% endif %}
+        <form method="POST" action="/corredor/login" class="widget-form">
+          <input type="hidden" name="redirect" value="/dashboard">
+          <input type="text" name="username" placeholder="Usuario" class="widget-input" required autocomplete="off">
+          <input type="password" name="password" placeholder="••••••" class="widget-input" required>
+          <button type="submit" class="widget-btn">Ingresar</button>
+        </form>
+      {% else %}
+        <div class="corredor-active">
+          <div class="corredor-avatar">{{ corredor.nombre[0] | upper }}</div>
+          <div class="corredor-info">
+            <div class="corredor-name">{{ corredor.nombre }}</div>
+            <div class="corredor-role">Corredor activo</div>
+          </div>
+          <div class="corredor-actions">
+            <a href="/corredor/dashboard" class="btn-corredor-dash">Mi Dashboard</a>
+            <a href="/corredor/logout" class="btn-corredor-out">Salir</a>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</header>
+
+<!-- Main -->
+<main class="main">
+  <div class="page-header">
+    <h1 class="page-title">Panel de Control</h1>
+    <p class="page-subtitle">Resumen general de la actividad de Inmersiva Grupo Inmobiliario</p>
+  </div>
+
+  <!-- Stats -->
+  {% set sym = {"PEN": "S/", "USD": "US$", "MXN": "$"} %}
+  <div class="stats-grid">
+    <div class="stat-card stat-card--navy">
+      <div class="stat-value">{{ stats.total_fichas }}</div>
+      <div class="stat-label">Total Fichas</div>
+      <div class="stat-icon">📋</div>
+    </div>
+    <div class="stat-card stat-card--gold">
+      <div class="stat-value">{{ stats.fichas_mes }}</div>
+      <div class="stat-label">Fichas Este Mes</div>
+      <div class="stat-icon">📅</div>
+    </div>
+    <div class="stat-card stat-card--green">
+      <div class="stat-value">{{ stats.corredores_activos }}</div>
+      <div class="stat-label">Corredores Activos</div>
+      <div class="stat-icon">👥</div>
+    </div>
+    <div class="stat-card stat-card--blue">
+      <div class="stat-value">{{ stats.pdfs_generados }}</div>
+      <div class="stat-label">PDFs Generados</div>
+      <div class="stat-icon">📄</div>
+    </div>
+  </div>
+
+  <!-- Fichas Recientes -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Fichas Recientes</span>
+    </div>
+    <div class="table-wrap">
+      {% if fichas %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Tipo / Operación</th>
+            <th>Ubicación</th>
+            <th>Precio</th>
+            <th>Corredor</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in fichas[:20] %}
+          <tr>
+            <td style="color:#a0aec0; font-size:12px;">{{ loop.index }}</td>
+            <td>
+              <div style="font-weight:600; font-size:13px;">{{ f.tipo }}</div>
+              <span class="badge-op badge-{{ f.operacion | lower }}">{{ f.operacion }}</span>
+            </td>
+            <td>
+              <div class="loc-main">{{ f.direccion }}</div>
+              <div class="loc-sub">{{ f.ciudad }}{% if f.estado %}, {{ f.estado }}{% endif %}</div>
+            </td>
+            <td class="price-col">{{ sym.get(f.moneda, f.moneda) }} {{ "{:,.0f}".format(f.precio) }}</td>
+            <td style="font-size:12px;">{{ f.agente_nombre }}</td>
+            <td>
+              <a href="/pdf/{{ f.id }}" class="action-btn action-pdf" target="_blank">PDF</a>
+              <a href="/imagen/{{ f.id }}" class="action-btn action-img" target="_blank">IMG</a>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state"><p>No hay fichas registradas aún.</p></div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- Corredores -->
+  <div class="section">
+    <div class="section-header">
+      <span class="section-title">Corredores</span>
+      <button class="btn-gold" onclick="openModal()">+ Nuevo Corredor</button>
+    </div>
+    <div class="table-wrap">
+      {% if corredores %}
+      <table>
+        <thead>
+          <tr>
+            <th>Nombre</th>
+            <th>Usuario</th>
+            <th>Email</th>
+            <th>Teléfono</th>
+            <th>Estado</th>
+            <th>Registrado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for c in corredores %}
+          <tr>
+            <td style="font-weight:600;">{{ c.nombre }}</td>
+            <td><span class="mono">{{ c.username }}</span></td>
+            <td>{{ c.email }}</td>
+            <td>{{ c.telefono or '—' }}</td>
+            <td>
+              <span class="dot dot-{{ 'green' if c.activo else 'red' }}"></span>
+              {{ 'Activo' if c.activo else 'Inactivo' }}
+            </td>
+            <td class="date-col">{{ c.created_at.strftime('%d/%m/%Y') if c.created_at else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <p>No hay corredores registrados. <button class="btn-gold" onclick="openModal()" style="margin-left:8px;">Crear el primero</button></p>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</main>
+
+<!-- Modal Nuevo Corredor -->
+<div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
+  <div class="modal" id="modalBox">
+    <div class="modal-header">
+      <span class="modal-title">Nuevo Corredor</span>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      {% if corredor_error %}
+      <div class="modal-error">{{ corredor_error }}</div>
+      {% endif %}
+      <form method="POST" action="/admin/corredor/nuevo" id="formNuevoCorredor">
+        <div class="form-grid">
+          <div class="form-group">
+            <label for="m_nombre">Nombre</label>
+            <input type="text" id="m_nombre" name="nombre" placeholder="Nombre completo" required>
+          </div>
+          <div class="form-group">
+            <label for="m_telefono">Teléfono</label>
+            <input type="text" id="m_telefono" name="telefono" placeholder="999 000 000">
+          </div>
+          <div class="form-group full">
+            <label for="m_email">Email</label>
+            <input type="email" id="m_email" name="email" placeholder="corredor@inmersiva.com" required>
+          </div>
+          <div class="form-group">
+            <label for="m_username">Usuario</label>
+            <input type="text" id="m_username" name="username" placeholder="nombre_usuario" required autocomplete="off">
+          </div>
+          <div class="form-group">
+            <label for="m_password">Contraseña</label>
+            <input type="password" id="m_password" name="password" placeholder="••••••••" required autocomplete="new-password">
+          </div>
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+      <button class="btn-create" form="formNuevoCorredor" type="submit">Crear Corredor</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openModal() {
+    document.getElementById('modalOverlay').classList.add('open');
+  }
+  function closeModal() {
+    document.getElementById('modalOverlay').classList.remove('open');
+  }
+  function closeModalOutside(e) {
+    if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  // Auto-open modal if there is a corredor_error
+  {% if corredor_error %}
+  document.addEventListener('DOMContentLoaded', openModal);
+  {% endif %}
+</script>
+</body>
+</html>

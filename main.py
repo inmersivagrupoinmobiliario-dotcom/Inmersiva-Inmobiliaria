@@ -2,21 +2,47 @@ import os
 import json
 import shutil
 import uuid
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 
 from fastapi import FastAPI, Form, File, UploadFile, Request
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from dotenv import load_dotenv
 
 from models.listing import Listing
 from services.ai_service import generar_contenido
+from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session
+from database import engine, SessionLocal, Base
 
 load_dotenv()
 
-app = FastAPI(title="Inmersiva Grupo Inmobiliario — Generador de Contenido")
+# DB init
+from models.db_models import Corredor as CorredorModel
+Base.metadata.create_all(bind=engine)
+
+
+def _seed():
+    db = SessionLocal()
+    try:
+        if db.query(CorredorModel).count() == 0:
+            db.add(CorredorModel(
+                nombre="Corredor Demo", email="corredor@inmersiva.com",
+                username="corredor1", hashed_password=hash_password("corredor123"),
+            ))
+            db.commit()
+    finally:
+        db.close()
+
+
+_seed()
+
+EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
+EMPRESA_PASS = os.getenv("EMPRESA_PASS", "Inmersiva2025")
+
+app = FastAPI(title="Inmersiva Grupo Inmobiliario")
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
@@ -26,6 +52,7 @@ UPLOADS = Path("uploads")
 GENERATED = Path("generated")
 
 
+# ── Helpers ───────────────────────────────────────────────────────────────────
 def save_listing(listing: Listing):
     folder = GENERATED / listing.id
     folder.mkdir(parents=True, exist_ok=True)
@@ -42,11 +69,225 @@ def save_upload(upload: UploadFile, dest: Path) -> None:
         shutil.copyfileobj(upload.file, f)
 
 
+def list_fichas(corredor_email: str = None) -> list:
+    fichas = []
+    for data_file in sorted(GENERATED.glob("*/data.json"), key=lambda p: p.stat().st_mtime, reverse=True):
+        try:
+            data = json.loads(data_file.read_text(encoding="utf-8"))
+            if corredor_email and data.get("agente_email") != corredor_email:
+                continue
+            data["_mtime"] = data_file.stat().st_mtime
+            fichas.append(data)
+        except Exception:
+            pass
+    return fichas
+
+
+def fichas_stats(fichas: list) -> dict:
+    now = datetime.now()
+    fichas_mes = sum(
+        1 for f in fichas
+        if datetime.fromtimestamp(f.get("_mtime", 0)).month == now.month
+        and datetime.fromtimestamp(f.get("_mtime", 0)).year == now.year
+    )
+    pdfs = sum(1 for f in fichas if (GENERATED / "pdfs" / f"{f['id']}.pdf").exists())
+    return {"total": len(fichas), "fichas_mes": fichas_mes, "pdfs": pdfs}
+
+
+# ── Auth routes ───────────────────────────────────────────────────────────────
 @app.get("/", response_class=HTMLResponse)
-async def form(request: Request):
-    return templates.TemplateResponse(request, "form.html")
+async def root(request: Request):
+    if get_empresa_session(request):
+        return RedirectResponse("/dashboard", status_code=302)
+    return RedirectResponse("/login", status_code=302)
 
 
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(request: Request):
+    if get_empresa_session(request):
+        return RedirectResponse("/dashboard", status_code=302)
+    if get_corredor_session(request):
+        return RedirectResponse("/corredor/dashboard", status_code=302)
+    return templates.TemplateResponse(request, "login.html", {"error": ""})
+
+
+@app.post("/login")
+async def login_submit(request: Request, username: str = Form(...), password: str = Form(...)):
+    # Try empresa
+    if username == EMPRESA_USER and password == EMPRESA_PASS:
+        token = create_token({"sub": username, "role": "empresa"})
+        resp = RedirectResponse("/dashboard", status_code=302)
+        resp.set_cookie("empresa_token", token, httponly=True, samesite="lax")
+        return resp
+    # Try corredor
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(
+            CorredorModel.username == username, CorredorModel.activo == True
+        ).first()
+        if corredor and verify_password(password, corredor.hashed_password):
+            token = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
+            resp = RedirectResponse("/corredor/dashboard", status_code=302)
+            resp.set_cookie("corredor_token", token, httponly=True, samesite="lax")
+            return resp
+    finally:
+        db.close()
+    return templates.TemplateResponse(request, "login.html", {"error": "Usuario o contraseña incorrectos"}, status_code=401)
+
+
+@app.get("/logout")
+async def logout():
+    resp = RedirectResponse("/login", status_code=302)
+    resp.delete_cookie("empresa_token")
+    resp.delete_cookie("corredor_token")
+    return resp
+
+
+# ── Empresa dashboard ─────────────────────────────────────────────────────────
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_empresa(request: Request):
+    empresa = get_empresa_session(request)
+    if not empresa:
+        return RedirectResponse("/login", status_code=302)
+    corredor_session = get_corredor_session(request)
+    corredor_error = request.query_params.get("corredor_error", "")
+
+    db = SessionLocal()
+    try:
+        corredores = db.query(CorredorModel).order_by(CorredorModel.created_at.desc()).all()
+        corredores_activos = sum(1 for c in corredores if c.activo)
+        corredor_obj = None
+        if corredor_session:
+            corredor_obj = db.query(CorredorModel).filter(CorredorModel.username == corredor_session["sub"]).first()
+    finally:
+        db.close()
+
+    fichas = list_fichas()
+    s = fichas_stats(fichas)
+    return templates.TemplateResponse(request, "dashboard_empresa.html", {
+        "empresa_user": empresa["sub"],
+        "corredor": corredor_obj,
+        "fichas": fichas,
+        "corredores": corredores,
+        "corredor_error": corredor_error,
+        "stats": {
+            "total_fichas": s["total"],
+            "fichas_mes": s["fichas_mes"],
+            "corredores_activos": corredores_activos,
+            "pdfs_generados": s["pdfs"],
+        },
+    })
+
+
+# ── Corredor auth ─────────────────────────────────────────────────────────────
+@app.post("/corredor/login")
+async def corredor_login(request: Request, username: str = Form(...), password: str = Form(...)):
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(
+            CorredorModel.username == username, CorredorModel.activo == True
+        ).first()
+        if corredor and verify_password(password, corredor.hashed_password):
+            token = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
+            resp = RedirectResponse("/corredor/dashboard", status_code=302)
+            resp.set_cookie("corredor_token", token, httponly=True, samesite="lax")
+            return resp
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard?corredor_error=Usuario+o+contrase%C3%B1a+incorrectos", status_code=302)
+
+
+@app.get("/corredor/logout")
+async def corredor_logout():
+    resp = RedirectResponse("/dashboard", status_code=302)
+    resp.delete_cookie("corredor_token")
+    return resp
+
+
+@app.get("/corredor/dashboard", response_class=HTMLResponse)
+async def dashboard_corredor(request: Request):
+    corredor_session = get_corredor_session(request)
+    if not corredor_session:
+        if get_empresa_session(request):
+            return RedirectResponse("/dashboard", status_code=302)
+        return RedirectResponse("/login", status_code=302)
+
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(CorredorModel.username == corredor_session["sub"]).first()
+    finally:
+        db.close()
+
+    if not corredor:
+        resp = RedirectResponse("/login", status_code=302)
+        resp.delete_cookie("corredor_token")
+        return resp
+
+    fichas = list_fichas(corredor_email=corredor.email)
+    s = fichas_stats(fichas)
+    return templates.TemplateResponse(request, "dashboard_corredor.html", {
+        "corredor": corredor,
+        "fichas": fichas,
+        "stats": {"mis_fichas": s["total"], "fichas_mes": s["fichas_mes"], "pdfs": s["pdfs"]},
+    })
+
+
+# ── Nueva ficha (protected) ───────────────────────────────────────────────────
+@app.get("/nueva-ficha", response_class=HTMLResponse)
+async def nueva_ficha(request: Request):
+    corredor_session = get_corredor_session(request)
+    if not corredor_session:
+        if get_empresa_session(request):
+            return RedirectResponse("/dashboard", status_code=302)
+        return RedirectResponse("/login", status_code=302)
+
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(CorredorModel.username == corredor_session["sub"]).first()
+    finally:
+        db.close()
+
+    return templates.TemplateResponse(request, "form.html", {
+        "agente_nombre_default": corredor.nombre if corredor else "",
+        "agente_email_default": corredor.email if corredor else "",
+        "agente_telefono_default": corredor.telefono if corredor else "",
+    })
+
+
+# ── Admin: nuevo corredor ─────────────────────────────────────────────────────
+@app.post("/admin/corredor/nuevo")
+async def crear_corredor(
+    request: Request,
+    nombre: str = Form(...),
+    email: str = Form(...),
+    telefono: str = Form(default=""),
+    username: str = Form(...),
+    password: str = Form(...),
+):
+    empresa = get_empresa_session(request)
+    if not empresa:
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        exists = db.query(CorredorModel).filter(
+            (CorredorModel.username == username) | (CorredorModel.email == email)
+        ).first()
+        if exists:
+            return RedirectResponse("/dashboard?corredor_error=El+usuario+o+email+ya+existe", status_code=302)
+        db.add(CorredorModel(
+            nombre=nombre, email=email, telefono=telefono,
+            username=username, hashed_password=hash_password(password),
+        ))
+        db.commit()
+    except Exception:
+        db.rollback()
+        return RedirectResponse("/dashboard?corredor_error=Error+al+crear+corredor", status_code=302)
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+# ── Form submit (protected) ───────────────────────────────────────────────────
 @app.post("/generar", response_class=HTMLResponse)
 async def generar(
     request: Request,
@@ -139,6 +380,12 @@ async def generar(
     video_propiedad: Optional[UploadFile] = File(None),
     tour_360_url: str = Form(default=""),
 ):
+    corredor_session = get_corredor_session(request)
+    if not corredor_session:
+        if get_empresa_session(request):
+            return RedirectResponse("/dashboard", status_code=302)
+        return RedirectResponse("/login", status_code=302)
+
     listing_id = str(uuid.uuid4())
     upload_dir = UPLOADS / listing_id
     upload_dir.mkdir(parents=True, exist_ok=True)
@@ -220,6 +467,7 @@ async def generar(
 # ── PDF ───────────────────────────────────────────────────────────────────────
 from services.pdf_service import generar_pdf
 
+
 @app.get("/pdf/{listing_id}")
 async def descargar_pdf(listing_id: str):
     listing = load_listing(listing_id)
@@ -232,6 +480,7 @@ async def descargar_pdf(listing_id: str):
 
 # ── Instagram Image ───────────────────────────────────────────────────────────
 from services.image_service import generar_imagen_instagram
+
 
 @app.get("/imagen/{listing_id}")
 async def descargar_imagen(listing_id: str):
@@ -246,6 +495,7 @@ async def descargar_imagen(listing_id: str):
 
 # ── Instagram Publishing ──────────────────────────────────────────────────────
 from services.social_service import publicar_instagram
+
 
 @app.post("/publicar/{listing_id}")
 async def publicar(listing_id: str):
@@ -262,6 +512,7 @@ async def publicar(listing_id: str):
 # ── Video ─────────────────────────────────────────────────────────────────────
 from services.video_service import iniciar_render, get_status
 
+
 @app.post("/video/{listing_id}")
 async def generar_video(listing_id: str):
     listing = load_listing(listing_id)
@@ -269,6 +520,7 @@ async def generar_video(listing_id: str):
     video_path.parent.mkdir(parents=True, exist_ok=True)
     iniciar_render(listing, str(video_path))
     return JSONResponse(content={"ok": True, "status": "rendering"})
+
 
 @app.get("/video/status/{listing_id}")
 async def video_status(listing_id: str):
