@@ -30,18 +30,28 @@ from models.db_models import (
 def _init_db():
     try:
         Base.metadata.create_all(bind=engine)
-        db = SessionLocal()
-        try:
-            if db.query(CorredorModel).count() == 0:
-                db.add(CorredorModel(
-                    nombre="Corredor Demo", email="corredor@inmersiva.com",
-                    username="corredor1", hashed_password=hash_password("corredor123"),
-                ))
-                db.commit()
-        finally:
-            db.close()
+        print("[DB] Tablas verificadas/creadas OK")
     except Exception as e:
-        print(f"[WARN] DB init: {e}")
+        import traceback
+        print(f"[ERROR] create_all falló: {e}")
+        traceback.print_exc()
+        return
+    db = SessionLocal()
+    try:
+        if db.query(CorredorModel).count() == 0:
+            db.add(CorredorModel(
+                nombre="Corredor Demo", email="corredor1@inmersiva.com",
+                username="corredor1", hashed_password=hash_password("corredor123"),
+            ))
+            db.commit()
+            print("[DB] Corredor demo creado: corredor1 / corredor123")
+        else:
+            print(f"[DB] {db.query(CorredorModel).count()} corredor(es) existentes")
+    except Exception as e:
+        db.rollback()
+        print(f"[ERROR] Seed corredor: {e}")
+    finally:
+        db.close()
 
 _init_db()
 
@@ -860,9 +870,12 @@ async def crear_corredor(
             username=username, hashed_password=hash_password(password),
         ))
         db.commit()
-    except Exception:
+    except Exception as e:
         db.rollback()
-        return RedirectResponse("/dashboard?corredor_error=Error+al+crear+corredor", status_code=302)
+        import traceback, urllib.parse
+        traceback.print_exc()
+        msg = urllib.parse.quote(str(e)[:200])
+        return RedirectResponse(f"/dashboard?corredor_error={msg}", status_code=302)
     finally:
         db.close()
     return RedirectResponse("/dashboard", status_code=302)
