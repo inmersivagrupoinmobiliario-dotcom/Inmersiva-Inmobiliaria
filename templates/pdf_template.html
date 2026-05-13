@@ -3,122 +3,323 @@
 <head>
 <meta charset="UTF-8">
 <style>
-  @page { margin: 0; size: Letter; }
+  @page {
+    margin: 0;
+    size: Letter;
+  }
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: 'Helvetica Neue', Arial, sans-serif; color: #1B2A4A; }
-
-  .header {
-    background: #1B2A4A; color: white;
-    padding: 20px 32px;
-    display: flex; justify-content: space-between; align-items: center;
-  }
-  .header-brand { font-size: 22px; font-weight: 700; letter-spacing: 1px; }
-  .header-sub { color: #C9A84C; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; margin-top: 2px; }
-  .header-badge {
-    background: #C9A84C; color: #1B2A4A;
-    font-size: 14px; font-weight: 700;
-    padding: 6px 16px; border-radius: 4px;
-    text-transform: uppercase; letter-spacing: 1px;
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    color: #1B2A4A;
+    background: white;
   }
 
-  .portada { width: 100%; height: 320px; object-fit: cover; display: block; }
-  .no-photo { height: 200px; background: #F1F3F5; display: flex; align-items: center; justify-content: center; color: #999; font-size: 14px; }
-
-  .content { padding: 24px 32px; }
-
-  .precio { font-size: 32px; font-weight: 700; color: #C9A84C; margin: 12px 0 4px; }
-  .ubicacion { font-size: 13px; color: #6C757D; margin-bottom: 16px; }
-
-  .stats-row {
-    display: flex; gap: 16px; flex-wrap: wrap;
-    background: #F8F9FA; border-radius: 8px;
-    padding: 14px 20px; margin-bottom: 20px;
+  /* ── Header ── */
+  .hdr {
+    background: #1B2A4A;
+    display: flex;
+    align-items: stretch;
+    border-bottom: 5px solid #C9A84C;
   }
-  .stat { display: flex; flex-direction: column; align-items: center; min-width: 70px; }
-  .stat-val { font-size: 18px; font-weight: 700; color: #1B2A4A; }
-  .stat-label { font-size: 10px; color: #6C757D; text-transform: uppercase; letter-spacing: .5px; margin-top: 2px; }
-
-  .section-title {
-    font-size: 10px; font-weight: 700; text-transform: uppercase;
-    letter-spacing: 1.5px; color: #1B2A4A;
-    border-bottom: 2px solid #C9A84C; padding-bottom: 4px; margin-bottom: 10px;
+  .hdr-logo {
+    background: white;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 140px;
   }
-  .descripcion { font-size: 12px; line-height: 1.7; color: #343A40; margin-bottom: 20px; }
+  .hdr-logo img { height: 64px; width: auto; }
+  .hdr-info {
+    flex: 1;
+    padding: 14px 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+  .hdr-tipo {
+    color: #C9A84C;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .hdr-precio {
+    color: white;
+    font-size: 26px;
+    font-weight: 800;
+    line-height: 1;
+    margin-bottom: 4px;
+  }
+  .hdr-ubicacion {
+    color: #ccc;
+    font-size: 10px;
+    letter-spacing: 0.5px;
+  }
+  .hdr-badge {
+    background: #C9A84C;
+    color: #1B2A4A;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 8px 20px;
+    align-self: center;
+    margin-right: 20px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    white-space: nowrap;
+  }
 
-  .amenidades-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .amenidad-tag { background: #1B2A4A; color: white; font-size: 10px; padding: 4px 10px; border-radius: 99px; }
+  /* ── Portada ── */
+  .portada-img { width: 100%; height: 300px; object-fit: cover; display: block; }
+  .no-photo { height: 160px; background: #F1F3F5; display: flex; align-items: center; justify-content: center; color: #aaa; font-size: 12px; }
 
-  .extras-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
-  .extras-grid img { width: 130px; height: 90px; object-fit: cover; border-radius: 6px; }
+  /* ── Contenido principal ── */
+  .body { padding: 22px 28px; }
 
+  /* ── Stats ── */
+  .stats {
+    display: flex;
+    gap: 0;
+    background: #1B2A4A;
+    border-radius: 6px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+  .stat {
+    flex: 1;
+    text-align: center;
+    padding: 12px 8px;
+    border-right: 1px solid rgba(255,255,255,0.1);
+  }
+  .stat:last-child { border-right: none; }
+  .stat-val { color: #C9A84C; font-size: 17px; font-weight: 800; }
+  .stat-lbl { color: rgba(255,255,255,0.65); font-size: 8px; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+  /* ── Section ── */
+  .sec-title {
+    font-size: 8px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: white;
+    background: #1B2A4A;
+    padding: 5px 10px;
+    border-left: 4px solid #C9A84C;
+    margin-bottom: 10px;
+    margin-top: 16px;
+  }
+
+  /* ── Descripción ── */
+  .desc { font-size: 11px; line-height: 1.75; color: #343A40; margin-bottom: 4px; }
+
+  /* ── Tags ── */
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .tag {
+    background: #1B2A4A;
+    color: white;
+    font-size: 9px;
+    padding: 3px 9px;
+    border-radius: 99px;
+  }
+  .tag-gold {
+    background: #C9A84C;
+    color: #1B2A4A;
+    font-size: 9px;
+    padding: 3px 9px;
+    border-radius: 99px;
+    font-weight: 700;
+  }
+
+  /* ── Info grid ── */
+  .info-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 6px 16px;
+    font-size: 10px;
+    color: #444;
+    margin-bottom: 4px;
+  }
+  .info-row { display: flex; gap: 6px; align-items: baseline; }
+  .info-key { font-weight: 700; color: #1B2A4A; white-space: nowrap; }
+  .info-val { color: #555; }
+
+  /* ── Galería ── */
+  .gallery { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 4px; }
+  .gallery img { width: 120px; height: 82px; object-fit: cover; border-radius: 4px; }
+
+  /* ── Agente box ── */
   .agente-box {
-    background: #1B2A4A; color: white;
-    border-radius: 8px; padding: 16px 20px;
-    display: flex; justify-content: space-between; align-items: center;
+    background: #1B2A4A;
+    border-radius: 6px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 18px;
   }
-  .agente-nombre { font-size: 15px; font-weight: 700; }
-  .agente-info { font-size: 11px; color: #C9A84C; margin-top: 4px; }
+  .agente-logo { height: 44px; width: auto; }
+  .agente-divider { width: 1px; height: 40px; background: rgba(255,255,255,0.2); }
+  .agente-info { flex: 1; }
+  .agente-nombre { color: white; font-size: 13px; font-weight: 700; margin-bottom: 3px; }
+  .agente-contact { color: #C9A84C; font-size: 10px; line-height: 1.6; }
+  .agente-brand { color: rgba(255,255,255,0.5); font-size: 8px; text-align: right; text-transform: uppercase; letter-spacing: 1px; }
 
-  .footer-pdf { text-align: center; padding: 12px; font-size: 10px; color: #6C757D; }
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 10px 20px;
+    font-size: 8px;
+    color: #999;
+    border-top: 1px solid #eee;
+    margin-top: 12px;
+  }
+  .footer span { color: #C9A84C; }
+
+  /* ── Precio tachado (mínimo) ── */
+  .precio-row { display: flex; align-items: baseline; gap: 12px; margin-bottom: 16px; }
+  .precio-pub { font-size: 24px; font-weight: 800; color: #C9A84C; }
+  .precio-min { font-size: 11px; color: #888; }
+
+  hr { border: none; border-top: 1px solid #eee; margin: 12px 0; }
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div>
-    <div class="header-brand">INMERSIVA</div>
-    <div class="header-sub">Grupo Inmobiliario</div>
+<!-- ── HEADER ─────────────────────────────────────────────────────────────── -->
+<div class="hdr">
+  <div class="hdr-logo">
+    {% if logo_b64 %}
+    <img src="data:image/jpeg;base64,{{ logo_b64 }}">
+    {% else %}
+    <div style="color:#1B2A4A;font-size:14px;font-weight:800;letter-spacing:1px">INMERSIVA</div>
+    {% endif %}
   </div>
-  <div class="header-badge">{{ listing.tipo }} en {{ listing.operacion }}</div>
+  <div class="hdr-info">
+    <div class="hdr-tipo">{{ listing.tipo }} en {{ listing.operacion }}</div>
+    <div class="hdr-precio">{{ listing.precio_str }}</div>
+    <div class="hdr-ubicacion">{{ listing.direccion }}, {{ listing.ciudad }}, {{ listing.estado }}</div>
+  </div>
+  <div class="hdr-badge">{{ listing.operacion }}</div>
 </div>
 
+<!-- ── FOTO PORTADA ────────────────────────────────────────────────────────── -->
 {% if portada_b64 %}
-<img class="portada" src="data:image/jpeg;base64,{{ portada_b64 }}">
+<img class="portada-img" src="data:image/jpeg;base64,{{ portada_b64 }}">
 {% else %}
 <div class="no-photo">Sin foto de portada</div>
 {% endif %}
 
-<div class="content">
+<!-- ── CUERPO ─────────────────────────────────────────────────────────────── -->
+<div class="body">
 
-  <div class="precio">{{ listing.precio_str }}</div>
-  <div class="ubicacion">📍 {{ listing.direccion }}, {{ listing.ciudad }}, {{ listing.estado }}</div>
-
-  <div class="stats-row">
-    {% if listing.recamaras %}<div class="stat"><div class="stat-val">{{ listing.recamaras }}</div><div class="stat-label">Rec.</div></div>{% endif %}
-    {% if listing.banos %}<div class="stat"><div class="stat-val">{{ listing.banos }}</div><div class="stat-label">Baños</div></div>{% endif %}
-    {% if listing.m2_construidos %}<div class="stat"><div class="stat-val">{{ listing.m2_construidos }}</div><div class="stat-label">M² Const.</div></div>{% endif %}
-    {% if listing.m2_terreno %}<div class="stat"><div class="stat-val">{{ listing.m2_terreno }}</div><div class="stat-label">M² Ter.</div></div>{% endif %}
-    {% if listing.estacionamientos %}<div class="stat"><div class="stat-val">{{ listing.estacionamientos }}</div><div class="stat-label">Est.</div></div>{% endif %}
+  <!-- PRECIO Y MÍNIMO -->
+  <div class="precio-row">
+    <div class="precio-pub">{{ listing.precio_str }}</div>
+    {% if listing.precio_minimo_str %}
+    <div class="precio-min">Mínimo aceptable: {{ listing.precio_minimo_str }}</div>
+    {% endif %}
   </div>
 
-  <div class="section-title">Descripción</div>
-  <div class="descripcion">{{ listing.descripcion_generada }}</div>
+  <!-- STATS BAR -->
+  {% set has_stats = listing.recamaras or listing.banos or listing.m2_construidos or listing.m2_terreno or listing.estacionamientos or listing.pisos or listing.antiguedad %}
+  {% if has_stats %}
+  <div class="stats">
+    {% if listing.recamaras %}<div class="stat"><div class="stat-val">{{ listing.recamaras }}</div><div class="stat-lbl">Dorm.</div></div>{% endif %}
+    {% if listing.banos %}<div class="stat"><div class="stat-val">{{ listing.banos }}</div><div class="stat-lbl">Baños</div></div>{% endif %}
+    {% if listing.m2_construidos %}<div class="stat"><div class="stat-val">{{ listing.m2_construidos }}</div><div class="stat-lbl">M² Const.</div></div>{% endif %}
+    {% if listing.m2_terreno %}<div class="stat"><div class="stat-val">{{ listing.m2_terreno }}</div><div class="stat-lbl">M² Terreno</div></div>{% endif %}
+    {% if listing.estacionamientos %}<div class="stat"><div class="stat-val">{{ listing.estacionamientos }}</div><div class="stat-lbl">Cocheras</div></div>{% endif %}
+    {% if listing.pisos %}<div class="stat"><div class="stat-val">{{ listing.pisos }}</div><div class="stat-lbl">Pisos</div></div>{% endif %}
+    {% if listing.antiguedad %}<div class="stat"><div class="stat-val">{{ listing.antiguedad }}</div><div class="stat-lbl">Años</div></div>{% endif %}
+  </div>
+  {% endif %}
 
+  <!-- DESCRIPCIÓN IA -->
+  {% if listing.descripcion_generada %}
+  <div class="sec-title">Descripción</div>
+  <div class="desc">{{ listing.descripcion_generada }}</div>
+  {% endif %}
+
+  <!-- CARACTERÍSTICAS ADICIONALES -->
+  {% set has_extra = listing.vista or listing.estado_inmueble or listing.modalidad or listing.forma_pago or listing.tenencia %}
+  {% if has_extra %}
+  <div class="sec-title">Detalles del Inmueble</div>
+  <div class="info-grid">
+    {% if listing.vista %}<div class="info-row"><span class="info-key">Vista:</span><span class="info-val">{{ listing.vista }}</span></div>{% endif %}
+    {% if listing.estado_inmueble %}<div class="info-row"><span class="info-key">Estado:</span><span class="info-val">{{ listing.estado_inmueble }}</span></div>{% endif %}
+    {% if listing.modalidad %}<div class="info-row"><span class="info-key">Modalidad:</span><span class="info-val">{{ listing.modalidad }}</span></div>{% endif %}
+    {% if listing.forma_pago %}<div class="info-row"><span class="info-key">Formas de pago:</span><span class="info-val">{{ listing.forma_pago | join(', ') }}</span></div>{% endif %}
+    {% if listing.tenencia %}<div class="info-row"><span class="info-key">Tenencia:</span><span class="info-val">{{ listing.tenencia }}</span></div>{% endif %}
+    {% if listing.mantenimiento_mensual %}<div class="info-row"><span class="info-key">Mantenimiento:</span><span class="info-val">S/ {{ listing.mantenimiento_mensual }}/mes</span></div>{% endif %}
+    {% if listing.antiguedad %}<div class="info-row"><span class="info-key">Antigüedad:</span><span class="info-val">{{ listing.antiguedad }} años</span></div>{% endif %}
+  </div>
+  {% endif %}
+
+  <!-- SERVICIOS -->
+  {% if listing.servicios %}
+  <div class="sec-title">Servicios</div>
+  <div class="tags">
+    {% for s in listing.servicios %}<span class="tag">{{ s }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- AMENIDADES -->
   {% if listing.amenidades %}
-  <div class="section-title">Amenidades</div>
-  <div class="amenidades-grid">
-    {% for a in listing.amenidades %}<span class="amenidad-tag">{{ a }}</span>{% endfor %}
+  <div class="sec-title">Amenidades</div>
+  <div class="tags">
+    {% for a in listing.amenidades %}<span class="tag-gold">{{ a }}</span>{% endfor %}
   </div>
   {% endif %}
 
+  <!-- EQUIPAMIENTO -->
+  {% if listing.equipamiento %}
+  <div class="sec-title">Equipamiento incluido</div>
+  <div class="tags">
+    {% for e in listing.equipamiento %}<span class="tag">{{ e }}</span>{% endfor %}
+  </div>
+  {% endif %}
+
+  <!-- GALERÍA -->
   {% if extras_b64_list %}
-  <div class="section-title">Galería de Fotos</div>
-  <div class="extras-grid">
-    {% for img in extras_b64_list %}<img src="data:image/jpeg;base64,{{ img }}">{% endfor %}
+  <div class="sec-title">Galería de Fotos</div>
+  <div class="gallery">
+    {% for img in extras_b64_list %}
+    <img src="data:image/jpeg;base64,{{ img }}">
+    {% endfor %}
   </div>
   {% endif %}
 
+  <!-- TOUR 360 -->
+  {% if listing.tour_360_url %}
+  <div class="sec-title">Tour Virtual 360°</div>
+  <div style="font-size:10px;color:#1B2A4A;padding:6px 0">
+    🔗 {{ listing.tour_360_url }}
+  </div>
+  {% endif %}
+
+  <!-- AGENTE -->
   <div class="agente-box">
-    <div>
+    {% if logo_b64 %}
+    <img class="agente-logo" src="data:image/jpeg;base64,{{ logo_b64 }}">
+    {% endif %}
+    <div class="agente-divider"></div>
+    <div class="agente-info">
       <div class="agente-nombre">{{ listing.agente_nombre }}</div>
-      <div class="agente-info">📱 {{ listing.agente_telefono }} &nbsp;·&nbsp; ✉️ {{ listing.agente_email }}</div>
+      <div class="agente-contact">
+        📱 {{ listing.agente_telefono }}<br>
+        ✉️ {{ listing.agente_email }}
+      </div>
     </div>
-    <div style="color:#C9A84C;font-size:11px;text-align:right">Inmersiva<br>Grupo Inmobiliario</div>
+    <div class="agente-brand">Inmersiva<br>Grupo Inmobiliario<br>inmobiliariainmersiva.com</div>
   </div>
 
 </div>
 
-<div class="footer-pdf">inmobiliariainmersiva.com · Documento generado por Inmersiva Grupo Inmobiliario</div>
+<div class="footer">
+  <span>Inmersiva Grupo Inmobiliario</span> · inmobiliariainmersiva.com · Documento generado con IA
+</div>
 
 </body>
 </html>

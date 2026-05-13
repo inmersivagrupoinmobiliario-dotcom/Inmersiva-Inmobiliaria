@@ -6,153 +6,104 @@
   <title>Ficha de Captación — Inmersiva Grupo Inmobiliario</title>
   <link rel="stylesheet" href="/static/css/style.css">
   <style>
-    .ficha-header {
-      background: #1B2A4A;
-      padding: 0;
-      display: flex;
-      align-items: stretch;
-      border-bottom: 4px solid #C9A84C;
+    :root { --navy:#1B2A4A; --gold:#C9A84C; }
+    * { box-sizing: border-box; }
+
+    /* ── Header ── */
+    .ficha-header { background:var(--navy); display:flex; align-items:stretch; border-bottom:4px solid var(--gold); }
+    .ficha-logo-block { background:white; padding:14px 20px; display:flex; align-items:center; }
+    .ficha-logo-block img { height:76px; width:auto; }
+    .ficha-title-block { padding:18px 28px; }
+    .ficha-title-block h1 { color:white; font-size:1.9rem; font-weight:800; letter-spacing:1px; margin:0 0 4px; line-height:1.1; }
+    .ficha-title-block p { color:var(--gold); font-size:.78rem; letter-spacing:3px; text-transform:uppercase; margin:0; }
+
+    /* ── Resultado de la llamada ── */
+    .llamada-bar { background:#f5f5f5; border-bottom:2px solid var(--gold); padding:10px 28px; display:flex; flex-wrap:wrap; gap:8px 28px; align-items:center; }
+    .llamada-bar .lb-title { font-size:.72rem; font-weight:700; color:var(--navy); letter-spacing:1px; text-transform:uppercase; width:100%; }
+    .llamada-bar label { display:flex; align-items:center; gap:6px; font-size:.83rem; color:#333; cursor:pointer; }
+    .llamada-bar input[type=checkbox] { accent-color:var(--navy); width:15px; height:15px; }
+
+    /* ── Corredor bar ── */
+    .corredor-bar { background:#fff; border-bottom:1px solid #ddd; padding:12px 28px; display:flex; flex-wrap:wrap; gap:8px 28px; align-items:center; }
+    .cb-field { display:flex; align-items:center; gap:8px; flex:1; min-width:180px; }
+    .cb-field label { font-size:.78rem; font-weight:700; color:var(--navy); white-space:nowrap; }
+    .cb-field input { border:none; border-bottom:1.5px solid var(--gold); background:transparent; padding:4px 6px; font-size:.88rem; flex:1; outline:none; }
+
+    /* ── Section header ── */
+    .section-header { background:var(--navy); color:white; padding:9px 16px; font-size:.75rem; font-weight:700; letter-spacing:2px; text-transform:uppercase; border-left:4px solid var(--gold); margin-bottom:18px; }
+    .section-num { color:var(--gold); margin-right:6px; }
+
+    /* ── Grids ── */
+    .fg { display:grid; gap:14px 20px; }
+    .fg.c2 { grid-template-columns:1fr 1fr; }
+    .fg.c3 { grid-template-columns:1fr 1fr 1fr; }
+    .fg.c4 { grid-template-columns:1fr 1fr 1fr 1fr; }
+    .fg.c5 { grid-template-columns:1fr 1fr 1fr 1fr 1fr; }
+    .span2 { grid-column:span 2; }
+    .span3 { grid-column:span 3; }
+    .span4 { grid-column:span 4; }
+
+    .fgroup { display:flex; flex-direction:column; }
+    .fgroup label { font-size:.74rem; font-weight:700; color:var(--navy); text-transform:uppercase; letter-spacing:.5px; margin-bottom:5px; }
+    .fgroup input, .fgroup select, .fgroup textarea {
+      border:1px solid #d0d0d0; border-radius:5px; padding:8px 10px;
+      font-size:.88rem; color:#333; outline:none;
+      transition:border-color .15s;
     }
-    .ficha-logo-block {
-      background: white;
-      padding: 16px 24px;
-      display: flex;
-      align-items: center;
-      min-width: 180px;
-    }
-    .ficha-logo-block img {
-      height: 80px;
-      width: auto;
-      display: block;
-    }
-    .ficha-title-block {
-      padding: 20px 32px;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-    }
-    .ficha-title-block h1 {
-      color: white;
-      font-size: 2rem;
-      font-weight: 800;
-      letter-spacing: 1px;
-      margin: 0 0 4px 0;
-      line-height: 1.1;
-    }
-    .ficha-title-block p {
-      color: #C9A84C;
-      font-size: 0.85rem;
-      letter-spacing: 3px;
-      text-transform: uppercase;
-      margin: 0;
-    }
-    .section-header {
-      background: #1B2A4A;
-      color: white;
-      padding: 10px 18px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      letter-spacing: 2px;
-      text-transform: uppercase;
-      border-left: 4px solid #C9A84C;
-      margin-bottom: 20px;
-    }
-    .section-num {
-      color: #C9A84C;
-      margin-right: 8px;
-    }
-    .corredor-bar {
-      background: #f0f2f5;
-      border-bottom: 2px solid #C9A84C;
-      padding: 14px 32px;
-      display: flex;
-      gap: 32px;
-      align-items: center;
-      flex-wrap: wrap;
-    }
-    .corredor-bar .cb-field {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      flex: 1;
-      min-width: 200px;
-    }
-    .corredor-bar label {
-      font-size: 0.82rem;
-      font-weight: 600;
-      color: #1B2A4A;
-      white-space: nowrap;
-    }
-    .corredor-bar input {
-      border: none;
-      border-bottom: 1.5px solid #C9A84C;
-      background: transparent;
-      padding: 4px 6px;
-      font-size: 0.9rem;
-      flex: 1;
-      outline: none;
-    }
-    .services-grid {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-    }
-    .service-item {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-size: 0.88rem;
-      color: #333;
-      cursor: pointer;
-    }
-    .service-item input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      accent-color: #1B2A4A;
-      cursor: pointer;
-    }
-    .cols-2 { grid-template-columns: 1fr 1fr; }
-    .cols-3 { grid-template-columns: 1fr 1fr 1fr; }
-    .cols-4 { grid-template-columns: 1fr 1fr 1fr 1fr; }
-    .video-upload-area {
-      border: 2px dashed #C9A84C;
-      border-radius: 8px;
-      padding: 28px;
-      text-align: center;
-      cursor: pointer;
-      background: #fffdf5;
-      transition: border-color 0.2s, background 0.2s;
-    }
-    .video-upload-area:hover { background: #fff8e8; }
-    .video-upload-area input[type="file"] { display: none; }
-    .upload-icon { font-size: 2.2rem; margin-bottom: 6px; }
-    .upload-label { font-weight: 600; color: #1B2A4A; font-size: 0.95rem; }
-    .upload-hint { color: #888; font-size: 0.8rem; margin-top: 4px; }
-    .video-preview { margin-top: 12px; }
-    .video-preview video { max-width: 100%; max-height: 200px; border-radius: 6px; }
-    .url-field { margin-top: 14px; }
-    .url-field label { display: block; font-size: 0.82rem; font-weight: 600; color: #1B2A4A; margin-bottom: 6px; }
-    .url-field input { width: 100%; padding: 10px 14px; border: 1.5px solid #d0d0d0; border-radius: 6px; font-size: 0.9rem; box-sizing: border-box; }
-    .footer-inmersiva {
-      text-align: center;
-      padding: 24px;
-      color: #888;
-      font-size: 0.78rem;
-      border-top: 1px solid #eee;
-      margin-top: 24px;
-    }
-    .footer-inmersiva span { color: #C9A84C; font-weight: 600; }
-    @media (max-width: 600px) {
-      .ficha-header { flex-direction: column; }
-      .ficha-logo-block { min-width: unset; justify-content: center; }
-      .corredor-bar { flex-direction: column; gap: 12px; }
-      .cols-2, .cols-3, .cols-4 { grid-template-columns: 1fr; }
+    .fgroup input:focus, .fgroup select:focus, .fgroup textarea:focus { border-color:var(--gold); }
+    .fgroup textarea { resize:vertical; }
+
+    /* ── Inline radio / checkbox groups ── */
+    .opt-group { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:4px; }
+    .opt-item { display:flex; align-items:center; gap:6px; font-size:.83rem; color:#333; cursor:pointer; }
+    .opt-item input { accent-color:var(--navy); width:14px; height:14px; cursor:pointer; }
+
+    /* ── Precio con moneda ── */
+    .precio-row { display:flex; gap:8px; }
+    .precio-row select { border:1px solid #d0d0d0; border-radius:5px; padding:8px 10px; font-size:.88rem; color:#333; background:white; min-width:90px; }
+    .precio-row input { flex:1; border:1px solid #d0d0d0; border-radius:5px; padding:8px 10px; font-size:.88rem; }
+
+    /* ── Amenidades / servicios grid ── */
+    .check-grid { display:grid; grid-template-columns:repeat(auto-fill, minmax(170px,1fr)); gap:8px; }
+    .check-item { display:flex; align-items:center; gap:7px; font-size:.83rem; color:#333; cursor:pointer; padding:5px 8px; border:1px solid #eee; border-radius:5px; }
+    .check-item:hover { background:#f8f6f0; border-color:var(--gold); }
+    .check-item input { accent-color:var(--navy); width:14px; height:14px; }
+
+    /* ── Escala urgencia ── */
+    .urgencia-scale { display:flex; gap:10px; margin-top:4px; }
+    .urgencia-scale label { display:flex; flex-direction:column; align-items:center; gap:4px; font-size:.78rem; color:#555; cursor:pointer; }
+    .urgencia-scale input { accent-color:var(--navy); }
+
+    /* ── Upload areas ── */
+    .upload-area { border:2px dashed var(--gold); border-radius:8px; padding:22px; text-align:center; cursor:pointer; background:#fffdf5; transition:.2s; }
+    .upload-area:hover { background:#fff8e8; }
+    .upload-area input[type=file] { display:none; }
+    .upload-icon { font-size:2rem; margin-bottom:4px; }
+    .upload-label { font-weight:600; color:var(--navy); font-size:.9rem; }
+    .upload-hint { color:#888; font-size:.77rem; margin-top:3px; }
+    .preview-grid { display:flex; flex-wrap:wrap; gap:8px; margin-top:10px; justify-content:center; }
+    .preview-grid img { height:80px; border-radius:5px; object-fit:cover; }
+    .video-preview { margin-top:10px; }
+    .video-preview video { max-width:100%; max-height:180px; border-radius:6px; }
+
+    /* ── Footer ── */
+    .ficha-footer { text-align:center; padding:20px; color:#888; font-size:.76rem; border-top:1px solid #eee; margin-top:16px; }
+    .ficha-footer span { color:var(--gold); font-weight:600; }
+
+    .divider { border:none; border-top:1px solid #eee; margin:16px 0; }
+    .nota { font-size:.75rem; color:#888; font-style:italic; padding:8px 12px; background:#f9f9f9; border-left:3px solid var(--gold); border-radius:0 4px 4px 0; margin-top:-8px; }
+
+    @media(max-width:680px) {
+      .fg.c2,.fg.c3,.fg.c4,.fg.c5 { grid-template-columns:1fr; }
+      .span2,.span3,.span4 { grid-column:span 1; }
+      .ficha-header { flex-direction:column; }
+      .corredor-bar { flex-direction:column; gap:10px; }
     }
   </style>
 </head>
 <body>
 
-<!-- ── HEADER ──────────────────────────────────────────────────────────────── -->
+<!-- ═══ HEADER ════════════════════════════════════════════════════════════ -->
 <header class="ficha-header">
   <div class="ficha-logo-block">
     <img src="/static/img/logo.jpeg" alt="Inmersiva Grupo Inmobiliario">
@@ -163,231 +114,476 @@
   </div>
 </header>
 
-{% if error %}
-<div class="alert alert-error" style="margin:16px 24px">{{ error }}</div>
-{% endif %}
+{% if error %}<div style="margin:14px 24px;padding:12px 16px;background:#fde8e8;border-left:4px solid #e53e3e;border-radius:4px;font-size:.88rem;color:#c0392b">{{ error }}</div>{% endif %}
 
-<!-- ── CORREDOR BAR ────────────────────────────────────────────────────────── -->
+<!-- ═══ RESULTADO DE LA LLAMADA ══════════════════════════════════════════ -->
+<div class="llamada-bar">
+  <div class="lb-title">Resultado de la llamada</div>
+  {% for r in ["Contestó","No contestó","Volver a llamar","Visita agendada","Info por WhatsApp","Descartado"] %}
+  <label><input type="checkbox" name="resultado_llamada" value="{{ r }}" form="fichaForm"> {{ r }}</label>
+  {% endfor %}
+</div>
+
+<!-- ═══ CORREDOR BAR ══════════════════════════════════════════════════════ -->
 <div class="corredor-bar">
-  <div class="cb-field">
-    <label>Corredor/a:</label>
-    <input type="text" name="agente_nombre" id="agente_nombre" placeholder="Nombre completo" required form="fichaForm">
-  </div>
-  <div class="cb-field">
-    <label>WhatsApp:</label>
-    <input type="text" name="agente_telefono" id="agente_telefono" placeholder="5512345678" required form="fichaForm">
-  </div>
-  <div class="cb-field">
-    <label>Email:</label>
-    <input type="email" name="agente_email" id="agente_email" placeholder="corredor@inmersiva.com" required form="fichaForm">
-  </div>
+  <div class="cb-field"><label>Corredor/a:</label><input type="text" name="agente_nombre" placeholder="Nombre completo" required form="fichaForm"></div>
+  <div class="cb-field"><label>WhatsApp:</label><input type="text" name="agente_telefono" placeholder="999 000 000" required form="fichaForm"></div>
+  <div class="cb-field"><label>Email:</label><input type="email" name="agente_email" placeholder="corredor@inmersiva.com" required form="fichaForm"></div>
+  <div class="cb-field"><label>Origen:</label><input type="text" name="origen_contacto" placeholder="Ej. Portal, Referido" form="fichaForm"></div>
 </div>
 
 <div class="container">
-  <form id="fichaForm" action="/generar" method="post" enctype="multipart/form-data">
+<form id="fichaForm" action="/generar" method="post" enctype="multipart/form-data">
 
-    <!-- ── 1. DATOS DEL INMUEBLE ──────────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">1.</span> DATOS DEL INMUEBLE</div>
-      <div class="form-grid cols-2">
-        <div class="form-group">
-          <label for="tipo">Tipo *</label>
-          <select name="tipo" id="tipo" required>
-            <option value="">Selecciona...</option>
-            <option value="Casa">Casa</option>
-            <option value="Departamento">Departamento</option>
-            <option value="Terreno">Terreno</option>
-            <option value="Penthouse">Penthouse</option>
-            <option value="Local comercial">Local comercial</option>
-            <option value="Oficina">Oficina</option>
-          </select>
-        </div>
-        <div class="form-group">
-          <label for="operacion">Operación *</label>
-          <select name="operacion" id="operacion" required>
-            <option value="">Selecciona...</option>
-            <option value="Venta">Venta</option>
-            <option value="Renta">Renta</option>
-            <option value="Venta o renta">Venta o renta</option>
-          </select>
-        </div>
-        <div class="form-group full">
-          <label for="direccion">Dirección exacta *</label>
-          <input type="text" name="direccion" id="direccion" placeholder="Ej. Av. Insurgentes Sur 1234, Col. Del Valle" required>
-        </div>
-        <div class="form-group">
-          <label for="ciudad">Ciudad *</label>
-          <input type="text" name="ciudad" id="ciudad" placeholder="Ej. Ciudad de México" required>
-        </div>
-        <div class="form-group">
-          <label for="estado">Estado *</label>
-          <input type="text" name="estado" id="estado" placeholder="Ej. CDMX" required>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 2. CARACTERÍSTICAS ─────────────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">2.</span> CARACTERÍSTICAS</div>
-      <div class="form-grid cols-4">
-        <div class="form-group">
-          <label for="m2_construidos">M² Construidos</label>
-          <input type="number" name="m2_construidos" id="m2_construidos" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label for="m2_terreno">M² Terreno</label>
-          <input type="number" name="m2_terreno" id="m2_terreno" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label for="recamaras">Recámaras</label>
-          <input type="number" name="recamaras" id="recamaras" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label for="banos">Baños</label>
-          <input type="number" name="banos" id="banos" placeholder="0" min="0" step="0.5">
-        </div>
-        <div class="form-group">
-          <label for="estacionamientos">Cocheras</label>
-          <input type="number" name="estacionamientos" id="estacionamientos" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label for="antiguedad">Antigüedad (años)</label>
-          <input type="number" name="antiguedad" id="antiguedad" placeholder="0" min="0">
-        </div>
-        <div class="form-group">
-          <label for="precio">Precio (MXN) *</label>
-          <input type="number" name="precio" id="precio" placeholder="3500000" min="0" required>
-        </div>
-        <div class="form-group">
-          <label for="vista">Vista / Orientación</label>
-          <input type="text" name="vista" id="vista" placeholder="Ej. Norte, Parque">
-        </div>
-      </div>
-      <div class="form-group" style="margin-top:12px">
-        <label>Estado del inmueble</label>
-        <div class="services-grid" style="margin-top:8px">
-          {% for est in ["A estrenar", "Conservado", "Requiere mantenimiento", "Requiere remodelación"] %}
-          <label class="service-item">
-            <input type="radio" name="estado_inmueble" value="{{ est }}"> {{ est }}
-          </label>
-          {% endfor %}
-        </div>
-      </div>
-    </div>
-
-    <!-- ── 3. SERVICIOS Y AMENIDADES ─────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">3.</span> SERVICIOS Y AMENIDADES</div>
-      <label style="font-size:.82rem;font-weight:600;color:#1B2A4A;display:block;margin-bottom:10px">Servicios incluidos</label>
-      <div class="services-grid" style="margin-bottom:20px">
-        {% for srv in ["Agua", "Luz", "Gas natural", "Internet / cable", "Desagüe", "Pozo séptico"] %}
-        <label class="service-item">
-          <input type="checkbox" name="servicios" value="{{ srv }}"> {{ srv }}
-        </label>
-        {% endfor %}
-      </div>
-      <label style="font-size:.82rem;font-weight:600;color:#1B2A4A;display:block;margin-bottom:10px">Amenidades</label>
-      <div class="amenidades-grid">
-        {% for a in ["Alberca", "Jardín", "Seguridad 24h", "Gimnasio", "Salón de eventos", "Área de juegos", "Roof garden", "Elevador", "Bodega", "Cuarto de servicio", "Estudio", "Cisterna propia", "Paneles solares", "Vista al mar", "Frente a parque", "Cocina integral", "Closets", "Aire acondicionado", "Amueblado", "Terraza", "Chimenea"] %}
-        <label class="amenidad-item">
-          <input type="checkbox" name="amenidades" value="{{ a }}"> {{ a }}
-        </label>
+<!-- ═══ 1. DATOS DEL PROPIETARIO ═════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">1.</span> DATOS DEL PROPIETARIO</div>
+  <div class="fg c2">
+    <div class="fgroup span2"><label>Nombre completo</label><input type="text" name="propietario_nombre" placeholder="Apellidos y nombres completos"></div>
+    <div class="fgroup"><label>DNI / CE</label><input type="text" name="propietario_dni" placeholder="00000000"></div>
+    <div class="fgroup"><label>Teléfono / WhatsApp</label><input type="text" name="propietario_telefono" placeholder="999 000 000"></div>
+    <div class="fgroup span2"><label>Correo electrónico</label><input type="email" name="propietario_email" placeholder="propietario@correo.com"></div>
+  </div>
+  <hr class="divider">
+  <div class="fg c2" style="margin-top:4px">
+    <div class="fgroup">
+      <label>Estado civil</label>
+      <div class="opt-group">
+        {% for e in ["Soltero/a","Casado/a","Conviviente","Divorciado/a","Viudo/a"] %}
+        <label class="opt-item"><input type="radio" name="propietario_estado_civil" value="{{ e }}"> {{ e }}</label>
         {% endfor %}
       </div>
     </div>
-
-    <!-- ── 4. INFORMACIÓN COMERCIAL ──────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">4.</span> INFORMACIÓN COMERCIAL</div>
-      <div class="form-grid cols-2">
-        <div class="form-group">
-          <label>Modalidad</label>
-          <div class="services-grid" style="margin-top:8px">
-            {% for mod in ["Solo venta", "Venta o alquiler", "Permuta"] %}
-            <label class="service-item">
-              <input type="radio" name="modalidad" value="{{ mod }}"> {{ mod }}
-            </label>
-            {% endfor %}
-          </div>
-        </div>
-        <div class="form-group">
-          <label>Forma de pago aceptada</label>
-          <div class="services-grid" style="margin-top:8px">
-            {% for fp in ["Contado", "Crédito hipotecario", "Infonavit / Fovissste", "Permuta"] %}
-            <label class="service-item">
-              <input type="checkbox" name="forma_pago" value="{{ fp }}"> {{ fp }}
-            </label>
-            {% endfor %}
-          </div>
-        </div>
+    <div class="fgroup">
+      <label>Régimen patrimonial</label>
+      <div class="opt-group">
+        {% for r in ["Gananciales","Separación de bienes"] %}
+        <label class="opt-item"><input type="radio" name="propietario_regimen" value="{{ r }}"> {{ r }}</label>
+        {% endfor %}
       </div>
     </div>
-
-    <!-- ── 5. FOTOS DE LA PROPIEDAD ──────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">5.</span> FOTOS DE LA PROPIEDAD</div>
-      <div class="form-group" style="margin-bottom:16px">
-        <label>Foto de portada * <span style="font-weight:400;color:#888;font-size:.78rem">(aparece en el PDF e imagen de Instagram)</span></label>
-        <div class="file-upload-area" onclick="document.getElementById('foto_portada').click()">
-          <input type="file" id="foto_portada" name="foto_portada" accept="image/*" required onchange="previewPortada(this)">
-          <div class="upload-icon">📷</div>
-          <div class="upload-label">Seleccionar foto de portada</div>
-          <div class="upload-hint">JPG, PNG — mínimo 1200×800 px recomendado</div>
-          <div id="portada-preview" class="preview-grid"></div>
-        </div>
-      </div>
-      <div class="form-group">
-        <label>Fotos adicionales <span style="font-weight:400;color:#888;font-size:.78rem">(opcional — se usan en el reel de video)</span></label>
-        <div class="file-upload-area" onclick="document.getElementById('fotos_extras').click()">
-          <input type="file" id="fotos_extras" name="fotos_extras" accept="image/*" multiple onchange="previewExtras(this)">
-          <div class="upload-icon">🖼️</div>
-          <div class="upload-label">Agregar más fotos</div>
-          <div class="upload-hint">Puedes seleccionar varias a la vez</div>
-          <div id="extras-preview" class="preview-grid"></div>
-        </div>
+    <div class="fgroup">
+      <label>Relación con el inmueble</label>
+      <div class="opt-group">
+        {% for rel in ["Propietario único","Copropietario","Apoderado","Familiar"] %}
+        <label class="opt-item"><input type="radio" name="propietario_relacion" value="{{ rel }}"> {{ rel }}</label>
+        {% endfor %}
       </div>
     </div>
-
-    <!-- ── 6. VIDEO / TOUR VIRTUAL ───────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">6.</span> VIDEO / TOUR VIRTUAL</div>
-      <div class="form-group" style="margin-bottom:16px">
-        <label>Video de la propiedad <span style="font-weight:400;color:#888;font-size:.78rem">(opcional — MP4, MOV, AVI)</span></label>
-        <div class="video-upload-area" onclick="document.getElementById('video_propiedad').click()">
-          <input type="file" id="video_propiedad" name="video_propiedad" accept="video/*" onchange="previewVideo(this)">
-          <div class="upload-icon">🎬</div>
-          <div class="upload-label">Seleccionar video</div>
-          <div class="upload-hint">Se adjuntará como material de referencia</div>
-          <div class="video-preview" id="video-preview"></div>
-        </div>
-      </div>
-      <div class="url-field">
-        <label>Link de Tour 360° <span style="font-weight:400;color:#888;font-size:.78rem">(opcional)</span></label>
-        <input type="url" name="tour_360_url" id="tour_360_url" placeholder="https://...">
+    <div class="fgroup">
+      <label>¿Otros titulares deben firmar?</label>
+      <div class="opt-group">
+        <label class="opt-item"><input type="radio" name="propietario_otros_titulares" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="propietario_otros_titulares" value="Sí"> Sí</label>
       </div>
     </div>
-
-    <!-- ── 7. NOTAS DEL CORREDOR ─────────────────────────────────────────── -->
-    <div class="card">
-      <div class="section-header"><span class="section-num">7.</span> NOTAS DEL CORREDOR</div>
-      <div class="form-group">
-        <label for="descripcion_agente">¿Qué destaca de esta propiedad? *
-          <span style="font-weight:400;color:#888;font-size:.78rem">(la IA usará esto para generar la descripción)</span>
-        </label>
-        <textarea name="descripcion_agente" id="descripcion_agente" rows="4"
-          placeholder="Ej. Ubicación privilegiada frente al parque, acabados de lujo, recién remodelada, excelente iluminación natural..." required></textarea>
-      </div>
-    </div>
-
-    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
-      ✨ Generar Contenido con IA
-    </button>
-
-  </form>
+  </div>
 </div>
 
-<div class="footer-inmersiva">
-  <span>Inmersiva Grupo Inmobiliario</span> · Sistema Generador de Contenido IA
+<!-- ═══ 2. DATOS DEL INMUEBLE ════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">2.</span> DATOS DEL INMUEBLE</div>
+  <div class="fg c3">
+    <div class="fgroup">
+      <label>Tipo *</label>
+      <select name="tipo" required>
+        <option value="">Selecciona...</option>
+        {% for t in ["Casa","Departamento","Terreno","Penthouse","Local comercial","Oficina","Otro"] %}
+        <option value="{{ t }}">{{ t }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Operación *</label>
+      <select name="operacion" required>
+        <option value="">Selecciona...</option>
+        {% for op in ["Venta","Renta","Venta o renta"] %}
+        <option value="{{ op }}">{{ op }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="fgroup">
+      <label>Estado del inmueble</label>
+      <select name="estado_inmueble">
+        <option value="">Selecciona...</option>
+        {% for est in ["A estrenar","Conservado","Requiere mantenimiento","Requiere remodelación"] %}
+        <option value="{{ est }}">{{ est }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="fgroup span3"><label>Dirección exacta *</label><input type="text" name="direccion" placeholder="Ej. Av. Javier Prado 1234, San Isidro" required></div>
+    <div class="fgroup span2"><label>Distrito / Urbanización / Referencia</label><input type="text" name="ciudad" placeholder="Ej. San Isidro" required></div>
+    <div class="fgroup"><label>Provincia / Estado *</label><input type="text" name="estado" placeholder="Ej. Lima" required></div>
+  </div>
+  <hr class="divider">
+  <div class="fg c5" style="margin-top:4px">
+    <div class="fgroup"><label>Área terreno (m²)</label><input type="number" name="m2_terreno" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Área construida (m²)</label><input type="number" name="m2_construidos" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Pisos</label><input type="number" name="pisos" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Antigüedad (años)</label><input type="number" name="antiguedad" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Vista / Orientación</label><input type="text" name="vista" placeholder="Norte, Parque..."></div>
+    <div class="fgroup"><label>Dormitorios</label><input type="number" name="recamaras" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Baños</label><input type="number" name="banos" placeholder="0" min="0" step="0.5"></div>
+    <div class="fgroup"><label>Cocheras</label><input type="number" name="estacionamientos" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Mant. mensual ({{ "S/" }})</label><input type="number" name="mantenimiento_mensual" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>¿Cuotas pendientes?</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="cuotas_pendientes" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="cuotas_pendientes" value="Sí"> Sí</label>
+      </div>
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="fgroup" style="margin-top:4px">
+    <label>Servicios disponibles</label>
+    <div class="check-grid" style="margin-top:8px">
+      {% for srv in ["Agua","Luz","Gas natural","Internet / cable","Desagüe","Pozo séptico"] %}
+      <label class="check-item"><input type="checkbox" name="servicios" value="{{ srv }}"> {{ srv }}</label>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 3. AMENIDADES Y EQUIPAMIENTO ════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">3.</span> AMENIDADES Y EQUIPAMIENTO</div>
+  <div class="fgroup">
+    <label>Características y amenidades</label>
+    <div class="check-grid" style="margin-top:8px">
+      {% for a in ["Alberca","Jardín","Seguridad 24h","Gimnasio","Salón de eventos","Área de juegos","Roof garden","Elevador","Bodega","Cuarto de servicio","Estudio","Cisterna propia","Paneles solares","Vista al mar","Frente a parque","Terraza","Chimenea","Parrilla / BBQ","Condominio privado","Portería"] %}
+      <label class="check-item"><input type="checkbox" name="amenidades" value="{{ a }}"> {{ a }}</label>
+      {% endfor %}
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="fgroup" style="margin-top:4px">
+    <label>Equipamiento incluido</label>
+    <div class="check-grid" style="margin-top:8px">
+      {% for eq in ["Cocina empotrada","Closets","Aire acondicionado","Muebles","Electrodomésticos","Ninguno"] %}
+      <label class="check-item"><input type="checkbox" name="equipamiento" value="{{ eq }}"> {{ eq }}</label>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 4. DOCUMENTACIÓN, TENENCIA Y SITUACIÓN LEGAL ════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">4.</span> DOCUMENTACIÓN, TENENCIA Y SITUACIÓN LEGAL</div>
+  <div class="fgroup">
+    <label>Tipo de tenencia</label>
+    <div class="opt-group" style="margin-top:6px">
+      {% for t in ["Propiedad inscrita en Registros Públicos","Solo certificado de posesión","En trámite de inscripción","Posesión sin documento"] %}
+      <label class="opt-item"><input type="radio" name="tenencia" value="{{ t }}"> {{ t }}</label>
+      {% endfor %}
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="fg c3" style="margin-top:4px">
+    <div class="fgroup"><label>Partida / Ficha registral</label><input type="text" name="partida_registral" placeholder="N°..."></div>
+    <div class="fgroup"><label>Oficina registral</label><input type="text" name="oficina_registral" placeholder="Ej. Lima"></div>
+    <div class="fgroup"><label>Declaratoria de fábrica</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="declaratoria_fabrica" value="Sí"> Sí</label>
+        <label class="opt-item"><input type="radio" name="declaratoria_fabrica" value="No"> No</label>
+      </div>
+    </div>
+    <div class="fgroup"><label>Independización</label>
+      <div class="opt-group" style="margin-top:8px">
+        {% for v in ["Sí","No","N/A"] %}<label class="opt-item"><input type="radio" name="independizacion" value="{{ v }}"> {{ v }}</label>{% endfor %}
+      </div>
+    </div>
+    <div class="fgroup"><label>Predial al día</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="predial_al_dia" value="Sí"> Sí</label>
+        <label class="opt-item"><input type="radio" name="predial_al_dia" value="No"> No</label>
+      </div>
+    </div>
+    <div class="fgroup"><label>Arbitrios al día</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="arbitrios_al_dia" value="Sí"> Sí</label>
+        <label class="opt-item"><input type="radio" name="arbitrios_al_dia" value="No"> No</label>
+      </div>
+    </div>
+    <div class="fgroup"><label>¿Hipoteca o gravamen?</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="hipoteca" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="hipoteca" value="Sí"> Sí</label>
+      </div>
+    </div>
+    <div class="fgroup"><label>Entidad / banco</label><input type="text" name="hipoteca_entidad" placeholder="Ej. BCP, BBVA..."></div>
+    <div class="fgroup"><label>Saldo aprox.</label><input type="text" name="hipoteca_saldo" placeholder="Ej. S/ 80,000"></div>
+    <div class="fgroup"><label>¿Litigios o linderos en disputa?</label>
+      <div class="opt-group" style="margin-top:8px">
+        <label class="opt-item"><input type="radio" name="litigios" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="litigios" value="Sí"> Sí</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 5. INFORMACIÓN COMERCIAL ═════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">5.</span> INFORMACIÓN COMERCIAL</div>
+  <div class="fg c3">
+    <div class="fgroup">
+      <label>Moneda y precio publicado *</label>
+      <div class="precio-row">
+        <select name="moneda">
+          <option value="PEN">S/ Soles</option>
+          <option value="USD">US$ Dólares</option>
+          <option value="MXN">$ MXN</option>
+        </select>
+        <input type="number" name="precio" placeholder="0" min="0" required>
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>Precio mínimo aceptable</label>
+      <input type="number" name="precio_minimo" placeholder="0" min="0">
+    </div>
+    <div class="fgroup">
+      <label>Comisión (%)</label>
+      <input type="text" name="comision" placeholder="Ej. 3%">
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="fg c3" style="margin-top:4px">
+    <div class="fgroup">
+      <label>Modalidad</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for m in ["Solo venta","Venta o alquiler","Permuta"] %}
+        <label class="opt-item"><input type="radio" name="modalidad" value="{{ m }}"> {{ m }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>La comisión la paga</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for c in ["Dueño","Comprador","Compartida"] %}
+        <label class="opt-item"><input type="radio" name="comision_paga" value="{{ c }}"> {{ c }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>Forma de pago aceptada</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for fp in ["Contado","Crédito hipotecario","Mi Vivienda","Techo Propio","Permuta"] %}
+        <label class="opt-item"><input type="checkbox" name="forma_pago" value="{{ fp }}"> {{ fp }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>¿Fotos profesionales?</label>
+      <div class="opt-group" style="margin-top:6px">
+        <label class="opt-item"><input type="radio" name="fotos_profesionales" value="Sí"> Sí</label>
+        <label class="opt-item"><input type="radio" name="fotos_profesionales" value="No"> No</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 6. FOTOS DE LA PROPIEDAD ═════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">6.</span> FOTOS DE LA PROPIEDAD</div>
+  <div style="margin-bottom:16px">
+    <p style="font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:8px">Foto de portada * <span style="font-weight:400;color:#888">(principal para PDF e Instagram)</span></p>
+    <div class="upload-area" onclick="document.getElementById('foto_portada').click()">
+      <input type="file" id="foto_portada" name="foto_portada" accept="image/*" required onchange="previewPortada(this)">
+      <div class="upload-icon">📷</div>
+      <div class="upload-label">Seleccionar foto de portada</div>
+      <div class="upload-hint">JPG, PNG — mínimo 1200 × 800 px</div>
+      <div class="preview-grid" id="portada-preview"></div>
+    </div>
+  </div>
+  <div>
+    <p style="font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:8px">Fotos adicionales <span style="font-weight:400;color:#888">(se usan en el reel de video)</span></p>
+    <div class="upload-area" onclick="document.getElementById('fotos_extras').click()">
+      <input type="file" id="fotos_extras" name="fotos_extras" accept="image/*" multiple onchange="previewExtras(this)">
+      <div class="upload-icon">🖼️</div>
+      <div class="upload-label">Agregar más fotos</div>
+      <div class="upload-hint">Puedes seleccionar varias a la vez</div>
+      <div class="preview-grid" id="extras-preview"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 7. VIDEO / TOUR VIRTUAL ══════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">7.</span> VIDEO / TOUR VIRTUAL</div>
+  <div style="margin-bottom:16px">
+    <p style="font-size:.8rem;font-weight:600;color:var(--navy);margin-bottom:8px">Video de la propiedad <span style="font-weight:400;color:#888">(opcional — MP4, MOV)</span></p>
+    <div class="upload-area" onclick="document.getElementById('video_propiedad').click()">
+      <input type="file" id="video_propiedad" name="video_propiedad" accept="video/*" onchange="previewVideo(this)">
+      <div class="upload-icon">🎬</div>
+      <div class="upload-label">Seleccionar video</div>
+      <div class="upload-hint">MP4, MOV, AVI</div>
+      <div class="video-preview" id="video-preview"></div>
+    </div>
+  </div>
+  <div class="fgroup">
+    <label>Link de Tour 360° <span style="font-weight:400;text-transform:none;color:#888;font-size:.75rem">(opcional)</span></label>
+    <input type="url" name="tour_360_url" placeholder="https://...">
+  </div>
+</div>
+
+<!-- ═══ 8. HISTORIAL DE VENTA ════════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">8.</span> HISTORIAL DE VENTA</div>
+  <div class="fg c4">
+    <div class="fgroup"><label>Tiempo publicada (meses)</label><input type="number" name="tiempo_publicada" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>N° de visitas</label><input type="number" name="num_visitas" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>N° de ofertas</label><input type="number" name="num_ofertas" placeholder="0" min="0"></div>
+    <div class="fgroup"><label>Oferta más alta</label><input type="number" name="oferta_mas_alta" placeholder="0" min="0"></div>
+  </div>
+  <hr class="divider">
+  <div class="fgroup" style="margin-top:4px">
+    <label>Publicada en</label>
+    <div class="check-grid" style="margin-top:8px">
+      {% for p in ["Urbania","Adondevivir","Properati","OLX / ML","Cartel","Facebook","Portal propio","Otro"] %}
+      <label class="check-item"><input type="checkbox" name="portales" value="{{ p }}"> {{ p }}</label>
+      {% endfor %}
+    </div>
+  </div>
+  <hr class="divider">
+  <div class="fg c2" style="margin-top:4px">
+    <div class="fgroup">
+      <label>¿Otros corredores?</label>
+      <div class="opt-group" style="margin-top:6px">
+        <label class="opt-item"><input type="radio" name="otros_corredores" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="otros_corredores" value="Sí"> Sí</label>
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>¿Exclusividad?</label>
+      <div class="opt-group" style="margin-top:6px">
+        <label class="opt-item"><input type="radio" name="exclusividad" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="exclusividad" value="Sí"> Sí</label>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══ 9. MOTIVACIÓN Y URGENCIA ════════════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">9.</span> MOTIVACIÓN Y URGENCIA <span style="font-size:.65rem;letter-spacing:1px;color:#C9A84C">— LO MÁS IMPORTANTE</span></div>
+  <div class="fgroup" style="margin-bottom:16px">
+    <label>Motivo de venta</label>
+    <input type="text" name="motivo_venta" placeholder="Ej. Mudanza al extranjero, deuda, herencia...">
+  </div>
+  <div class="fg c2">
+    <div class="fgroup">
+      <label>Plazo deseado</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for pl in ["Inmediato (<1 mes)","Corto (1–3 meses)","Medio (3–6 meses)","Sin apuro"] %}
+        <label class="opt-item"><input type="radio" name="plazo_venta" value="{{ pl }}"> {{ pl }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>Urgencia percibida <span style="font-weight:400;text-transform:none;font-size:.75rem">(1 = ninguna · 5 = altísima)</span></label>
+      <div class="urgencia-scale">
+        {% for i in range(1,6) %}
+        <label><input type="radio" name="urgencia" value="{{ i }}"> {{ i }}</label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="fgroup" style="margin-top:14px">
+    <label>¿Ya comprometió el dinero de la venta?</label>
+    <textarea name="dinero_comprometido" rows="2" placeholder="Ej. Tiene deuda pendiente, planea comprar otro inmueble..."></textarea>
+  </div>
+</div>
+
+<!-- ═══ 10. OCUPACIÓN Y DISPONIBILIDAD ══════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">10.</span> OCUPACIÓN Y DISPONIBILIDAD PARA VISITAS</div>
+  <div class="fg c2">
+    <div class="fgroup">
+      <label>Estado actual</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for est in ["Habitada por el dueño","Alquilada","Desocupada"] %}
+        <label class="opt-item"><input type="radio" name="estado_ocupacion" value="{{ est }}"> {{ est }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>¿Llaves con un tercero?</label>
+      <div class="opt-group" style="margin-top:6px">
+        <label class="opt-item"><input type="radio" name="llaves_tercero" value="No"> No</label>
+        <label class="opt-item"><input type="radio" name="llaves_tercero" value="Sí"> Sí</label>
+      </div>
+    </div>
+  </div>
+  <div class="fgroup" style="margin-top:14px">
+    <label>Disponibilidad para mostrar</label>
+    <textarea name="disponibilidad_visitas" rows="2" placeholder="Ej. Lunes a viernes de 9am a 6pm, previa cita..."></textarea>
+  </div>
+</div>
+
+<!-- ═══ 11. RESULTADO Y SIGUIENTE PASO ══════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">11.</span> SIGUIENTE PASO</div>
+  <div class="fg c3">
+    <div class="fgroup"><label>Próximo contacto — fecha</label><input type="date" name="proximo_contacto_fecha"></div>
+    <div class="fgroup"><label>Hora</label><input type="time" name="proximo_contacto_hora"></div>
+    <div class="fgroup">
+      <label>Canal</label>
+      <div class="opt-group" style="margin-top:8px">
+        {% for ch in ["Llamada","WhatsApp","Visita"] %}
+        <label class="opt-item"><input type="radio" name="proximo_contacto_canal" value="{{ ch }}"> {{ ch }}</label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="fgroup" style="margin-top:14px">
+    <label>Acuerdo concreto</label>
+    <textarea name="acuerdo_concreto" rows="2" placeholder="Ej. Enviará escrituras el viernes, visita programada para el lunes 10am..."></textarea>
+  </div>
+</div>
+
+<!-- ═══ 12. OBSERVACIONES DEL CORREDOR ══════════════════════════════════ -->
+<div class="card">
+  <div class="section-header"><span class="section-num">12.</span> OBSERVACIONES DEL CORREDOR</div>
+  <div class="fg c2">
+    <div class="fgroup">
+      <label>Interés percibido <span style="font-weight:400;text-transform:none;font-size:.75rem">(1 = ninguno · 5 = muy alto)</span></label>
+      <div class="urgencia-scale">
+        {% for i in range(1,6) %}
+        <label><input type="radio" name="interes_percibido" value="{{ i }}"> {{ i }}</label>
+        {% endfor %}
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>Decisor único</label>
+      <div class="opt-group" style="margin-top:6px">
+        <label class="opt-item"><input type="radio" name="decisor_unico" value="Sí"> Sí</label>
+        <label class="opt-item"><input type="radio" name="decisor_unico" value="No"> No</label>
+      </div>
+    </div>
+    <div class="fgroup">
+      <label>Tono / Actitud</label>
+      <div class="opt-group" style="margin-top:6px">
+        {% for tone in ["Abierto","Receloso","Apurado","Cansado de corredores","Otro"] %}
+        <label class="opt-item"><input type="radio" name="tono_actitud" value="{{ tone }}"> {{ tone }}</label>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+  <div class="fgroup" style="margin-top:16px">
+    <label>Notas libres para la IA * <span style="font-weight:400;text-transform:none;color:#888;font-size:.75rem">(destaca lo mejor de la propiedad para generar el contenido)</span></label>
+    <textarea name="descripcion_agente" rows="4" placeholder="Ej. Ubicación privilegiada frente al parque, acabados de lujo, excelente iluminación, propietario muy motivado a vender..." required></textarea>
+  </div>
+  <p class="nota">Recordatorio Inmersiva: el objetivo de la llamada es conseguir la visita, no firmar exclusividad. Si el inmueble tiene solo certificado de posesión, advierte al equipo: no aplica crédito hipotecario tradicional.</p>
+</div>
+
+<button type="submit" class="btn btn-primary btn-block" id="submitBtn" style="margin-bottom:8px">
+  ✨ Generar Contenido con IA
+</button>
+
+</form>
+</div>
+
+<div class="ficha-footer">
+  <span>Inmersiva Grupo Inmobiliario</span> · Sistema Generador de Contenido IA · inmobiliariainmersiva.com
 </div>
 
 <script src="/static/js/main.js"></script>
@@ -397,39 +593,25 @@
     btn.disabled = true;
     btn.textContent = '⏳ Generando contenido...';
   });
-
   function previewPortada(input) {
-    const preview = document.getElementById('portada-preview');
-    preview.innerHTML = '';
-    if (input.files && input.files[0]) {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(input.files[0]);
-      preview.appendChild(img);
-    }
+    const p = document.getElementById('portada-preview');
+    p.innerHTML = '';
+    if (input.files[0]) { const img = document.createElement('img'); img.src = URL.createObjectURL(input.files[0]); p.appendChild(img); }
   }
-
   function previewExtras(input) {
-    const preview = document.getElementById('extras-preview');
-    preview.innerHTML = '';
-    Array.from(input.files).forEach(file => {
-      const img = document.createElement('img');
-      img.src = URL.createObjectURL(file);
-      preview.appendChild(img);
-    });
+    const p = document.getElementById('extras-preview');
+    p.innerHTML = '';
+    Array.from(input.files).forEach(f => { const img = document.createElement('img'); img.src = URL.createObjectURL(f); p.appendChild(img); });
   }
-
   function previewVideo(input) {
-    const preview = document.getElementById('video-preview');
-    preview.innerHTML = '';
-    if (input.files && input.files[0]) {
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(input.files[0]);
-      video.controls = true;
-      preview.appendChild(video);
-      const name = document.createElement('p');
-      name.style.cssText = 'font-size:.8rem;color:#666;margin-top:6px';
-      name.textContent = input.files[0].name;
-      preview.appendChild(name);
+    const p = document.getElementById('video-preview');
+    p.innerHTML = '';
+    if (input.files[0]) {
+      const v = document.createElement('video');
+      v.src = URL.createObjectURL(input.files[0]);
+      v.controls = true;
+      p.appendChild(v);
+      const n = document.createElement('p'); n.style.cssText='font-size:.78rem;color:#666;margin-top:4px'; n.textContent=input.files[0].name; p.appendChild(n);
     }
   }
 </script>

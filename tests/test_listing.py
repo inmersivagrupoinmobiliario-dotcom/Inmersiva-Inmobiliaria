@@ -27,4 +27,4 @@ def test_listing_precio_formateado():
         descripcion_agente="Moderno y bien ubicado",
         agente_nombre="Ana M", agente_telefono="55999", agente_email="a@b.com",
     )
-    assert l.precio_str == "$25,000 MXN"
+    assert l.precio_str == "S/ 25,000"
