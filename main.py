@@ -10,11 +10,12 @@ from fastapi import FastAPI, Form, File, UploadFile, Request
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from starlette.middleware.sessions import SessionMiddleware
 from dotenv import load_dotenv
 
 from models.listing import Listing
 from services.ai_service import generar_contenido
-from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session
+from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session, oauth
 from database import engine, SessionLocal, Base
 
 load_dotenv()
@@ -44,6 +45,7 @@ EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
 EMPRESA_PASS = os.getenv("EMPRESA_PASS", "Inmersiva2025")
 
 app = FastAPI(title="Inmersiva Grupo Inmobiliario")
+app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "inmersiva-session-secret-2025"))
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
@@ -142,6 +144,66 @@ async def logout():
     resp.delete_cookie("empresa_token")
     resp.delete_cookie("corredor_token")
     return resp
+
+
+# ── Google OAuth ──────────────────────────────────────────────────────────────
+@app.get("/auth/google")
+async def google_login(request: Request):
+    redirect_uri = request.url_for("google_callback")
+    return await oauth.google.authorize_redirect(request, redirect_uri)
+
+
+@app.get("/auth/google/callback", name="google_callback")
+async def google_callback(request: Request):
+    try:
+        token = await oauth.google.authorize_access_token(request)
+    except Exception:
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"error": "Error al autenticar con Google. Intenta de nuevo."},
+            status_code=400,
+        )
+
+    user_info = token.get("userinfo", {})
+    email = user_info.get("email", "")
+    nombre = user_info.get("name", email)
+
+    if not email:
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"error": "No se pudo obtener el correo de Google."},
+            status_code=400,
+        )
+
+    # ¿Es cuenta empresa?
+    google_empresa_emails = [
+        e.strip() for e in os.getenv("GOOGLE_EMPRESA_EMAIL", "").split(",") if e.strip()
+    ]
+    if email in google_empresa_emails:
+        t = create_token({"sub": EMPRESA_USER, "role": "empresa"})
+        resp = RedirectResponse("/dashboard", status_code=302)
+        resp.set_cookie("empresa_token", t, httponly=True, samesite="lax")
+        return resp
+
+    # ¿Es corredor registrado?
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(
+            CorredorModel.email == email, CorredorModel.activo == True
+        ).first()
+        if corredor:
+            t = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
+            resp = RedirectResponse("/corredor/dashboard", status_code=302)
+            resp.set_cookie("corredor_token", t, httponly=True, samesite="lax")
+            return resp
+    finally:
+        db.close()
+
+    return templates.TemplateResponse(
+        request, "login.html",
+        {"error": f"El correo {email} no tiene acceso. Contacta al administrador."},
+        status_code=403,
+    )
 
 
 # ── Empresa dashboard ─────────────────────────────────────────────────────────
