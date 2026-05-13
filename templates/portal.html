@@ -83,7 +83,11 @@
           <a href="/corredor/dashboard" class="text-gray-300 text-sm hover:text-white transition-colors">Mi Dashboard</a>
         {% endif %}
         <a href="/logout" class="text-gray-400 text-xs hover:text-white transition-colors">Salir</a>
+      {% elif usuario %}
+        <span class="hidden md:block text-gray-400 text-xs truncate max-w-[120px]">{{ usuario.get('nombre', usuario.get('sub', '')) }}</span>
+        <a href="/usuario/logout" class="text-gray-400 text-xs hover:text-white transition-colors">Salir</a>
       {% else %}
+        <a href="/registro" class="hidden sm:block text-gray-300 text-sm hover:text-white transition-colors">Registrarse</a>
         <a href="/login" class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-90 text-navy" style="background-color:#C9A84C;">
           Ingresar
         </a>

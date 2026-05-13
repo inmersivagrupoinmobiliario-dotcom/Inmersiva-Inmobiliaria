@@ -15,14 +15,14 @@ from dotenv import load_dotenv
 
 from models.listing import Listing
 from services.ai_service import generar_contenido
-from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session, oauth
+from auth import hash_password, verify_password, create_token, get_empresa_session, get_corredor_session, get_usuario_session, oauth
 from database import engine, SessionLocal, Base
 from typing import Optional as Opt
 
 load_dotenv()
 
 # DB init
-from models.db_models import Corredor as CorredorModel, PropiedadPublica
+from models.db_models import Corredor as CorredorModel, PropiedadPublica, UsuarioPublico
 
 def _init_db():
     try:
@@ -124,11 +124,13 @@ async def portal(
 
     empresa = get_empresa_session(request)
     corredor = get_corredor_session(request)
-    user = empresa or corredor
+    usuario = get_usuario_session(request)
+    user = empresa or corredor or usuario
     return templates.TemplateResponse(request, "portal.html", {
         "propiedades": propiedades,
         "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or ""},
         "user": user,
+        "usuario": usuario,
     })
 
 
@@ -242,12 +244,73 @@ async def destacar_propiedad(request: Request, propiedad_id: int):
 
 
 @app.get("/login", response_class=HTMLResponse)
-async def login_page(request: Request):
+async def login_page(request: Request, tab: str = "usuario"):
     if get_empresa_session(request):
         return RedirectResponse("/dashboard", status_code=302)
     if get_corredor_session(request):
         return RedirectResponse("/corredor/dashboard", status_code=302)
-    return templates.TemplateResponse(request, "login.html", {"error": ""})
+    if get_usuario_session(request):
+        return RedirectResponse("/", status_code=302)
+    return templates.TemplateResponse(request, "login.html", {"error": "", "tab": tab})
+
+
+# ── Registro usuario público ───────────────────────────────────────────────────
+@app.get("/registro", response_class=HTMLResponse)
+async def registro_page(request: Request):
+    if get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request):
+        return RedirectResponse("/", status_code=302)
+    return templates.TemplateResponse(request, "registro.html", {"error": "", "success": ""})
+
+
+@app.post("/registro")
+async def registro_submit(
+    request: Request,
+    nombre: str = Form(...),
+    email: str = Form(...),
+    telefono: str = Form(default=""),
+    password: str = Form(...),
+    password2: str = Form(...),
+):
+    if password != password2:
+        return templates.TemplateResponse(request, "registro.html",
+                                          {"error": "Las contraseñas no coinciden.", "success": ""})
+    if len(password) < 6:
+        return templates.TemplateResponse(request, "registro.html",
+                                          {"error": "La contraseña debe tener al menos 6 caracteres.", "success": ""})
+    db = SessionLocal()
+    try:
+        if db.query(UsuarioPublico).filter(UsuarioPublico.email == email).first():
+            return templates.TemplateResponse(request, "registro.html",
+                                              {"error": "Ese email ya está registrado.", "success": ""})
+        db.add(UsuarioPublico(
+            nombre=nombre, email=email, telefono=telefono,
+            hashed_password=hash_password(password),
+        ))
+        db.commit()
+    finally:
+        db.close()
+    token = create_token({"sub": email, "nombre": nombre, "role": "usuario"})
+    resp = RedirectResponse("/", status_code=302)
+    resp.set_cookie("usuario_token", token, httponly=True, samesite="lax")
+    return resp
+
+
+@app.post("/login/usuario")
+async def login_usuario(request: Request, email: str = Form(...), password: str = Form(...)):
+    db = SessionLocal()
+    try:
+        usuario = db.query(UsuarioPublico).filter(
+            UsuarioPublico.email == email, UsuarioPublico.activo == True
+        ).first()
+        if usuario and usuario.hashed_password and verify_password(password, usuario.hashed_password):
+            token = create_token({"sub": email, "nombre": usuario.nombre, "role": "usuario"})
+            resp = RedirectResponse("/", status_code=302)
+            resp.set_cookie("usuario_token", token, httponly=True, samesite="lax")
+            return resp
+    finally:
+        db.close()
+    return templates.TemplateResponse(request, "login.html",
+                                      {"error": "Email o contraseña incorrectos.", "tab": "usuario"})
 
 
 @app.post("/login")
@@ -271,7 +334,7 @@ async def login_submit(request: Request, username: str = Form(...), password: st
             return resp
     finally:
         db.close()
-    return templates.TemplateResponse(request, "login.html", {"error": "Usuario o contraseña incorrectos"}, status_code=401)
+    return templates.TemplateResponse(request, "login.html", {"error": "Usuario o contraseña incorrectos", "tab": "admin"}, status_code=401)
 
 
 @app.get("/logout")
@@ -279,6 +342,14 @@ async def logout():
     resp = RedirectResponse("/login", status_code=302)
     resp.delete_cookie("empresa_token")
     resp.delete_cookie("corredor_token")
+    resp.delete_cookie("usuario_token")
+    return resp
+
+
+@app.get("/usuario/logout")
+async def usuario_logout():
+    resp = RedirectResponse("/", status_code=302)
+    resp.delete_cookie("usuario_token")
     return resp
 
 
@@ -335,11 +406,29 @@ async def google_callback(request: Request):
     finally:
         db.close()
 
-    return templates.TemplateResponse(
-        request, "login.html",
-        {"error": f"El correo {email} no tiene acceso. Contacta al administrador."},
-        status_code=403,
-    )
+    # Auto-create or login as UsuarioPublico
+    db2 = SessionLocal()
+    try:
+        google_id = user_info.get("sub", "")
+        usuario = db2.query(UsuarioPublico).filter(UsuarioPublico.email == email).first()
+        if not usuario:
+            usuario = UsuarioPublico(
+                nombre=nombre,
+                email=email,
+                google_id=google_id,
+            )
+            db2.add(usuario)
+            db2.commit()
+            db2.refresh(usuario)
+        elif google_id and not usuario.google_id:
+            usuario.google_id = google_id
+            db2.commit()
+        t = create_token({"sub": email, "nombre": usuario.nombre, "role": "usuario"})
+        resp = RedirectResponse("/", status_code=302)
+        resp.set_cookie("usuario_token", t, httponly=True, samesite="lax")
+        return resp
+    finally:
+        db2.close()
 
 
 # ── Empresa dashboard ─────────────────────────────────────────────────────────
@@ -393,7 +482,9 @@ async def corredor_login(request: Request, username: str = Form(...), password: 
             return resp
     finally:
         db.close()
-    return RedirectResponse("/dashboard?corredor_error=Usuario+o+contrase%C3%B1a+incorrectos", status_code=302)
+    return templates.TemplateResponse(request, "login.html",
+                                      {"error": "Usuario o contraseña incorrectos.", "tab": "corredor"},
+                                      status_code=401)
 
 
 @app.get("/corredor/logout")

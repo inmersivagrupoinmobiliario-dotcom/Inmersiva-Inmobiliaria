@@ -16,6 +16,19 @@ class Corredor(Base):
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
+class UsuarioPublico(Base):
+    __tablename__ = "usuarios_publicos"
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    hashed_password = Column(String(200), nullable=True)
+    google_id = Column(String(100), nullable=True)
+    telefono = Column(String(20), default="")
+    activo = Column(Boolean, default=True)
+    favoritos = Column(Text, default="[]")
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class PropiedadPublica(Base):
     __tablename__ = "propiedades_publicas"
     id = Column(Integer, primary_key=True)

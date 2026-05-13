@@ -49,3 +49,8 @@ def get_empresa_session(request: Request) -> Optional[dict]:
 def get_corredor_session(request: Request) -> Optional[dict]:
     token = request.cookies.get("corredor_token")
     return decode_token(token) if token else None
+
+
+def get_usuario_session(request: Request) -> Optional[dict]:
+    token = request.cookies.get("usuario_token")
+    return decode_token(token) if token else None
