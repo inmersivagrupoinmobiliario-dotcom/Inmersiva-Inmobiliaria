@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Resultados — ListaPro Inmersiva</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-text">
+    <h1>ListaPro — Resultados</h1>
+    <p>Inmersiva Grupo Inmobiliario</p>
+  </div>
+</header>
+
+<div class="container">
+
+  <div id="alert-container"></div>
+
+  <!-- Resumen de la propiedad -->
+  <div class="card">
+    <div class="card-title">{{ listing.tipo }} en {{ listing.operacion }} · {{ listing.ciudad }}, {{ listing.estado }}</div>
+    <p style="font-size:1.5rem;font-weight:700;color:var(--gold)">{{ listing.precio_str }}</p>
+    <p style="color:var(--gray-600);margin-top:.25rem">{{ listing.direccion }}</p>
+    <div style="display:flex;gap:1.5rem;margin-top:1rem;flex-wrap:wrap;font-size:.9rem">
+      {% if listing.recamaras %}<span>🛏 {{ listing.recamaras }} rec.</span>{% endif %}
+      {% if listing.banos %}<span>🚿 {{ listing.banos }} baños</span>{% endif %}
+      {% if listing.m2_construidos %}<span>📐 {{ listing.m2_construidos }} m² const.</span>{% endif %}
+      {% if listing.estacionamientos %}<span>🚗 {{ listing.estacionamientos }} est.</span>{% endif %}
+    </div>
+  </div>
+
+  <!-- Descripción IA -->
+  <div class="card">
+    <div class="card-title">Descripción Profesional</div>
+    <div class="result-box" id="desc-box">{{ listing.descripcion_generada }}<button class="copy-btn" onclick="copyText('desc-box')">Copiar</button></div>
+  </div>
+
+  <!-- Copy Instagram -->
+  <div class="card">
+    <div class="card-title">Copy para Instagram</div>
+    <div class="result-box" id="ig-box">{{ listing.copy_instagram }}<button class="copy-btn" onclick="copyText('ig-box')">Copiar</button></div>
+  </div>
+
+  <!-- Acciones -->
+  <div class="card">
+    <div class="card-title">Descargas y Publicación</div>
+    <div class="actions-row">
+      <a href="/pdf/{{ listing.id }}" class="btn btn-primary" target="_blank">📄 Descargar PDF</a>
+      <a href="/imagen/{{ listing.id }}" class="btn btn-gold" download>🖼 Imagen Instagram</a>
+      <button onclick="publicarInstagram('{{ listing.id }}')" class="btn btn-outline">📲 Publicar en Instagram</button>
+      <button onclick="generarVideo('{{ listing.id }}')" class="btn btn-outline" id="btn-video">🎬 Generar Video Reel</button>
+    </div>
+
+    <!-- Video progress -->
+    <div id="video-progress" style="display:none;margin-top:1.5rem">
+      <p style="font-size:.9rem;color:var(--navy);margin-bottom:.5rem" id="video-status">Iniciando render...</p>
+      <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+    </div>
+    <div id="video-download" style="display:none;margin-top:1rem">
+      <a id="video-link" href="#" class="btn btn-gold" download>⬇️ Descargar Video</a>
+    </div>
+  </div>
+
+  <a href="/" class="btn btn-outline" style="margin-bottom:2rem">← Nueva Propiedad</a>
+
+</div>
+
+<footer class="footer">
+  Powered by <span>Inmersiva Grupo Inmobiliario</span> · ListaPro v1.0
+</footer>
+
+<script src="/static/js/main.js"></script>
+</body>
+</html>

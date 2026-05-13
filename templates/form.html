@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>ListaPro — Inmersiva Grupo Inmobiliario</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="header-text">
+    <h1>ListaPro</h1>
+    <p>Inmersiva Grupo Inmobiliario</p>
+  </div>
+</header>
+
+<div class="container">
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form id="listingForm" action="/generar" method="post" enctype="multipart/form-data">
+
+    <!-- Datos de la Propiedad -->
+    <div class="card">
+      <div class="card-title">Datos de la Propiedad</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="tipo">Tipo de propiedad *</label>
+          <select name="tipo" id="tipo" required>
+            <option value="">Selecciona...</option>
+            <option value="Casa">Casa</option>
+            <option value="Departamento">Departamento</option>
+            <option value="Terreno">Terreno</option>
+            <option value="Penthouse">Penthouse</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label for="operacion">Operación *</label>
+          <select name="operacion" id="operacion" required>
+            <option value="">Selecciona...</option>
+            <option value="Venta">Venta</option>
+            <option value="Renta">Renta</option>
+          </select>
+        </div>
+        <div class="form-group full">
+          <label for="direccion">Dirección / Ubicación *</label>
+          <input type="text" name="direccion" id="direccion" placeholder="Ej. Av. Insurgentes Sur 1234, Col. Del Valle" required>
+        </div>
+        <div class="form-group">
+          <label for="ciudad">Ciudad *</label>
+          <input type="text" name="ciudad" id="ciudad" placeholder="Ej. Ciudad de México" required>
+        </div>
+        <div class="form-group">
+          <label for="estado">Estado *</label>
+          <input type="text" name="estado" id="estado" placeholder="Ej. CDMX" required>
+        </div>
+        <div class="form-group">
+          <label for="precio">Precio (MXN) *</label>
+          <input type="number" name="precio" id="precio" placeholder="Ej. 3500000" min="0" required>
+        </div>
+      </div>
+    </div>
+
+    <!-- Características -->
+    <div class="card">
+      <div class="card-title">Características</div>
+      <div class="form-grid cols-3">
+        <div class="form-group">
+          <label for="recamaras">Recámaras</label>
+          <input type="number" name="recamaras" id="recamaras" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="banos">Baños</label>
+          <input type="number" name="banos" id="banos" placeholder="0" min="0" step="0.5">
+        </div>
+        <div class="form-group">
+          <label for="estacionamientos">Estacionamientos</label>
+          <input type="number" name="estacionamientos" id="estacionamientos" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="m2_construidos">M² Construidos</label>
+          <input type="number" name="m2_construidos" id="m2_construidos" placeholder="0" min="0">
+        </div>
+        <div class="form-group">
+          <label for="m2_terreno">M² Terreno</label>
+          <input type="number" name="m2_terreno" id="m2_terreno" placeholder="0" min="0">
+        </div>
+      </div>
+    </div>
+
+    <!-- Amenidades -->
+    <div class="card">
+      <div class="card-title">Amenidades</div>
+      <div class="amenidades-grid">
+        {% for amenidad in ["Alberca", "Jardín", "Seguridad 24h", "Gimnasio", "Salón de eventos", "Área de juegos", "Roof garden", "Elevador", "Bodega", "Cuarto de servicio", "Estudio", "Cisterna propia", "Paneles solares", "Vista al mar", "Frente a parque"] %}
+        <label class="amenidad-item">
+          <input type="checkbox" name="amenidades" value="{{ amenidad }}">
+          {{ amenidad }}
+        </label>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- Notas del Agente -->
+    <div class="card">
+      <div class="card-title">Notas del Agente</div>
+      <div class="form-group">
+        <label for="descripcion_agente">¿Qué destaca de esta propiedad? (2-3 líneas) *</label>
+        <textarea name="descripcion_agente" id="descripcion_agente" rows="3"
+          placeholder="Ej. Ubicación privilegiada frente al parque, acabados de lujo, recién remodelada..." required></textarea>
+      </div>
+    </div>
+
+    <!-- Fotos -->
+    <div class="card">
+      <div class="card-title">Fotos de la Propiedad</div>
+      <div class="form-group" style="margin-bottom:1rem">
+        <label>Foto de portada * (aparece grande en el PDF e imagen de Instagram)</label>
+        <div class="file-upload-area" onclick="document.getElementById('foto_portada').click()">
+          <input type="file" id="foto_portada" name="foto_portada" accept="image/*" required onchange="previewPortada(this)">
+          <div class="upload-label">📷 Seleccionar foto de portada</div>
+          <div class="upload-hint">JPG, PNG — recomendado mínimo 1200×800px</div>
+          <div id="portada-preview" class="preview-grid"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Fotos adicionales (opcional)</label>
+        <div class="file-upload-area" onclick="document.getElementById('fotos_extras').click()">
+          <input type="file" id="fotos_extras" name="fotos_extras" accept="image/*" multiple onchange="previewExtras(this)">
+          <div class="upload-label">📷 Agregar más fotos</div>
+          <div class="upload-hint">Puedes seleccionar varias a la vez</div>
+          <div id="extras-preview" class="preview-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Datos del Agente -->
+    <div class="card">
+      <div class="card-title">Datos del Agente</div>
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="agente_nombre">Nombre completo *</label>
+          <input type="text" name="agente_nombre" id="agente_nombre" placeholder="Ej. Carlos López" required>
+        </div>
+        <div class="form-group">
+          <label for="agente_telefono">Teléfono / WhatsApp *</label>
+          <input type="text" name="agente_telefono" id="agente_telefono" placeholder="Ej. 5512345678" required>
+        </div>
+        <div class="form-group full">
+          <label for="agente_email">Email *</label>
+          <input type="email" name="agente_email" id="agente_email" placeholder="carlos@inmersiva.com" required>
+        </div>
+      </div>
+    </div>
+
+    <button type="submit" class="btn btn-primary btn-block" id="submitBtn">
+      ✨ Generar Contenido con IA
+    </button>
+  </form>
+
+</div>
+
+<footer class="footer">
+  Powered by <span>Inmersiva Grupo Inmobiliario</span> · ListaPro v1.0
+</footer>
+
+<script src="/static/js/main.js"></script>
+<script>
+  document.getElementById('listingForm').addEventListener('submit', function() {
+    const btn = document.getElementById('submitBtn');
+    btn.disabled = true;
+    btn.textContent = '⏳ Generando contenido...';
+  });
+
+  function previewPortada(input) {
+    const preview = document.getElementById('portada-preview');
+    preview.innerHTML = '';
+    if (input.files && input.files[0]) {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(input.files[0]);
+      preview.appendChild(img);
+    }
+  }
+
+  function previewExtras(input) {
+    const preview = document.getElementById('extras-preview');
+    preview.innerHTML = '';
+    Array.from(input.files).forEach(file => {
+      const img = document.createElement('img');
+      img.src = URL.createObjectURL(file);
+      preview.appendChild(img);
+    });
+  }
+</script>
+</body>
+</html>
