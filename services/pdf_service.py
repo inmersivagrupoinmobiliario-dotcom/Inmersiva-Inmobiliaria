@@ -4,7 +4,8 @@ from jinja2 import Environment, FileSystemLoader
 from weasyprint import HTML
 from models.listing import Listing
 
-_jinja = Environment(loader=FileSystemLoader("templates"))
+_TEMPLATES = Path(__file__).parent.parent / "templates"
+_jinja = Environment(loader=FileSystemLoader(str(_TEMPLATES)))
 
 
 def _img_to_b64(path: str) -> str:
