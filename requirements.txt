@@ -1,0 +1,40 @@
+# ─── INMERSIVA — Dependencias del proyecto ───────────────────────────────────
+# Instalar con: pip install -r requirements.txt
+
+# Framework web principal
+fastapi==0.115.5
+uvicorn[standard]==0.32.1
+
+# Templates HTML
+jinja2==3.1.4
+
+# Formularios y archivos
+python-multipart==0.0.12
+aiofiles==24.1.0
+
+# Base de datos
+sqlalchemy==2.0.36
+psycopg2-binary==2.9.10
+alembic==1.14.0
+
+# Configuración y variables de entorno
+pydantic==2.10.3
+pydantic-settings==2.6.1
+python-dotenv==1.0.1
+
+# Autenticación JWT
+passlib[bcrypt]==1.7.4
+python-jose[cryptography]==3.3.0
+
+# IA — OpenAI
+openai==1.57.2
+
+# Generación de imágenes sociales
+pillow==11.0.0
+
+# Generación de PDFs
+reportlab==4.2.5
+
+# HTTP requests (para publicación en redes)
+httpx==0.28.0
+requests==2.32.3
