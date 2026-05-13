@@ -400,6 +400,40 @@
         <button onclick="openModal('modal-doc')" class="btn-gold">+ Subir documento</button>
       </div>
 
+      <!-- Plantillas de empresa -->
+      {% if docs_empresa %}
+      <div class="mb-5">
+        <div class="flex items-center gap-2 mb-3">
+          <div class="h-px flex-1" style="background:linear-gradient(90deg,#C9A84C,transparent);"></div>
+          <span class="text-xs font-bold tracking-widest uppercase px-3" style="color:#C9A84C;">Plantillas Inmersiva</span>
+          <div class="h-px flex-1" style="background:linear-gradient(270deg,#C9A84C,transparent);"></div>
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {% for d in docs_empresa %}
+          <a href="{{ d.url }}" target="_blank"
+             class="card-section p-4 flex items-center gap-3 no-underline hover:shadow-md transition-shadow group">
+            <div class="text-3xl flex-shrink-0">{{ d.icono }}</div>
+            <div class="flex-1 min-w-0">
+              <div class="font-semibold text-gray-800 text-sm truncate group-hover:text-navy">{{ d.nombre }}</div>
+              <div class="flex items-center gap-2 mt-1">
+                <span class="badge bg-gray-100 text-gray-500" style="font-size:10px;">{{ d.tipo }}</span>
+                <span class="text-xs text-gray-400">{{ d.ext }} · {{ d.size_kb }} KB</span>
+              </div>
+            </div>
+            <div class="text-gray-300 group-hover:text-gold transition-colors flex-shrink-0">⬇</div>
+          </a>
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+
+      <!-- Documentos subidos por el corredor -->
+      <div class="flex items-center gap-2 mb-3">
+        <div class="h-px flex-1 bg-gray-200"></div>
+        <span class="text-xs font-bold tracking-widest uppercase px-3 text-gray-400">Mis Archivos</span>
+        <div class="h-px flex-1 bg-gray-200"></div>
+      </div>
+
       <div class="card-section overflow-hidden">
         {% if documentos %}
         <table class="w-full text-sm">
@@ -423,9 +457,7 @@
               <td class="px-5 py-3">
                 {% if doc.archivo %}
                 <a href="/uploads/{{ doc.archivo }}" target="_blank"
-                   class="badge bg-blue-50 text-blue-600 hover:bg-blue-100 no-underline cursor-pointer">
-                  ⬇ Descargar
-                </a>
+                   class="badge bg-blue-50 text-blue-600 hover:bg-blue-100 no-underline cursor-pointer">⬇ Descargar</a>
                 {% else %}
                 <span class="text-gray-300 text-xs">Sin archivo</span>
                 {% endif %}
@@ -440,10 +472,11 @@
           </tbody>
         </table>
         {% else %}
-        <div class="text-center py-16 text-gray-400">
-          <div class="text-5xl mb-3">📁</div>
-          <div class="font-semibold mb-1">Sin documentos</div>
-          <button onclick="openModal('modal-doc')" class="btn-gold mt-2">+ Subir primer documento</button>
+        <div class="text-center py-12 text-gray-400">
+          <div class="text-4xl mb-2">📂</div>
+          <div class="font-semibold text-sm mb-1">Aún no has subido archivos</div>
+          <div class="text-xs text-gray-300 mb-3">Sube contratos, fotos u otros documentos personales</div>
+          <button onclick="openModal('modal-doc')" class="btn-gold">+ Subir archivo</button>
         </div>
         {% endif %}
       </div>

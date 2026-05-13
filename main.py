@@ -53,6 +53,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "in
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
+app.mount("/doc", StaticFiles(directory="DOC"), name="doc")
 templates = Jinja2Templates(directory="templates")
 
 UPLOADS = Path("uploads")
@@ -519,6 +520,34 @@ def _corredor_or_redirect(request: Request):
     return corredor, None
 
 
+_DOC_ICONS = {
+    ".pdf": "📄", ".docx": "📝", ".doc": "📝",
+    ".xlsx": "📊", ".xls": "📊", ".png": "🖼", ".jpg": "🖼",
+}
+_DOC_TIPO = {
+    "contrato": "Contrato", "autorizacion": "Autorización",
+    "ficha": "Ficha", "guion": "Guión", "protocolo": "Protocolo",
+}
+
+def _doc_empresa_list():
+    doc_dir = Path("DOC")
+    items = []
+    for f in sorted(doc_dir.iterdir()):
+        if f.is_file() and not f.name.startswith("."):
+            ext = f.suffix.lower()
+            nombre = f.stem.replace("_", " ").replace("inmersiva", "").strip().title()
+            tipo = next((v for k, v in _DOC_TIPO.items() if k in f.name.lower()), "Documento")
+            items.append({
+                "nombre": nombre,
+                "tipo": tipo,
+                "ext": ext.lstrip(".").upper(),
+                "icono": _DOC_ICONS.get(ext, "📎"),
+                "url": f"/doc/{f.name}",
+                "size_kb": round(f.stat().st_size / 1024),
+            })
+    return items
+
+
 @app.get("/corredor/dashboard", response_class=HTMLResponse)
 async def dashboard_corredor(request: Request, seccion: str = "resumen"):
     corredor, redir = _corredor_or_redirect(request)
@@ -540,6 +569,8 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
         contactos_map = {c.id: c for c in contactos}
     finally:
         db.close()
+
+    docs_empresa = _doc_empresa_list()
 
     pipeline = {
         "Nuevo":        [c for c in contactos if c.estado == "Nuevo"],
@@ -564,6 +595,7 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
         "pipeline": pipeline,
         "citas": citas,
         "documentos": documentos,
+        "docs_empresa": docs_empresa,
         "posts": posts,
         "contactos_map": contactos_map,
     })
