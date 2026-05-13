@@ -63,6 +63,7 @@ app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "in
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
+Path("DOC").mkdir(exist_ok=True)
 app.mount("/doc", StaticFiles(directory="DOC"), name="doc")
 templates = Jinja2Templates(directory="templates")
 
