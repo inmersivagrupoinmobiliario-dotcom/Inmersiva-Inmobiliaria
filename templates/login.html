@@ -2,339 +2,178 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inmersiva — Ingresar</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Ingresar — Inmersiva Grupo Inmobiliario</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
     body {
+      font-family: 'Inter', system-ui, sans-serif;
       min-height: 100vh;
       display: flex;
       align-items: center;
       justify-content: center;
-      background: linear-gradient(135deg, #0a1628 0%, #1B2A4A 60%, #0d1f3a 100%);
-      font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
-      position: relative;
-      overflow: hidden;
-      padding: 16px;
+      background: radial-gradient(ellipse at 60% 20%, #1e3a5f 0%, #0f1623 60%);
+      padding: 20px;
     }
-
     body::before {
       content: '';
       position: fixed;
-      inset: 0;
-      background-image: radial-gradient(circle, rgba(201,168,76,0.08) 1px, transparent 1px);
-      background-size: 28px 28px;
+      width: 500px; height: 500px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(201,168,76,.12) 0%, transparent 70%);
+      top: -100px; right: -100px;
       pointer-events: none;
     }
-
     body::after {
       content: '';
       position: fixed;
-      left: 0; top: 0;
-      width: 4px; height: 100%;
-      background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%);
-    }
-
-    .card {
-      width: 460px;
-      max-width: calc(100vw - 32px);
-      background: #fff;
-      border-radius: 16px;
-      box-shadow: 0 25px 80px rgba(0,0,0,0.5), 0 8px 24px rgba(0,0,0,0.3);
-      overflow: hidden;
-      position: relative;
-      z-index: 1;
-    }
-
-    /* Header */
-    .card-header {
-      background: linear-gradient(135deg, #0a1628 0%, #1B2A4A 100%);
-      border-bottom: 3px solid #C9A84C;
-      padding: 28px 24px 24px;
-      text-align: center;
-    }
-
-    .logo-circle {
-      width: 72px; height: 72px;
-      background: #fff;
+      width: 400px; height: 400px;
       border-radius: 50%;
-      margin: 0 auto 14px;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+      background: radial-gradient(circle, rgba(201,168,76,.07) 0%, transparent 70%);
+      bottom: -80px; left: -80px;
+      pointer-events: none;
+    }
+    .card {
+      background: #fff;
+      border-radius: 20px;
+      width: 100%;
+      max-width: 420px;
+      box-shadow: 0 24px 80px rgba(0,0,0,.4);
       overflow: hidden;
     }
-    .logo-circle img { width: 58px; height: 58px; object-fit: contain; }
-    .logo-circle .logo-fallback { font-size: 26px; font-weight: 800; color: #1B2A4A; }
-
-    .brand-name { color: #fff; font-size: 20px; font-weight: 800; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 3px; }
-    .brand-sub  { color: #C9A84C; font-size: 9px; font-weight: 600; letter-spacing: 2.5px; text-transform: uppercase; }
-
-    /* Tab bar */
-    .tab-bar {
-      display: flex;
-      border-bottom: 1px solid #e5e7eb;
-    }
-    .tab-btn {
-      flex: 1;
-      padding: 13px 6px;
-      font-size: 11px;
-      font-weight: 700;
-      letter-spacing: 0.4px;
-      text-transform: uppercase;
-      border: none;
-      background: #f9fafb;
-      color: #9ca3af;
-      cursor: pointer;
-      transition: all 0.2s;
-      border-bottom: 3px solid transparent;
-      display: flex; flex-direction: column; align-items: center; gap: 4px;
-    }
-    .tab-btn .tab-icon { font-size: 18px; }
-    .tab-btn.active {
-      background: #fff;
-      color: #1B2A4A;
-      border-bottom-color: #C9A84C;
-    }
-    .tab-btn:hover:not(.active) { background: #f1f5f9; color: #4b5563; }
-
-    /* Panels */
-    .tab-panel { display: none; padding: 28px 32px 24px; }
-    .tab-panel.active { display: block; }
-
-    .form-group { margin-bottom: 18px; }
-    .form-group label {
+    .card::before {
+      content: '';
       display: block;
-      font-size: 11px; font-weight: 700;
-      letter-spacing: 1px; text-transform: uppercase;
-      color: #4a5568; margin-bottom: 7px;
+      height: 4px;
+      background: linear-gradient(90deg, #C9A84C, #e8c96d, #C9A84C);
     }
-    .form-group input {
-      width: 100%;
-      padding: 11px 14px;
-      border: 2px solid #e2e8f0;
-      border-radius: 8px;
-      font-size: 14px; color: #1a202c;
-      background: #f8fafc;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      outline: none;
-      font-family: inherit;
+    .brand {
+      text-align: center;
+      padding: 32px 32px 24px;
+      border-bottom: 1px solid #f1f5f9;
     }
-    .form-group input:focus {
-      border-color: #C9A84C;
-      background: #fff;
-      box-shadow: 0 0 0 3px rgba(201,168,76,0.12);
+    .brand-logo {
+      width: 72px; height: 72px;
+      border-radius: 50%;
+      background: #1B2A4A;
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 16px;
+      border: 3px solid #C9A84C;
+      overflow: hidden;
     }
-    .form-group input::placeholder { color: #a0aec0; }
-
+    .brand-logo img { width: 58px; height: 58px; object-fit: contain; }
+    .brand-name { color: #1B2A4A; font-size: 1.3rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
+    .brand-sub  { color: #C9A84C; font-size: .65rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-top: 2px; }
+    .form-body { padding: 28px 32px 32px; }
     .error-box {
-      background: #fff5f5; border: 1px solid #fc8181;
-      border-radius: 8px; padding: 11px 14px;
-      margin-bottom: 18px;
-      color: #c53030; font-size: 13px; font-weight: 500;
-      display: flex; align-items: center; gap: 8px;
+      background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px;
+      padding: 12px 16px; color: #991b1b; font-size: .85rem; font-weight: 600;
+      margin-bottom: 20px; display: flex; align-items: center; gap: 8px;
     }
-
+    .register-hint {
+      background: #f0fdf4; border: 1.5px solid #86efac; border-radius: 10px;
+      padding: 12px 16px; color: #166534; font-size: .85rem; margin-bottom: 20px;
+    }
+    .register-hint a { color: #16a34a; font-weight: 700; }
+    .field { margin-bottom: 18px; }
+    .field label {
+      display: block; font-size: .72rem; font-weight: 800;
+      letter-spacing: 1.5px; text-transform: uppercase; color: #374151; margin-bottom: 7px;
+    }
+    .field input {
+      width: 100%; padding: 12px 14px; border: 2px solid #e5e7eb; border-radius: 10px;
+      font-size: .95rem; font-family: inherit; color: #111827; background: #f9fafb;
+      transition: border-color .2s, background .2s; outline: none;
+    }
+    .field input:focus { border-color: #C9A84C; background: #fff; }
+    .field input::placeholder { color: #9ca3af; }
     .btn-submit {
-      width: 100%; padding: 13px;
-      background: linear-gradient(135deg, #C9A84C 0%, #e0bc6e 100%);
-      border: none; border-radius: 8px;
-      color: #1B2A4A; font-size: 12px; font-weight: 800;
-      letter-spacing: 2px; text-transform: uppercase;
-      cursor: pointer;
-      box-shadow: 0 4px 16px rgba(201,168,76,0.35);
-      transition: opacity 0.2s, transform 0.1s, box-shadow 0.2s;
-      font-family: inherit;
+      width: 100%; padding: 14px;
+      background: linear-gradient(135deg, #C9A84C, #e8c96d);
+      color: #1B2A4A; font-weight: 800; font-size: 1rem;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      border: none; border-radius: 10px; cursor: pointer;
+      box-shadow: 0 4px 16px rgba(201,168,76,.35);
+      transition: opacity .2s, transform .1s; margin-top: 4px;
     }
-    .btn-submit:hover  { opacity: 0.92; box-shadow: 0 6px 24px rgba(201,168,76,0.45); transform: translateY(-1px); }
-    .btn-submit:active { transform: translateY(0); box-shadow: 0 2px 8px rgba(201,168,76,0.3); }
-
+    .btn-submit:hover  { opacity: .92; transform: translateY(-1px); }
+    .btn-submit:active { transform: translateY(0); }
     .divider {
-      display: flex; align-items: center; gap: 12px;
-      margin: 18px 0;
-      color: #a0aec0; font-size: 11px; font-weight: 600;
-      letter-spacing: 0.5px; text-transform: uppercase;
+      display: flex; align-items: center; gap: 12px; margin: 20px 0;
+      color: #9ca3af; font-size: .75rem; font-weight: 600; letter-spacing: 1px; text-transform: uppercase;
     }
-    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
-
+    .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: #e5e7eb; }
     .btn-google {
-      width: 100%; padding: 11px 16px;
-      background: #fff; border: 2px solid #e2e8f0;
-      border-radius: 8px; color: #2d3748;
-      font-size: 14px; font-weight: 600;
-      cursor: pointer;
+      width: 100%; padding: 12px; background: #fff; border: 2px solid #e5e7eb;
+      border-radius: 10px; font-size: .92rem; font-weight: 600; color: #374151; cursor: pointer;
       display: flex; align-items: center; justify-content: center; gap: 10px;
-      text-decoration: none;
-      transition: border-color 0.2s, box-shadow 0.2s, background 0.2s;
-      font-family: inherit;
+      font-family: inherit; transition: border-color .2s, box-shadow .2s; text-decoration: none;
     }
-    .btn-google:hover { border-color: #C9A84C; background: #fffdf5; box-shadow: 0 2px 12px rgba(201,168,76,0.15); }
-
-    .panel-hint {
-      margin-top: 16px;
-      text-align: center;
-      font-size: 12px; color: #718096;
-    }
-    .panel-hint a { color: #C9A84C; font-weight: 600; text-decoration: none; }
-    .panel-hint a:hover { text-decoration: underline; }
-
-    .panel-desc {
-      font-size: 12px; color: #9ca3af;
-      margin-bottom: 20px; line-height: 1.6;
-      text-align: center;
-    }
-
-    /* Card footer */
-    .card-footer {
-      background: #f7f8fa; border-top: 1px solid #e2e8f0;
-      padding: 12px 24px; text-align: center;
-      color: #718096; font-size: 11px;
-    }
-    .card-footer a { color: #C9A84C; text-decoration: none; }
-    .card-footer a:hover { text-decoration: underline; }
+    .btn-google:hover { border-color: #C9A84C; box-shadow: 0 2px 10px rgba(0,0,0,.08); }
+    .footer-links { text-align: center; margin-top: 22px; font-size: .82rem; color: #6b7280; }
+    .footer-links a { color: #C9A84C; font-weight: 700; text-decoration: none; }
+    .footer-links a:hover { text-decoration: underline; }
+    .site-link { text-align: center; margin-top: 24px; font-size: .75rem; color: rgba(255,255,255,.4); }
+    .site-link a { color: rgba(201,168,76,.7); text-decoration: none; }
+    .site-link a:hover { color: #C9A84C; }
   </style>
 </head>
 <body>
-  <div class="card">
-
-    <!-- Header -->
-    <div class="card-header">
-      <div class="logo-circle">
-        <img src="/static/img/logo.jpeg" alt="Inmersiva"
-             onerror="this.style.display='none'; this.nextElementSibling.style.display='block'">
-        <span class="logo-fallback" style="display:none">I</span>
+  <div style="width:100%;max-width:420px;">
+    <div class="card">
+      <div class="brand">
+        <div class="brand-logo">
+          <img src="/static/img/logo.jpeg" alt="Inmersiva" onerror="this.style.display='none'">
+        </div>
+        <div class="brand-name">Inmersiva</div>
+        <div class="brand-sub">Grupo Inmobiliario</div>
       </div>
-      <div class="brand-name">Inmersiva</div>
-      <div class="brand-sub">Grupo Inmobiliario</div>
-    </div>
 
-    <!-- Tab bar -->
-    <div class="tab-bar">
-      <button class="tab-btn" id="tab-usuario" onclick="switchTab('usuario')">
-        <span class="tab-icon">🏠</span>
-        Mi Cuenta
-      </button>
-      <button class="tab-btn" id="tab-corredor" onclick="switchTab('corredor')">
-        <span class="tab-icon">🏢</span>
-        Corredor
-      </button>
-      <button class="tab-btn" id="tab-admin" onclick="switchTab('admin')">
-        <span class="tab-icon">⚙️</span>
-        Admin
-      </button>
-    </div>
+      <div class="form-body">
+        {% if error %}
+        <div class="error-box"><span>⚠️</span> {{ error }}</div>
+        {% endif %}
 
-    <!-- ── Panel Usuario ── -->
-    <div class="tab-panel" id="panel-usuario">
-      {% if error and tab == 'usuario' %}
-      <div class="error-box">⚠ {{ error }}</div>
-      {% endif %}
-
-      <p class="panel-desc">Accede a tus favoritos y contacta corredores.</p>
-
-      <form method="POST" action="/login/usuario">
-        <div class="form-group">
-          <label for="u-email">Email</label>
-          <input type="email" id="u-email" name="email" placeholder="tu@email.com" required autocomplete="email">
+        {% if show_register %}
+        <div class="register-hint">
+          ¿No tienes cuenta aún? <a href="/registro">Crea tu cuenta gratis</a> o solicita acceso como corredor.
         </div>
-        <div class="form-group">
-          <label for="u-password">Contraseña</label>
-          <input type="password" id="u-password" name="password" placeholder="••••••••" required autocomplete="current-password">
+        {% endif %}
+
+        <form method="post" action="/login/smart" autocomplete="on">
+          <div class="field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="tu@email.com" required autofocus autocomplete="email">
+          </div>
+          <div class="field">
+            <label>Contraseña</label>
+            <input type="password" name="password" placeholder="••••••••" required autocomplete="current-password">
+          </div>
+          <button type="submit" class="btn-submit">Ingresar</button>
+        </form>
+
+        <div class="divider">o continuar con</div>
+
+        <a href="/auth/google" class="btn-google">
+          <svg width="20" height="20" viewBox="0 0 48 48">
+            <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
+            <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
+            <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
+            <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
+          </svg>
+          Continuar con Google
+        </a>
+
+        <div class="footer-links" style="margin-top:20px;">
+          ¿No tienes cuenta? <a href="/registro">Crear cuenta gratis</a>
         </div>
-        <button type="submit" class="btn-submit">Ingresar</button>
-      </form>
-
-      <div class="divider">o continuar con</div>
-
-      <a href="/auth/google" class="btn-google">
-        <svg width="18" height="18" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg">
-          <path d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z" fill="#4285F4"/>
-          <path d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z" fill="#34A853"/>
-          <path d="M3.964 10.71A5.41 5.41 0 0 1 3.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 0 0 0 9c0 1.452.348 2.827.957 4.042l3.007-2.332z" fill="#FBBC05"/>
-          <path d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z" fill="#EA4335"/>
-        </svg>
-        Continuar con Google
-      </a>
-
-      <div class="panel-hint">
-        ¿No tienes cuenta?
-        <a href="/registro">Crear cuenta gratis</a>
       </div>
     </div>
-
-    <!-- ── Panel Corredor ── -->
-    <div class="tab-panel" id="panel-corredor">
-      {% if error and tab == 'corredor' %}
-      <div class="error-box">⚠ {{ error }}</div>
-      {% endif %}
-
-      <p class="panel-desc">Accede a tu dashboard de gestión y CRM.</p>
-
-      <form method="POST" action="/corredor/login">
-        <div class="form-group">
-          <label for="c-username">Usuario</label>
-          <input type="text" id="c-username" name="username" placeholder="tu_usuario" required autocomplete="username">
-        </div>
-        <div class="form-group">
-          <label for="c-password">Contraseña</label>
-          <input type="password" id="c-password" name="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn-submit">Ingresar al dashboard</button>
-      </form>
-
-      <div class="panel-hint" style="margin-top:20px;">
-        ¿No tienes acceso? Contacta al
-        <a href="mailto:inmersivagrupoinmobiliario@gmail.com">administrador</a>
-      </div>
-    </div>
-
-    <!-- ── Panel Admin ── -->
-    <div class="tab-panel" id="panel-admin">
-      {% if error and tab == 'admin' %}
-      <div class="error-box">⚠ {{ error }}</div>
-      {% endif %}
-      {% if error and tab != 'usuario' and tab != 'corredor' and tab != 'admin' %}
-      <div class="error-box">⚠ {{ error }}</div>
-      {% endif %}
-
-      <p class="panel-desc">Panel de administración Inmersiva.</p>
-
-      <form method="POST" action="/login">
-        <div class="form-group">
-          <label for="a-username">Usuario</label>
-          <input type="text" id="a-username" name="username" placeholder="admin" required autocomplete="username">
-        </div>
-        <div class="form-group">
-          <label for="a-password">Contraseña</label>
-          <input type="password" id="a-password" name="password" placeholder="••••••••" required autocomplete="current-password">
-        </div>
-        <button type="submit" class="btn-submit">Acceder</button>
-      </form>
-    </div>
-
-    <!-- Footer -->
-    <div class="card-footer">
-      <a href="/">← Ver propiedades</a>
-      &nbsp;&middot;&nbsp; inmobiliariainmersiva.com
+    <div class="site-link">
+      <a href="/">← Ver propiedades · inmobiliariainmersiva.com</a>
     </div>
   </div>
-
-  <script>
-    const TABS = ['usuario', 'corredor', 'admin'];
-
-    function switchTab(tab) {
-      TABS.forEach(t => {
-        document.getElementById('tab-' + t).classList.toggle('active', t === tab);
-        document.getElementById('panel-' + t).classList.toggle('active', t === tab);
-      });
-    }
-
-    // Activate tab from server-side `tab` variable or URL param
-    const serverTab = "{{ tab | default('usuario') }}";
-    const urlTab = new URLSearchParams(window.location.search).get('tab');
-    switchTab(TABS.includes(urlTab) ? urlTab : (TABS.includes(serverTab) ? serverTab : 'usuario'));
-  </script>
 </body>
 </html>

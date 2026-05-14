@@ -100,6 +100,7 @@ _init_db()
 
 EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
 EMPRESA_PASS = os.getenv("EMPRESA_PASS", "Inmersiva2025")
+ADMIN_EMAIL  = os.getenv("ADMIN_EMAIL", "inmersivagrupoinmobiliario@gmail.com")
 
 app = FastAPI(title="Inmersiva Grupo Inmobiliario")
 app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "inmersiva-session-secret-2025"))
@@ -412,13 +413,12 @@ async def login_usuario(request: Request, email: str = Form(...), password: str 
 
 @app.post("/login")
 async def login_submit(request: Request, username: str = Form(...), password: str = Form(...)):
-    # Try empresa
+    # Legacy route — kept for backward compat
     if username == EMPRESA_USER and password == EMPRESA_PASS:
         token = create_token({"sub": username, "role": "empresa"})
         resp = RedirectResponse("/dashboard", status_code=302)
         resp.set_cookie("empresa_token", token, httponly=True, samesite="lax")
         return resp
-    # Try corredor
     db = SessionLocal()
     try:
         corredor = db.query(CorredorModel).filter(
@@ -431,7 +431,54 @@ async def login_submit(request: Request, username: str = Form(...), password: st
             return resp
     finally:
         db.close()
-    return templates.TemplateResponse(request, "login.html", {"error": "Usuario o contraseña incorrectos", "tab": "admin"}, status_code=401)
+    return templates.TemplateResponse(request, "login.html", {"error": "Usuario o contraseña incorrectos"}, status_code=401)
+
+
+@app.post("/login/smart")
+async def login_smart(request: Request, email: str = Form(...), password: str = Form(...)):
+    """Unified login — detects role by email and routes accordingly."""
+    email = email.strip().lower()
+
+    # 1. Admin
+    if email == ADMIN_EMAIL.lower():
+        if password == EMPRESA_PASS:
+            token = create_token({"sub": EMPRESA_USER, "role": "empresa"})
+            resp = RedirectResponse("/dashboard", status_code=302)
+            resp.set_cookie("empresa_token", token, httponly=True, samesite="lax")
+            return resp
+        return templates.TemplateResponse(request, "login.html", {"error": "Contraseña incorrecta."}, status_code=401)
+
+    db = SessionLocal()
+    try:
+        # 2. Corredor (by email)
+        corredor = db.query(CorredorModel).filter(
+            CorredorModel.email == email, CorredorModel.activo == True
+        ).first()
+        if corredor:
+            if corredor.hashed_password and verify_password(password, corredor.hashed_password):
+                token = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
+                resp = RedirectResponse("/corredor/dashboard", status_code=302)
+                resp.set_cookie("corredor_token", token, httponly=True, samesite="lax")
+                return resp
+            return templates.TemplateResponse(request, "login.html", {"error": "Contraseña incorrecta."}, status_code=401)
+
+        # 3. Usuario público
+        usuario = db.query(UsuarioPublico).filter(
+            UsuarioPublico.email == email, UsuarioPublico.activo == True
+        ).first()
+        if usuario:
+            if usuario.hashed_password and verify_password(password, usuario.hashed_password):
+                token = create_token({"sub": email, "nombre": usuario.nombre, "role": "usuario"})
+                resp = RedirectResponse("/", status_code=302)
+                resp.set_cookie("usuario_token", token, httponly=True, samesite="lax")
+                return resp
+            return templates.TemplateResponse(request, "login.html", {"error": "Contraseña incorrecta."}, status_code=401)
+    finally:
+        db.close()
+
+    # Not found
+    return templates.TemplateResponse(request, "login.html",
+        {"error": "No encontramos una cuenta con ese email.", "show_register": True}, status_code=401)
 
 
 @app.get("/logout")
