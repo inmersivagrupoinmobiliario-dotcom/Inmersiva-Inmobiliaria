@@ -224,11 +224,28 @@ async def portal(
     corredor = get_corredor_session(request)
     usuario = get_usuario_session(request)
     user = empresa or corredor or usuario
+
+    # Check if public user is also a registered corredor (for dual-access option)
+    usuario_es_corredor = False
+    if usuario and not corredor and not empresa:
+        db2 = SessionLocal()
+        try:
+            _cor = db2.query(CorredorModel).filter(
+                CorredorModel.email == usuario.get("sub", ""),
+                CorredorModel.activo == True,
+            ).first()
+            usuario_es_corredor = _cor is not None
+        finally:
+            db2.close()
+
+    portal_error = request.query_params.get("error", "")
     return templates.TemplateResponse(request, "portal.html", {
         "propiedades": propiedades,
         "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or "", "tour": tour or ""},
         "user": user,
         "usuario": usuario,
+        "usuario_es_corredor": usuario_es_corredor,
+        "portal_error": portal_error,
     })
 
 
@@ -495,6 +512,28 @@ async def usuario_logout():
     resp = RedirectResponse("/", status_code=302)
     resp.delete_cookie("usuario_token")
     return resp
+
+
+@app.post("/usuario/acceder-como-corredor")
+async def acceder_como_corredor(request: Request, password: str = Form(...)):
+    """Let a public user switch to their corredor session using just their password."""
+    usuario = get_usuario_session(request)
+    if not usuario:
+        return RedirectResponse("/login", status_code=302)
+    email = usuario.get("sub", "")
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(
+            CorredorModel.email == email, CorredorModel.activo == True
+        ).first()
+        if corredor and corredor.hashed_password and verify_password(password, corredor.hashed_password):
+            token = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
+            resp = RedirectResponse("/corredor/dashboard", status_code=302)
+            resp.set_cookie("corredor_token", token, httponly=True, samesite="lax")
+            return resp
+    finally:
+        db.close()
+    return RedirectResponse("/?error=corredor_pass", status_code=302)
 
 
 # ── Google OAuth ──────────────────────────────────────────────────────────────

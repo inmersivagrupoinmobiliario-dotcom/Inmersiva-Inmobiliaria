@@ -93,26 +93,101 @@
 
     <!-- Auth section -->
     <div class="flex items-center gap-3 flex-shrink-0">
-      {% if user %}
-        <span class="hidden md:block text-gray-400 text-xs truncate max-w-[120px]">{{ user.get('sub', '') }}</span>
-        {% if user.get('role') == 'empresa' %}
-          <a href="/dashboard" class="text-gray-300 text-sm hover:text-white transition-colors">Panel</a>
-        {% else %}
-          <a href="/corredor/dashboard" class="text-gray-300 text-sm hover:text-white transition-colors">Mi Dashboard</a>
-        {% endif %}
-        <a href="/logout" class="text-gray-400 text-xs hover:text-white transition-colors">Salir</a>
-      {% elif usuario %}
-        <span class="hidden md:block text-gray-300 text-sm font-semibold truncate max-w-[140px]">
-          {{ usuario.get('nombre', usuario.get('sub', '')) }}
-        </span>
-        <a href="/usuario/logout"
-           class="text-xs text-gray-400 hover:text-white transition-colors">Salir</a>
+      {% if usuario and not user or (usuario and user.get('role') == 'usuario') %}
+        <!-- Public user dropdown -->
+        {% set nombre_display = usuario.get('nombre', usuario.get('sub', 'Usuario')) %}
+        {% set inicial = nombre_display[0]|upper %}
+        <div class="relative" id="user-menu-wrap">
+          <button onclick="toggleMenu()" class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-white/10 transition-colors">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
+                 style="background:#C9A84C;color:#1B2A4A;">{{ inicial }}</div>
+            <span class="hidden md:block text-white text-sm font-semibold max-w-[110px] truncate">{{ nombre_display }}</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          </button>
+
+          <!-- Dropdown -->
+          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-64 rounded-2xl shadow-2xl overflow-hidden z-50"
+               style="background:#fff;border:1.5px solid #e5e7eb;">
+            <!-- Header -->
+            <div class="px-4 py-4 border-b" style="background:linear-gradient(135deg,#1B2A4A,#2d4070);">
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
+                     style="background:#C9A84C;color:#1B2A4A;">{{ inicial }}</div>
+                <div>
+                  <div class="text-white font-bold text-sm leading-tight">{{ nombre_display }}</div>
+                  <div class="text-xs leading-tight" style="color:#C9A84C;">{{ usuario.get('sub','') }}</div>
+                </div>
+              </div>
+            </div>
+            <!-- Menu items -->
+            <div class="py-2">
+              <a href="/mis-favoritos" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <span class="text-lg">🏠</span> Casas guardadas
+              </a>
+              <a href="/mi-perfil" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <span class="text-lg">👤</span> Mis datos
+              </a>
+              <a href="/mis-contactos" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
+                <span class="text-lg">📞</span> Mis consultas
+              </a>
+              {% if usuario_es_corredor %}
+              <div class="mx-3 my-1 h-px bg-gray-100"></div>
+              <button onclick="document.getElementById('modal-corredor').style.display='flex'"
+                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-colors text-left"
+                      style="color:#C9A84C;">
+                <span class="text-lg">🏢</span> Acceder como Corredor
+              </button>
+              {% endif %}
+              <div class="mx-3 my-1 h-px bg-gray-100"></div>
+              <a href="/usuario/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
+                <span class="text-lg">🚪</span> Cerrar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+
+      {% elif user %}
+        <!-- Empresa / Corredor session dropdown -->
+        {% set nombre_adm = user.get('nombre', user.get('sub','')) %}
+        {% set inicial_adm = nombre_adm[0]|upper %}
+        <div class="relative" id="user-menu-wrap">
+          <button onclick="toggleMenu()" class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-white/10 transition-colors">
+            <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
+                 style="background:#C9A84C;color:#1B2A4A;">{{ inicial_adm }}</div>
+            <span class="hidden md:block text-white text-sm font-semibold max-w-[110px] truncate">{{ nombre_adm }}</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+          </button>
+          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-2xl shadow-2xl overflow-hidden z-50"
+               style="background:#fff;border:1.5px solid #e5e7eb;">
+            <div class="px-4 py-3 border-b" style="background:linear-gradient(135deg,#1B2A4A,#2d4070);">
+              <div class="text-white font-bold text-sm">{{ nombre_adm }}</div>
+              <div class="text-xs" style="color:#C9A84C;">
+                {% if user.get('role') == 'empresa' %}Administrador{% else %}Corredor{% endif %}
+              </div>
+            </div>
+            <div class="py-2">
+              {% if user.get('role') == 'empresa' %}
+              <a href="/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <span class="text-lg">⚙️</span> Panel Admin
+              </a>
+              {% else %}
+              <a href="/corredor/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
+                <span class="text-lg">🏢</span> Mi Dashboard
+              </a>
+              {% endif %}
+              <div class="mx-3 my-1 h-px bg-gray-100"></div>
+              <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
+                <span class="text-lg">🚪</span> Cerrar sesión
+              </a>
+            </div>
+          </div>
+        </div>
+
       {% else %}
         <a href="/registro" class="hidden sm:block text-gray-300 text-sm hover:text-white transition-colors font-medium">
           Registrarse
         </a>
-        <a href="/login"
-           class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-90"
+        <a href="/login" class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-90"
            style="background-color:#C9A84C; color:#1B2A4A;">
           Ingresar
         </a>
@@ -120,6 +195,47 @@
     </div>
   </div>
 </nav>
+
+<!-- Modal: Acceder como Corredor -->
+<div id="modal-corredor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:2rem;margin-bottom:8px;">🏢</div>
+      <h3 style="font-size:1.1rem;font-weight:800;color:#1B2A4A;margin:0 0 4px;">Acceder como Corredor</h3>
+      <p style="font-size:.82rem;color:#6b7280;margin:0;">Ingresa tu contraseña de corredor para acceder al CRM.</p>
+    </div>
+    {% if portal_error == 'corredor_pass' %}
+    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;color:#991b1b;font-size:.83rem;margin-bottom:16px;">⚠️ Contraseña incorrecta.</div>
+    {% endif %}
+    <form method="post" action="/usuario/acceder-como-corredor">
+      <label style="display:block;font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#374151;margin-bottom:7px;">Contraseña</label>
+      <input type="password" name="password" required autofocus
+             style="width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;margin-bottom:16px;"
+             placeholder="••••••••">
+      <button type="submit"
+              style="width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96d);color:#1B2A4A;font-weight:800;font-size:.95rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;">
+        Entrar al CRM
+      </button>
+    </form>
+  </div>
+</div>
+
+<script>
+function toggleMenu() {
+  const d = document.getElementById('user-dropdown');
+  d.classList.toggle('hidden');
+}
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('user-menu-wrap');
+  if (wrap && !wrap.contains(e.target)) {
+    const d = document.getElementById('user-dropdown');
+    if (d) d.classList.add('hidden');
+  }
+});
+{% if portal_error == 'corredor_pass' %}
+document.getElementById('modal-corredor').style.display = 'flex';
+{% endif %}
+</script>
 
 
 <!-- ══════════════ HERO ══════════════ -->
