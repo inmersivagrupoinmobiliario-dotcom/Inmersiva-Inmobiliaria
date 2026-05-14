@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ corredor.nombre }} — Corredor Inmersiva</title>
+  <meta name="description" content="{{ (corredor.bio or ('Corredor inmobiliario profesional en Inmersiva Grupo Inmobiliario.'))[:160] }}">
+  <meta property="og:title" content="{{ corredor.nombre }} — Corredor Inmersiva">
+  <meta property="og:description" content="{{ (corredor.bio or '')[:200] }}">
+  {% if corredor.foto_perfil %}
+  <meta property="og:image" content="/uploads/{{ corredor.foto_perfil }}">
+  {% endif %}
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Barlow', system-ui, sans-serif; background: #f5f6f8; }
+    h1, h2, h3, .font-sora { font-family: 'Sora', system-ui, sans-serif; }
+
+    .prop-card {
+      position: relative; border-radius: 16px; overflow: hidden;
+      background: #1B2A4A; aspect-ratio: 3 / 4; display: block;
+      text-decoration: none; cursor: pointer;
+      transition: transform .28s ease, box-shadow .28s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,.10);
+    }
+    .prop-card:hover { transform: translateY(-6px); box-shadow: 0 20px 48px rgba(0,0,0,.15); }
+    .prop-card img { width:100%;height:100%;object-fit:cover;transition:transform .6s ease;display:block; }
+    .prop-card:hover img { transform: scale(1.05); }
+    .card-overlay {
+      position:absolute;inset:0;
+      background:linear-gradient(to bottom,rgba(0,0,0,0) 0%,rgba(0,0,0,0) 30%,rgba(10,20,38,.55) 60%,rgba(10,20,38,.92) 100%);
+    }
+    .card-top-shadow { position:absolute;top:0;left:0;right:0;height:70px;background:linear-gradient(to bottom,rgba(0,0,0,.3),transparent); }
+    .card-bottom { position:absolute;bottom:0;left:0;right:0;padding:14px 12px;z-index:2; }
+    .card-price { font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:#C9A84C;line-height:1;margin-bottom:4px; }
+    .card-title { font-size:.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px; }
+    .card-loc { font-size:.7rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:3px; }
+    .card-specs { display:flex;align-items:center;gap:8px;font-size:.7rem;color:rgba(255,255,255,.75);font-weight:500;margin-top:6px; }
+    .op-badge { font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px; }
+    .op-venta { background:#C9A84C;color:#1B2A4A; }
+    .op-renta { background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(201,168,76,.4); }
+  </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav style="background:#1B2A4A;position:sticky;top:0;z-index:50;box-shadow:0 2px 20px rgba(0,0,0,.25);">
+  <div style="max-width:1200px;margin:0 auto;padding:0 20px;height:56px;display:flex;align-items:center;justify-content:space-between;gap:12px;">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
+      <div style="width:34px;height:34px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" style="width:30px;height:30px;object-fit:contain;" onerror="this.style.display='none'">
+      </div>
+      <div class="hidden sm:block">
+        <div class="font-sora" style="color:#fff;font-weight:800;font-size:.8rem;letter-spacing:3px;">INMERSIVA</div>
+        <div style="color:#C9A84C;font-size:7px;letter-spacing:2px;font-weight:600;">GRUPO INMOBILIARIO</div>
+      </div>
+    </a>
+    <a href="/" style="color:rgba(255,255,255,.55);font-size:.82rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,.55)'">← Volver al portal</a>
+    <div style="flex:1;"></div>
+    {% if user %}
+      {% if user.get('role') == 'empresa' %}
+      <a href="/dashboard" style="color:rgba(255,255,255,.6);font-size:.82rem;text-decoration:none;">Panel</a>
+      {% else %}
+      <a href="/corredor/dashboard" style="color:rgba(255,255,255,.6);font-size:.82rem;text-decoration:none;">Dashboard</a>
+      {% endif %}
+    {% else %}
+    <a href="/login" style="font-family:'Sora',sans-serif;font-size:.78rem;font-weight:700;padding:7px 16px;background:#C9A84C;color:#1B2A4A;border-radius:8px;text-decoration:none;">Ingresar</a>
+    {% endif %}
+  </div>
+</nav>
+
+<main style="max-width:1200px;margin:0 auto;padding:32px 20px 60px;">
+
+  <!-- ── Corredor hero card ── -->
+  <div style="background:#fff;border-radius:20px;overflow:hidden;margin-bottom:32px;box-shadow:0 4px 24px rgba(0,0,0,.07);">
+
+    <!-- Navy header -->
+    <div style="background:linear-gradient(135deg,#1B2A4A 0%,#0f1a2e 100%);padding:36px 40px;position:relative;overflow:hidden;">
+      <!-- Dot pattern -->
+      <div style="position:absolute;inset:0;background-image:radial-gradient(circle,rgba(201,168,76,.08) 1px,transparent 1px);background-size:28px 28px;"></div>
+      <!-- Gold top bar -->
+      <div style="position:absolute;top:0;left:0;right:0;height:3px;background:linear-gradient(90deg,#C9A84C,#e8c96d,#C9A84C);"></div>
+
+      <div style="position:relative;display:flex;align-items:center;gap:28px;flex-wrap:wrap;">
+        <!-- Avatar -->
+        <div style="width:90px;height:90px;border-radius:50%;flex-shrink:0;border:3px solid #C9A84C;padding:3px;background:linear-gradient(135deg,#C9A84C,#e8c96d);">
+          <div style="width:100%;height:100%;border-radius:50%;overflow:hidden;background:#1B2A4A;display:flex;align-items:center;justify-content:center;">
+            {% if corredor.foto_perfil %}
+            <img src="/uploads/{{ corredor.foto_perfil }}" style="width:100%;height:100%;object-fit:cover;">
+            {% else %}
+            <span class="font-sora" style="font-size:2rem;font-weight:800;color:#C9A84C;">{{ corredor.nombre[0]|upper }}</span>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Info -->
+        <div style="flex:1;min-width:200px;">
+          <div style="color:#C9A84C;font-size:.65rem;font-weight:700;letter-spacing:3px;text-transform:uppercase;margin-bottom:6px;">Corredor Profesional</div>
+          <h1 class="font-sora" style="color:#fff;font-size:1.6rem;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;">{{ corredor.nombre }}</h1>
+
+          <div style="display:flex;flex-wrap:wrap;gap:10px;">
+            <span style="background:rgba(201,168,76,.15);color:#C9A84C;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.3);">
+              📧 {{ corredor.email }}
+            </span>
+            {% if corredor.telefono %}
+            <span style="background:rgba(255,255,255,.07);color:#aaa;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);">
+              📞 {{ corredor.telefono }}
+            </span>
+            {% endif %}
+            {% if corredor.instagram %}
+            <span style="background:rgba(225,48,108,.12);color:#f472b6;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(225,48,108,.2);">
+              IG @{{ corredor.instagram }}
+            </span>
+            {% endif %}
+          </div>
+
+          {% if corredor.bio %}
+          <p style="color:rgba(255,255,255,.6);font-size:.88rem;margin-top:14px;line-height:1.65;max-width:560px;">{{ corredor.bio }}</p>
+          {% endif %}
+        </div>
+
+        <!-- CTA buttons -->
+        <div style="display:flex;flex-direction:column;gap:10px;flex-shrink:0;">
+          {% set wa = corredor.whatsapp or corredor.telefono %}
+          {% if wa %}
+          <a href="https://wa.me/51{{ wa|replace(' ','')|replace('-','') }}?text=Hola+{{ corredor.nombre }}%2C+te+contacto+desde+Inmersiva."
+             target="_blank"
+             style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:11px 20px;background:#22C55E;color:#fff;border-radius:10px;text-decoration:none;white-space:nowrap;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
+          </a>
+          {% endif %}
+          <a href="mailto:{{ corredor.email }}"
+             style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:10px 20px;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;text-decoration:none;white-space:nowrap;">
+            ✉️ Enviar email
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stats strip -->
+    <div style="display:flex;border-top:1.5px solid #f1f5f9;">
+      <div style="flex:1;padding:18px;text-align:center;border-right:1px solid #f1f5f9;">
+        <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#1B2A4A;">{{ propiedades|length }}</div>
+        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">Propiedades</div>
+      </div>
+      <div style="flex:1;padding:18px;text-align:center;border-right:1px solid #f1f5f9;">
+        <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#C9A84C;">{{ propiedades|selectattr('operacion','eq','Venta')|list|length }}</div>
+        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Venta</div>
+      </div>
+      <div style="flex:1;padding:18px;text-align:center;">
+        <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#1B2A4A;">{{ propiedades|selectattr('operacion','eq','Renta')|list|length }}</div>
+        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Alquiler</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Properties grid ── -->
+  {% if propiedades %}
+  <div style="margin-bottom:20px;">
+    <div style="font-family:'Barlow',sans-serif;font-size:.68rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#C9A84C;margin-bottom:6px;">Portafolio</div>
+    <h2 class="font-sora" style="font-size:1.1rem;font-weight:800;color:#1B2A4A;margin:0;">Propiedades de {{ corredor.nombre.split()[0] }}</h2>
+  </div>
+
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:14px;">
+    {% for p in propiedades %}
+    <a href="/propiedad/{{ p.id }}" class="prop-card">
+      {% if p.foto_portada %}
+      <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}" onerror="this.style.display='none'">
+      {% else %}
+      <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A4A,#243660);">
+        <span style="font-size:3rem;opacity:.2;">🏠</span>
+      </div>
+      {% endif %}
+      <div class="card-top-shadow"></div>
+      <div class="card-overlay"></div>
+
+      <div style="position:absolute;top:10px;left:10px;z-index:2;display:flex;gap:5px;flex-wrap:wrap;">
+        <span class="op-badge {% if p.operacion == 'Venta' %}op-venta{% else %}op-renta{% endif %}">{{ p.operacion }}</span>
+        {% if p.destacado %}<span class="op-badge" style="background:rgba(0,0,0,.5);color:#fff;">★</span>{% endif %}
+      </div>
+
+      <div class="card-bottom">
+        <div class="card-price">{{ p.precio_fmt }}</div>
+        <div class="card-title">{{ p.titulo }}</div>
+        <div class="card-loc">
+          <svg width="9" height="9" fill="#C9A84C" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          {{ p.ciudad }}
+        </div>
+        <div class="card-specs">
+          {% if p.habitaciones %}<span>🛏 {{ p.habitaciones }}</span>{% endif %}
+          {% if p.banos %}<span>🚿 {{ p.banos }}</span>{% endif %}
+          {% if p.m2_construidos %}<span>📐 {{ p.m2_construidos }}m²</span>{% endif %}
+        </div>
+      </div>
+    </a>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div style="text-align:center;padding:64px 20px;">
+    <div style="font-size:56px;margin-bottom:16px;opacity:.6;">🏠</div>
+    <h3 class="font-sora" style="font-size:1.1rem;font-weight:700;color:#1B2A4A;margin:0 0 8px;">Sin propiedades publicadas aún</h3>
+    <p style="color:#9ca3af;font-size:.88rem;margin:0 0 20px;">Este corredor no tiene propiedades disponibles actualmente.</p>
+    <a href="/" style="display:inline-flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:10px 22px;background:#1B2A4A;color:#C9A84C;border-radius:10px;text-decoration:none;">
+      ← Ver todas las propiedades
+    </a>
+  </div>
+  {% endif %}
+
+</main>
+
+<!-- Footer -->
+<footer style="background:#0f1a2e;padding:24px 20px;">
+  <div style="max-width:1200px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;">
+    <div style="color:#4b5563;font-size:.75rem;">© 2026 Inmersiva Grupo Inmobiliario</div>
+    <a href="/" style="color:#C9A84C;font-size:.75rem;text-decoration:none;">← Ver todas las propiedades</a>
+  </div>
+</footer>
+
+</body>
+</html>

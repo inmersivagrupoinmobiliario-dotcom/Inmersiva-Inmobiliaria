@@ -124,7 +124,7 @@
     <div class="section" id="sec-resumen">
       <h2 class="text-xl font-black text-gray-900 mb-4">Bienvenido, {{ corredor.nombre.split()[0] }} 👋</h2>
 
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 mb-6">
+      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-6">
         <div class="stat-mini text-center">
           <div class="text-2xl font-black" style="color:#C9A84C;">{{ stats.mis_fichas }}</div>
           <div class="text-xs text-gray-500 mt-1 font-medium">Mis Fichas</div>
@@ -140,6 +140,10 @@
         <div class="stat-mini text-center">
           <div class="text-2xl font-black text-yellow-600">{{ stats.citas_pendientes }}</div>
           <div class="text-xs text-gray-500 mt-1 font-medium">Citas pendientes</div>
+        </div>
+        <div class="stat-mini text-center">
+          <div class="text-2xl font-black text-purple-600">{{ stats.total_vistas }}</div>
+          <div class="text-xs text-gray-500 mt-1 font-medium">Visitas totales</div>
         </div>
         <div class="stat-mini text-center">
           <div class="text-2xl font-black text-green-600">{{ stats.pdfs }}</div>
@@ -197,23 +201,38 @@
               <th class="px-5 py-3">Propiedad</th>
               <th class="px-5 py-3">Ubicación</th>
               <th class="px-5 py-3">Precio</th>
+              <th class="px-5 py-3">Vistas</th>
               <th class="px-5 py-3">Acciones</th>
             </tr>
           </thead>
           <tbody>
             {% set sym = {"PEN":"S/","USD":"US$","MXN":"$"} %}
             {% for f in fichas %}
+            {% set pub = props_map.get(f.id, {}) %}
             <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
               <td class="px-5 py-3 text-gray-400">{{ loop.index }}</td>
               <td class="px-5 py-3">
                 <div class="font-semibold text-gray-800">{{ f.tipo }}</div>
                 <span class="badge {% if f.operacion=='Venta' %}badge-ganado{% else %}badge-contactado{% endif %}">{{ f.operacion }}</span>
+                {% if pub.get('publicado') %}
+                <a href="/propiedad/{{ pub.get('prop_id') }}" target="_blank" class="badge bg-green-50 text-green-700 no-underline" style="font-size:.65rem;">↗ Ver</a>
+                {% endif %}
               </td>
               <td class="px-5 py-3">
                 <div class="text-gray-700">{{ f.direccion }}</div>
                 <div class="text-gray-400 text-xs">{{ f.ciudad }}{% if f.estado %}, {{ f.estado }}{% endif %}</div>
               </td>
               <td class="px-5 py-3 font-bold" style="color:#C9A84C;">{{ sym.get(f.moneda, f.moneda) }} {{ "{:,.0f}".format(f.precio) }}</td>
+              <td class="px-5 py-3">
+                {% if pub.get('publicado') %}
+                <div style="display:flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;color:#1B2A4A;">
+                  <svg width="13" height="13" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  {{ pub.get('vistas', 0) }}
+                </div>
+                {% else %}
+                <span class="text-gray-300 text-xs">—</span>
+                {% endif %}
+              </td>
               <td class="px-5 py-3">
                 <div class="flex gap-2">
                   <a href="/pdf/{{ f.id }}" target="_blank" class="badge bg-gray-100 text-gray-600 hover:bg-gray-200 cursor-pointer no-underline">PDF</a>

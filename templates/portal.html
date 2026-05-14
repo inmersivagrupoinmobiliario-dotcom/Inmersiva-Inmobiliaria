@@ -551,15 +551,29 @@
       {% endif %}
     </div>
 
-    <!-- Filter pills -->
-    <div class="filter-strip">
-      <a href="/" class="fpill {% if not filtros.operacion and not filtros.tipo %}active-navy{% endif %}">Todas</a>
-      <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-         class="fpill {% if filtros.operacion == 'Venta' %}active-gold{% endif %}">Venta</a>
-      <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-         class="fpill {% if filtros.operacion == 'Renta' %}active-navy{% endif %}">Alquiler</a>
-      <a href="/?tour=1{% if filtros.operacion %}&operacion={{ filtros.operacion }}{% endif %}"
-         class="fpill {% if filtros.get('tour') %}active-navy{% endif %}">🔮 Tour 360°</a>
+    <!-- Filter + sort pills -->
+    <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
+      <div class="filter-strip">
+        <a href="/" class="fpill {% if not filtros.operacion and not filtros.tipo %}active-navy{% endif %}">Todas</a>
+        <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+           class="fpill {% if filtros.operacion == 'Venta' %}active-gold{% endif %}">Venta</a>
+        <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+           class="fpill {% if filtros.operacion == 'Renta' %}active-navy{% endif %}">Alquiler</a>
+        <a href="/?tour=1{% if filtros.operacion %}&operacion={{ filtros.operacion }}{% endif %}"
+           class="fpill {% if filtros.get('tour') %}active-navy{% endif %}">🔮 Tour 360°</a>
+      </div>
+      <!-- Sort -->
+      <div style="margin-left:auto;flex-shrink:0;">
+        <select onchange="window.location.href=this.value"
+                style="font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:20px;border:1.5px solid #e2e4e8;background:#fff;color:#555;cursor:pointer;outline:none;">
+          {% set base = '?' + ('operacion=' + filtros.operacion + '&' if filtros.operacion else '') + ('tipo=' + filtros.tipo + '&' if filtros.tipo else '') + ('ciudad=' + filtros.ciudad + '&' if filtros.ciudad else '') %}
+          <option value="{{ base }}orden=" {% if not filtros.orden %}selected{% endif %}>Destacados primero</option>
+          <option value="{{ base }}orden=reciente" {% if filtros.orden == 'reciente' %}selected{% endif %}>Más recientes</option>
+          <option value="{{ base }}orden=precio_asc" {% if filtros.orden == 'precio_asc' %}selected{% endif %}>Precio: menor a mayor</option>
+          <option value="{{ base }}orden=precio_desc" {% if filtros.orden == 'precio_desc' %}selected{% endif %}>Precio: mayor a menor</option>
+          <option value="{{ base }}orden=vistas" {% if filtros.orden == 'vistas' %}selected{% endif %}>Más visitadas</option>
+        </select>
+      </div>
     </div>
   </div>
 

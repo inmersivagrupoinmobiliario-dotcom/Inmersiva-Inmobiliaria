@@ -55,6 +55,8 @@ def _run_migrations():
             # solicitudes_corredor new columns
             ("solicitudes_corredor", "dni", "VARCHAR(20)"),
             ("solicitudes_corredor", "cv_archivo", "VARCHAR(300)"),
+            # propiedades_publicas new columns
+            ("propiedades_publicas", "vistas", "INTEGER DEFAULT 0"),
         ]
         for table, col, col_type in migrations:
             try:
@@ -211,6 +213,7 @@ async def portal(
     precio_max: Opt[int] = None,
     habitaciones: Opt[int] = None,
     m2_min: Opt[int] = None,
+    orden: Opt[str] = None,
 ):
     db = SessionLocal()
     try:
@@ -231,10 +234,17 @@ async def portal(
             q = q.filter(PropiedadPublica.habitaciones >= habitaciones)
         if m2_min is not None:
             q = q.filter(PropiedadPublica.m2_construidos >= m2_min)
-        propiedades = q.order_by(
-            PropiedadPublica.destacado.desc(),
-            PropiedadPublica.created_at.desc()
-        ).all()
+        if orden == "precio_asc":
+            q = q.order_by(PropiedadPublica.precio.asc())
+        elif orden == "precio_desc":
+            q = q.order_by(PropiedadPublica.precio.desc())
+        elif orden == "reciente":
+            q = q.order_by(PropiedadPublica.created_at.desc())
+        elif orden == "vistas":
+            q = q.order_by(PropiedadPublica.vistas.desc())
+        else:
+            q = q.order_by(PropiedadPublica.destacado.desc(), PropiedadPublica.created_at.desc())
+        propiedades = q.all()
         # Build WhatsApp lookup for cards
         corredor_ids = [p.corredor_id for p in propiedades if p.corredor_id]
         corredores_dict: dict = {}
@@ -280,6 +290,7 @@ async def portal(
             "precio_max": precio_max or "",
             "habitaciones": habitaciones or "",
             "m2_min": m2_min or "",
+            "orden": orden or "",
         },
         "corredores_dict": corredores_dict,
         "favoritos": favoritos,
@@ -300,6 +311,9 @@ async def detalle_propiedad(request: Request, propiedad_id: int):
         ).first()
         if not propiedad:
             return RedirectResponse("/", status_code=302)
+        # Increment view counter
+        propiedad.vistas = (propiedad.vistas or 0) + 1
+        db.commit()
         corredor_obj = db.query(CorredorModel).filter(
             CorredorModel.id == propiedad.corredor_id
         ).first() if propiedad.corredor_id else None
@@ -464,6 +478,30 @@ async def publicar_ficha_portal(request: Request, listing_id: str):
     finally:
         db.close()
     return RedirectResponse("/dashboard", status_code=302)
+
+
+@app.get("/c/{username}", response_class=HTMLResponse)
+async def perfil_publico_corredor(request: Request, username: str):
+    db = SessionLocal()
+    try:
+        corredor_obj = db.query(CorredorModel).filter(
+            CorredorModel.username == username,
+            CorredorModel.activo == True,
+        ).first()
+        if not corredor_obj:
+            return RedirectResponse("/", status_code=302)
+        propiedades = db.query(PropiedadPublica).filter(
+            PropiedadPublica.corredor_id == corredor_obj.id,
+            PropiedadPublica.publicado == True,
+        ).order_by(PropiedadPublica.destacado.desc(), PropiedadPublica.created_at.desc()).all()
+    finally:
+        db.close()
+    user = get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request)
+    return templates.TemplateResponse(request, "corredor_perfil_publico.html", {
+        "corredor": corredor_obj,
+        "propiedades": propiedades,
+        "user": user,
+    })
 
 
 @app.post("/admin/propiedad/{propiedad_id}/despublicar")
@@ -919,6 +957,12 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
             PostRRSS.listing_id != None,
         ).order_by(PostRRSS.created_at.desc()).limit(50).all()
         contactos_map = {c.id: c for c in contactos}
+        # Vistas por propiedad publicada
+        props_publicas = db.query(PropiedadPublica).filter(
+            PropiedadPublica.corredor_id == corredor.id,
+        ).all()
+        props_map = {p.listing_id: {"vistas": p.vistas or 0, "prop_id": p.id, "publicado": p.publicado} for p in props_publicas}
+        total_vistas = sum(p.vistas or 0 for p in props_publicas if p.publicado)
     finally:
         db.close()
 
@@ -942,7 +986,9 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
             "pdfs": s["pdfs"],
             "contactos": len(contactos),
             "citas_pendientes": sum(1 for c in citas if c.estado == "Pendiente"),
+            "total_vistas": total_vistas,
         },
+        "props_map": props_map,
         "contactos": contactos,
         "pipeline": pipeline,
         "citas": citas,

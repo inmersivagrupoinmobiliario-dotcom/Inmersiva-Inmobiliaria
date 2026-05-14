@@ -139,6 +139,7 @@ class PropiedadPublica(Base):
     corredor_id = Column(Integer, ForeignKey("corredores.id"), nullable=True)
     publicado = Column(Boolean, default=True)
     destacado = Column(Boolean, default=False)
+    vistas = Column(Integer, default=0)
     created_at = Column(DateTime, default=datetime.utcnow)
 
     @property
