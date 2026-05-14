@@ -1088,6 +1088,18 @@ async def descargar_imagen(listing_id: str):
     return FileResponse(str(img_path), media_type="image/jpeg", filename=filename)
 
 
+@app.get("/imagen-vertical/{listing_id}")
+async def descargar_imagen_vertical(listing_id: str):
+    listing = load_listing(listing_id)
+    img_path = GENERATED / "images" / f"{listing_id}_vertical.jpg"
+    img_path.parent.mkdir(parents=True, exist_ok=True)
+    portada_path = (UPLOADS / listing.foto_portada) if listing.foto_portada else None
+    from services.image_service import generar_imagen_vertical
+    generar_imagen_vertical(listing, str(portada_path) if portada_path and portada_path.exists() else None, str(img_path))
+    filename = f"inmersiva_rrss_{listing.tipo.lower()}_{listing.ciudad.lower()}.jpg"
+    return FileResponse(str(img_path), media_type="image/jpeg", filename=filename)
+
+
 # ── Instagram Publishing ──────────────────────────────────────────────────────
 from services.social_service import publicar_instagram
 
