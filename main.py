@@ -1465,28 +1465,46 @@ async def registro_corredor_submit(
 
 # ── Admin: aprobar / rechazar solicitud de corredor ───────────────────────────
 @app.post("/admin/solicitud/{solicitud_id}/aprobar")
-async def aprobar_solicitud_corredor(
-    request: Request,
-    solicitud_id: int,
-    password: str = Form(...),
-    email_corp: str = Form(...),
-):
+async def aprobar_solicitud_corredor(request: Request, solicitud_id: int):
     if not get_empresa_session(request):
         return RedirectResponse("/login", status_code=302)
+    import unicodedata, secrets, string
     from models.db_models import SolicitudCorredor
     from services.email_service import setup_cloudflare_email_routing, enviar_credenciales_corredor
-    # username = parte local del email corporativo (ej: daniela.mendoza@inmersiva.com → daniela.mendoza)
-    username = email_corp.split("@")[0]
+
+    company_domain = os.getenv("COMPANY_EMAIL_DOMAIN", "inmersiva.com")
+
+    def normalizar(texto: str) -> str:
+        sin_tildes = unicodedata.normalize("NFD", texto)
+        sin_tildes = "".join(c for c in sin_tildes if unicodedata.category(c) != "Mn")
+        return sin_tildes.lower().replace(" ", ".")
+
     db = SessionLocal()
     try:
         sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
         if not sol:
             return RedirectResponse("/dashboard?error=Solicitud+no+encontrada", status_code=302)
-        existe = db.query(CorredorModel).filter(
+
+        # Generar email corporativo: primer_nombre.primer_apellido@inmersiva.com
+        partes = sol.nombre.strip().split()
+        slug = normalizar(f"{partes[0]}.{partes[-1]}") if len(partes) > 1 else normalizar(partes[0])
+        email_corp = f"{slug}@{company_domain}"
+        username = slug
+
+        # Si ya existe ese email, añadir dígito incremental
+        base_slug = slug
+        counter = 1
+        while db.query(CorredorModel).filter(
             (CorredorModel.email == email_corp) | (CorredorModel.username == username)
-        ).first()
-        if existe:
-            return RedirectResponse("/dashboard?error=Email+corporativo+ya+existe", status_code=302)
+        ).first():
+            username = f"{base_slug}{counter}"
+            email_corp = f"{username}@{company_domain}"
+            counter += 1
+
+        # Contraseña temporal segura: Inm + 4 dígitos + letra mayúscula
+        alphabet = string.ascii_letters + string.digits
+        password = "Inm" + "".join(secrets.choice(string.digits) for _ in range(4)) + secrets.choice(string.ascii_uppercase)
+
         db.add(CorredorModel(
             nombre=sol.nombre, email=email_corp, telefono=sol.telefono,
             username=username, hashed_password=hash_password(password),
@@ -1496,9 +1514,12 @@ async def aprobar_solicitud_corredor(
         db.commit()
     finally:
         db.close()
+
     setup_cloudflare_email_routing(email_corp, sol.email)
     enviar_credenciales_corredor(sol.nombre, email_corp, sol.email, username, password)
-    return RedirectResponse("/dashboard?ok=Corredor+aprobado+y+credenciales+enviadas", status_code=302)
+    import urllib.parse
+    msg = urllib.parse.quote(f"Corredor aprobado: {email_corp} · contraseña enviada a {sol.email}")
+    return RedirectResponse(f"/dashboard?ok={msg}", status_code=302)
 
 
 @app.post("/admin/solicitud/{solicitud_id}/rechazar")

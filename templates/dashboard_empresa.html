@@ -817,42 +817,20 @@
       </div>
       <!-- Actions -->
       {% if sol.estado == 'Pendiente' %}
-      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
-        <button onclick="toggleEl('aprobar-sol-{{ sol.id }}')"
-                style="padding:7px 14px;background:#28a745;color:white;border:none;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:600;">
-          ✅ Aprobar
-        </button>
+      <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-top:4px;">
+        <form method="post" action="/admin/solicitud/{{ sol.id }}/aprobar" style="margin:0">
+          <button type="submit"
+                  style="padding:7px 16px;background:#28a745;color:white;border:none;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:600;">
+            ✅ Aprobar
+          </button>
+        </form>
         <form method="post" action="/admin/solicitud/{{ sol.id }}/rechazar" style="margin:0">
           <button type="submit"
-                  style="padding:7px 14px;background:#dc3545;color:white;border:none;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:600;">
+                  style="padding:7px 16px;background:#dc3545;color:white;border:none;border-radius:7px;cursor:pointer;font-size:.82rem;font-weight:600;">
             ❌ Rechazar
           </button>
         </form>
-      </div>
-      <!-- Approve form (hidden) -->
-      <div id="aprobar-sol-{{ sol.id }}" style="display:none;margin-top:12px;background:#f8f9fa;border-radius:8px;padding:14px;">
-        <form method="post" action="/admin/solicitud/{{ sol.id }}/aprobar">
-          <div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:8px;">
-            <div>
-              <label style="font-size:.72rem;color:#666;display:block;margin-bottom:3px;">Email corporativo * <span style="color:#aaa;font-weight:400;">(será también el usuario de acceso)</span></label>
-              <input type="email" name="email_corp" required
-                     placeholder="{{ sol.nombre.split()[0]|lower }}.{{ (sol.nombre.split()[-1]|lower) if sol.nombre.split()|length > 1 else 'apellido' }}@inmersiva.com"
-                     style="padding:7px 10px;border:1.5px solid #ddd;border-radius:5px;width:100%;font-size:.82rem;">
-            </div>
-            <div>
-              <label style="font-size:.72rem;color:#666;display:block;margin-bottom:3px;">Contraseña temporal *</label>
-              <input type="text" name="password" required placeholder="Contraseña que recibirá por email"
-                     style="padding:7px 10px;border:1.5px solid #ddd;border-radius:5px;width:100%;font-size:.82rem;">
-            </div>
-          </div>
-          <p style="font-size:.73rem;color:#888;margin-bottom:8px;line-height:1.4;">
-            Se creará la regla de reenvío en Cloudflare (<strong>{{ sol.email }}</strong>) y se enviarán las credenciales por email.
-          </p>
-          <button type="submit"
-                  style="padding:8px 20px;background:#1B2A4A;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.82rem;font-weight:600;">
-            Crear cuenta y enviar credenciales
-          </button>
-        </form>
+        <span style="font-size:.75rem;color:#999;">El sistema generará el email corporativo y enviará las credenciales automáticamente.</span>
       </div>
       {% endif %}
     </div>
