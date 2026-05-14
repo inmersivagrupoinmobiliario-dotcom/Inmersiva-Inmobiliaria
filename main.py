@@ -1060,12 +1060,12 @@ async def crear_corredor(
     nombre: str = Form(...),
     email: str = Form(...),
     telefono: str = Form(default=""),
-    username: str = Form(...),
     password: str = Form(...),
     dni: str = Form(default=""),
     direccion: str = Form(default=""),
     email_personal: str = Form(default=""),
 ):
+    username = email.split("@")[0]
     empresa = get_empresa_session(request)
     if not empresa:
         return RedirectResponse("/login", status_code=302)
@@ -1468,7 +1468,6 @@ async def registro_corredor_submit(
 async def aprobar_solicitud_corredor(
     request: Request,
     solicitud_id: int,
-    username: str = Form(...),
     password: str = Form(...),
     email_corp: str = Form(...),
 ):
@@ -1476,6 +1475,8 @@ async def aprobar_solicitud_corredor(
         return RedirectResponse("/login", status_code=302)
     from models.db_models import SolicitudCorredor
     from services.email_service import setup_cloudflare_email_routing, enviar_credenciales_corredor
+    # username = parte local del email corporativo (ej: daniela.mendoza@inmersiva.com → daniela.mendoza)
+    username = email_corp.split("@")[0]
     db = SessionLocal()
     try:
         sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
@@ -1485,7 +1486,7 @@ async def aprobar_solicitud_corredor(
             (CorredorModel.email == email_corp) | (CorredorModel.username == username)
         ).first()
         if existe:
-            return RedirectResponse("/dashboard?error=Email+corporativo+o+usuario+ya+existe", status_code=302)
+            return RedirectResponse("/dashboard?error=Email+corporativo+ya+existe", status_code=302)
         db.add(CorredorModel(
             nombre=sol.nombre, email=email_corp, telefono=sol.telefono,
             username=username, hashed_password=hash_password(password),
@@ -1495,7 +1496,6 @@ async def aprobar_solicitud_corredor(
         db.commit()
     finally:
         db.close()
-    # Cloudflare email routing + envío de credenciales (no bloquean si fallan)
     setup_cloudflare_email_routing(email_corp, sol.email)
     enviar_credenciales_corredor(sol.nombre, email_corp, sol.email, username, password)
     return RedirectResponse("/dashboard?ok=Corredor+aprobado+y+credenciales+enviadas", status_code=302)
