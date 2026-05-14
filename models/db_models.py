@@ -153,3 +153,14 @@ class PropiedadPublica(Base):
     def precio_fmt(self):
         sym = "S/." if self.moneda == "PEN" else ("USD" if self.moneda == "USD" else self.moneda)
         return f"{sym} {self.precio:,}"
+
+
+class PasswordResetToken(Base):
+    __tablename__ = "password_reset_tokens"
+    id = Column(Integer, primary_key=True)
+    email = Column(String(100), nullable=False, index=True)
+    token = Column(String(64), unique=True, nullable=False)
+    tipo = Column(String(20), default="corredor")  # corredor / usuario
+    expires_at = Column(DateTime, nullable=False)
+    used = Column(Boolean, default=False)
+    created_at = Column(DateTime, default=datetime.utcnow)

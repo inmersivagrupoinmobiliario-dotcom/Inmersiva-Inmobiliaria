@@ -24,7 +24,7 @@ load_dotenv()
 # DB init
 from models.db_models import (
     Corredor as CorredorModel, PropiedadPublica, UsuarioPublico,
-    Contacto, Cita, DocumentoCorredor, PostRRSS,
+    Contacto, Cita, DocumentoCorredor, PostRRSS, PasswordResetToken,
 )
 
 def _run_migrations():
@@ -58,6 +58,8 @@ def _run_migrations():
             # propiedades_publicas new columns
             ("propiedades_publicas", "vistas", "INTEGER DEFAULT 0"),
         ]
+        # password_reset_tokens table (create via ORM, not ALTER TABLE)
+
         for table, col, col_type in migrations:
             try:
                 if is_pg:
@@ -214,38 +216,52 @@ async def portal(
     habitaciones: Opt[int] = None,
     m2_min: Opt[int] = None,
     orden: Opt[str] = None,
+    q: Opt[str] = None,
+    page: Opt[int] = 1,
 ):
+    PER_PAGE = 12
+    page = max(1, page or 1)
     db = SessionLocal()
     try:
-        q = db.query(PropiedadPublica).filter(PropiedadPublica.publicado == True)
+        qry = db.query(PropiedadPublica).filter(PropiedadPublica.publicado == True)
         if tipo:
-            q = q.filter(PropiedadPublica.tipo == tipo)
+            qry = qry.filter(PropiedadPublica.tipo == tipo)
         if operacion:
-            q = q.filter(PropiedadPublica.operacion == operacion)
+            qry = qry.filter(PropiedadPublica.operacion == operacion)
         if ciudad:
-            q = q.filter(PropiedadPublica.ciudad.ilike(f"%{ciudad}%"))
+            qry = qry.filter(PropiedadPublica.ciudad.ilike(f"%{ciudad}%"))
         if tour:
-            q = q.filter(PropiedadPublica.tour_360_url != "")
+            qry = qry.filter(PropiedadPublica.tour_360_url != "")
         if precio_min is not None:
-            q = q.filter(PropiedadPublica.precio >= precio_min)
+            qry = qry.filter(PropiedadPublica.precio >= precio_min)
         if precio_max is not None:
-            q = q.filter(PropiedadPublica.precio <= precio_max)
+            qry = qry.filter(PropiedadPublica.precio <= precio_max)
         if habitaciones is not None:
-            q = q.filter(PropiedadPublica.habitaciones >= habitaciones)
+            qry = qry.filter(PropiedadPublica.habitaciones >= habitaciones)
         if m2_min is not None:
-            q = q.filter(PropiedadPublica.m2_construidos >= m2_min)
+            qry = qry.filter(PropiedadPublica.m2_construidos >= m2_min)
+        if q:
+            term = f"%{q}%"
+            from sqlalchemy import or_
+            qry = qry.filter(or_(
+                PropiedadPublica.titulo.ilike(term),
+                PropiedadPublica.descripcion.ilike(term),
+                PropiedadPublica.ciudad.ilike(term),
+                PropiedadPublica.direccion.ilike(term),
+            ))
         if orden == "precio_asc":
-            q = q.order_by(PropiedadPublica.precio.asc())
+            qry = qry.order_by(PropiedadPublica.precio.asc())
         elif orden == "precio_desc":
-            q = q.order_by(PropiedadPublica.precio.desc())
+            qry = qry.order_by(PropiedadPublica.precio.desc())
         elif orden == "reciente":
-            q = q.order_by(PropiedadPublica.created_at.desc())
+            qry = qry.order_by(PropiedadPublica.created_at.desc())
         elif orden == "vistas":
-            q = q.order_by(PropiedadPublica.vistas.desc())
+            qry = qry.order_by(PropiedadPublica.vistas.desc())
         else:
-            q = q.order_by(PropiedadPublica.destacado.desc(), PropiedadPublica.created_at.desc())
-        propiedades = q.all()
-        # Build WhatsApp lookup for cards
+            qry = qry.order_by(PropiedadPublica.destacado.desc(), PropiedadPublica.created_at.desc())
+        total = qry.count()
+        propiedades = qry.offset((page - 1) * PER_PAGE).limit(PER_PAGE).all()
+        total_pages = max(1, (total + PER_PAGE - 1) // PER_PAGE)
         corredor_ids = [p.corredor_id for p in propiedades if p.corredor_id]
         corredores_dict: dict = {}
         if corredor_ids:
@@ -291,6 +307,7 @@ async def portal(
             "habitaciones": habitaciones or "",
             "m2_min": m2_min or "",
             "orden": orden or "",
+            "q": q or "",
         },
         "corredores_dict": corredores_dict,
         "favoritos": favoritos,
@@ -298,6 +315,9 @@ async def portal(
         "usuario": usuario,
         "usuario_es_corredor": usuario_es_corredor,
         "portal_error": portal_error,
+        "page": page,
+        "total_pages": total_pages,
+        "total": total,
     })
 
 
@@ -356,7 +376,21 @@ async def contactar_propiedad(
         ).first() if propiedad.corredor_id else None
         corredor_email = corredor_obj.email if corredor_obj else ADMIN_EMAIL
         corredor_nombre = corredor_obj.nombre if corredor_obj else "Inmersiva"
+        corredor_id = corredor_obj.id if corredor_obj else None
         propiedad_titulo = propiedad.titulo
+        # Save to CRM as Contacto so corredor sees it in dashboard
+        if corredor_id:
+            db.add(Contacto(
+                corredor_id=corredor_id,
+                nombre=nombre,
+                email=email_contacto,
+                telefono=telefono_contacto,
+                origen="Portal",
+                interes=propiedad_titulo,
+                notas=mensaje,
+                estado="Nuevo",
+            ))
+            db.commit()
     finally:
         db.close()
 
@@ -534,6 +568,178 @@ async def destacar_propiedad(request: Request, propiedad_id: int):
     finally:
         db.close()
     return RedirectResponse("/dashboard", status_code=302)
+
+
+# ── Admin: editar propiedad ───────────────────────────────────────────────────
+
+@app.get("/admin/propiedad/{propiedad_id}/editar", response_class=HTMLResponse)
+async def editar_propiedad_page(request: Request, propiedad_id: int):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        p = db.query(PropiedadPublica).filter(PropiedadPublica.id == propiedad_id).first()
+        if not p:
+            return RedirectResponse("/dashboard", status_code=302)
+        corredor_id = p.corredor_id
+        titulo = p.titulo; tipo = p.tipo; operacion = p.operacion
+        precio = p.precio; moneda = p.moneda; ciudad = p.ciudad
+        estado_prop = p.estado; direccion = p.direccion; descripcion = p.descripcion
+        habitaciones = p.habitaciones; banos = p.banos
+        m2_c = p.m2_construidos; m2_t = p.m2_terreno; estac = p.estacionamientos
+        tour = p.tour_360_url; foto_portada = p.foto_portada
+        prop_id = p.id
+    finally:
+        db.close()
+    db2 = SessionLocal()
+    try:
+        corredores = db2.query(CorredorModel).filter(CorredorModel.activo == True).all()
+        cors_list = [{"id": c.id, "nombre": c.nombre} for c in corredores]
+    finally:
+        db2.close()
+    ok_msg = request.query_params.get("ok", "")
+    return templates.TemplateResponse(request, "admin_propiedad_editar.html", {
+        "p": {"id": prop_id, "titulo": titulo, "tipo": tipo, "operacion": operacion,
+              "precio": precio, "moneda": moneda, "ciudad": ciudad, "estado": estado_prop,
+              "direccion": direccion, "descripcion": descripcion, "habitaciones": habitaciones,
+              "banos": banos, "m2_construidos": m2_c, "m2_terreno": m2_t,
+              "estacionamientos": estac, "tour_360_url": tour, "foto_portada": foto_portada,
+              "corredor_id": corredor_id},
+        "corredores": cors_list,
+        "ok_msg": ok_msg,
+    })
+
+
+@app.post("/admin/propiedad/{propiedad_id}/editar")
+async def editar_propiedad_submit(
+    request: Request,
+    propiedad_id: int,
+    titulo: str = Form(...),
+    tipo: str = Form(...),
+    operacion: str = Form(...),
+    precio: int = Form(...),
+    moneda: str = Form(default="PEN"),
+    ciudad: str = Form(...),
+    estado_prop: str = Form(...),
+    direccion: str = Form(default=""),
+    descripcion: str = Form(default=""),
+    habitaciones: Opt[int] = Form(default=None),
+    banos: Opt[float] = Form(default=None),
+    m2_construidos: Opt[int] = Form(default=None),
+    m2_terreno: Opt[int] = Form(default=None),
+    estacionamientos: Opt[int] = Form(default=None),
+    tour_360_url: str = Form(default=""),
+    corredor_id: Opt[int] = Form(default=None),
+):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        p = db.query(PropiedadPublica).filter(PropiedadPublica.id == propiedad_id).first()
+        if p:
+            p.titulo = titulo; p.tipo = tipo; p.operacion = operacion
+            p.precio = precio; p.moneda = moneda; p.ciudad = ciudad
+            p.estado = estado_prop; p.direccion = direccion; p.descripcion = descripcion
+            p.habitaciones = habitaciones; p.banos = banos
+            p.m2_construidos = m2_construidos; p.m2_terreno = m2_terreno
+            p.estacionamientos = estacionamientos; p.tour_360_url = tour_360_url
+            p.corredor_id = corredor_id
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse(f"/admin/propiedad/{propiedad_id}/editar?ok=1", status_code=302)
+
+
+# ── Recuperar contraseña ──────────────────────────────────────────────────────
+
+@app.get("/recuperar-contrasena", response_class=HTMLResponse)
+async def recuperar_contrasena_page(request: Request):
+    token = request.query_params.get("token", "")
+    error = request.query_params.get("error", "")
+    ok = request.query_params.get("ok", "")
+    return templates.TemplateResponse(request, "recuperar_contrasena.html",
+                                      {"token": token, "error": error, "ok": ok})
+
+
+@app.post("/recuperar-contrasena")
+async def recuperar_contrasena_submit(request: Request, email: str = Form(...)):
+    import secrets
+    from datetime import timedelta
+    from models.db_models import PasswordResetToken
+    db = SessionLocal()
+    try:
+        # Look up in corredores first, then usuarios
+        corredor_obj = db.query(CorredorModel).filter(
+            CorredorModel.email == email.lower().strip()
+        ).first()
+        usuario_obj = db.query(UsuarioPublico).filter(
+            UsuarioPublico.email == email.lower().strip()
+        ).first() if not corredor_obj else None
+
+        if not corredor_obj and not usuario_obj:
+            # Don't reveal whether email exists
+            return RedirectResponse("/recuperar-contrasena?ok=1", status_code=302)
+
+        nombre = corredor_obj.nombre if corredor_obj else usuario_obj.nombre
+        tipo = "corredor" if corredor_obj else "usuario"
+        email_destino = corredor_obj.email_personal if (corredor_obj and corredor_obj.email_personal) else email.lower().strip()
+
+        token_str = secrets.token_urlsafe(40)
+        expires = datetime.utcnow() + timedelta(hours=1)
+        db.add(PasswordResetToken(
+            email=email.lower().strip(),
+            token=token_str,
+            tipo=tipo,
+            expires_at=expires,
+        ))
+        db.commit()
+    finally:
+        db.close()
+
+    base_url = os.getenv("BASE_URL", "https://inmobiliariainmersiva.com")
+    reset_url = f"{base_url}/recuperar-contrasena?token={token_str}"
+    try:
+        from services.email_service import enviar_reset_password
+        enviar_reset_password(email_destino, nombre, reset_url)
+    except Exception:
+        pass
+    return RedirectResponse("/recuperar-contrasena?ok=1", status_code=302)
+
+
+@app.post("/reset-contrasena")
+async def reset_contrasena_submit(
+    request: Request,
+    token: str = Form(...),
+    password_nueva: str = Form(...),
+    password_nueva2: str = Form(...),
+):
+    from models.db_models import PasswordResetToken
+    if password_nueva != password_nueva2:
+        return RedirectResponse(f"/recuperar-contrasena?token={token}&error=Las+contraseñas+no+coinciden", status_code=302)
+    if len(password_nueva) < 6:
+        return RedirectResponse(f"/recuperar-contrasena?token={token}&error=La+contraseña+debe+tener+al+menos+6+caracteres", status_code=302)
+
+    db = SessionLocal()
+    try:
+        rt = db.query(PasswordResetToken).filter(
+            PasswordResetToken.token == token,
+            PasswordResetToken.used == False,
+        ).first()
+        if not rt or rt.expires_at < datetime.utcnow():
+            return RedirectResponse("/recuperar-contrasena?error=Enlace+inválido+o+expirado", status_code=302)
+
+        new_hash = hash_password(password_nueva)
+        if rt.tipo == "corredor":
+            obj = db.query(CorredorModel).filter(CorredorModel.email == rt.email).first()
+        else:
+            obj = db.query(UsuarioPublico).filter(UsuarioPublico.email == rt.email).first()
+        if obj:
+            obj.hashed_password = new_hash
+        rt.used = True
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/login?ok=Contraseña+actualizada+correctamente", status_code=302)
 
 
 # ── Auth routes ────────────────────────────────────────────────────────────────
@@ -839,6 +1045,16 @@ async def dashboard_empresa(request: Request):
     s = fichas_stats(fichas)
     ok_msg = request.query_params.get("ok", "")
     error_msg = request.query_params.get("error", "")
+
+    db3 = SessionLocal()
+    try:
+        todas_props = db3.query(PropiedadPublica).order_by(
+            PropiedadPublica.created_at.desc()
+        ).all()
+        corredor_nombres = {c.id: c.nombre for c in corredores}
+    finally:
+        db3.close()
+
     return templates.TemplateResponse(request, "dashboard_empresa.html", {
         "empresa_user": empresa["sub"],
         "corredor": corredor_obj,
@@ -850,12 +1066,15 @@ async def dashboard_empresa(request: Request):
         "posts_pendientes": posts_pendientes,
         "solicitudes": solicitudes,
         "actividad_corredores": actividad_corredores,
+        "todas_props": todas_props,
+        "corredor_nombres": corredor_nombres,
         "stats": {
             "total_fichas": s["total"],
             "fichas_mes": s["fichas_mes"],
             "corredores_activos": corredores_activos,
             "pdfs_generados": s["pdfs"],
             "posts_pendientes": len(posts_pendientes),
+            "total_props_publicadas": sum(1 for p in todas_props if p.publicado),
         },
     })
 
@@ -1642,6 +1861,12 @@ async def registro_corredor_submit(
         )
     finally:
         db.close()
+    # Notify admin
+    try:
+        from services.email_service import enviar_notificacion_solicitud
+        enviar_notificacion_solicitud(nombre, email, ADMIN_EMAIL)
+    except Exception:
+        pass
     return templates.TemplateResponse(request, "registro_corredor.html",
                                       {"error": "", "success": True})
 

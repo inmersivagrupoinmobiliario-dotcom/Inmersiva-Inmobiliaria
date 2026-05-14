@@ -415,7 +415,10 @@
         </select>
 
         <input type="text" name="ciudad" value="{{ filtros.ciudad }}" placeholder="Ciudad, zona o distrito..."
-               class="search-inp" style="flex:1;min-width:160px;">
+               class="search-inp" style="flex:1;min-width:130px;">
+
+        <input type="text" name="q" value="{{ filtros.q }}" placeholder="Buscar por palabra clave..."
+               class="search-inp" style="flex:1;min-width:140px;">
 
         <button type="submit"
                 style="padding:10px 20px;background:#C9A84C;color:#1B2A4A;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0;display:flex;align-items:center;gap:6px;white-space:nowrap;">
@@ -660,26 +663,57 @@
   <div style="text-align:center;padding:80px 20px;">
     <div style="font-size:64px;margin-bottom:20px;opacity:.7;">🏠</div>
     <h3 class="font-sora" style="font-size:1.2rem;font-weight:800;color:#1B2A4A;margin:0 0 10px;">
-      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max %}
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max or filtros.q %}
         Sin resultados con esos filtros
       {% else %}
         Próximamente tendremos propiedades
       {% endif %}
     </h3>
     <p style="color:#9ca3af;font-size:.9rem;margin:0 0 24px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6;">
-      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max %}
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max or filtros.q %}
         Intenta ampliar los criterios o
         <a href="/" style="color:#C9A84C;font-weight:700;text-decoration:none;">ver todas las propiedades</a>
       {% else %}
         Estamos captando las mejores propiedades de la región. Vuelve pronto.
       {% endif %}
     </p>
-    {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+    {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.q %}
     <a href="/" style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:11px 24px;background:#1B2A4A;color:#C9A84C;border-radius:10px;text-decoration:none;">
       Ver todas
     </a>
     {% endif %}
   </div>
+  {% endif %}
+
+  <!-- ── Paginación ── -->
+  {% if total_pages > 1 %}
+  {% set base_q = '?' + ('tipo=' + filtros.tipo + '&' if filtros.tipo else '') + ('operacion=' + filtros.operacion + '&' if filtros.operacion else '') + ('ciudad=' + filtros.ciudad + '&' if filtros.ciudad else '') + ('q=' + filtros.q + '&' if filtros.q else '') + ('orden=' + filtros.orden + '&' if filtros.orden else '') %}
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:32px 20px 8px;flex-wrap:wrap;">
+    {% if page > 1 %}
+    <a href="{{ base_q }}page={{ page - 1 }}"
+       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;transition:all .15s;"
+       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">← Anterior</a>
+    {% endif %}
+    {% for pg in range(1, total_pages + 1) %}
+      {% if pg == page %}
+      <span style="padding:8px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;background:#1B2A4A;color:#C9A84C;">{{ pg }}</span>
+      {% elif pg == 1 or pg == total_pages or (pg >= page - 2 and pg <= page + 2) %}
+      <a href="{{ base_q }}page={{ pg }}"
+         style="padding:8px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;"
+         onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">{{ pg }}</a>
+      {% elif pg == page - 3 or pg == page + 3 %}
+      <span style="color:#9ca3af;font-size:.82rem;">…</span>
+      {% endif %}
+    {% endfor %}
+    {% if page < total_pages %}
+    <a href="{{ base_q }}page={{ page + 1 }}"
+       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;transition:all .15s;"
+       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">Siguiente →</a>
+    {% endif %}
+  </div>
+  <p style="text-align:center;color:#9ca3af;font-size:.78rem;padding-bottom:16px;">
+    Mostrando página {{ page }} de {{ total_pages }} · {{ total }} propiedades en total
+  </p>
   {% endif %}
 
 </main>

@@ -254,3 +254,125 @@ def enviar_consulta_propiedad(
     except Exception as e:
         print(f"[EMAIL] Error al enviar consulta: {e}")
         return {"ok": False, "error": str(e)}
+
+
+def enviar_reset_password(email_destino: str, nombre: str, reset_url: str) -> dict:
+    """Sends password reset link to corredor or usuario."""
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_password = os.getenv("SMTP_PASSWORD", "")
+    smtp_from = os.getenv("SMTP_FROM", smtp_user)
+
+    if not smtp_user or not smtp_password:
+        print("[EMAIL] SMTP no configurado — omitiendo reset password")
+        return {"ok": False, "error": "SMTP no configurado"}
+
+    html = f"""<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:24px;background:#f4f6f9;font-family:Arial,sans-serif;">
+<div style="max-width:520px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+  <div style="padding:28px 36px;background:#1B2A4A;text-align:center;">
+    <h2 style="margin:0;color:#C9A84C;font-size:1.1rem;letter-spacing:1px;">RESTABLECER CONTRASEÑA</h2>
+    <p style="color:#aaa;margin:6px 0 0;font-size:.85rem;">Inmersiva Grupo Inmobiliario</p>
+  </div>
+  <div style="padding:28px 36px;">
+    <p style="color:#333;margin:0 0 12px;">Hola <strong>{nombre}</strong>,</p>
+    <p style="color:#666;margin:0 0 24px;font-size:.9rem;line-height:1.6;">
+      Recibimos una solicitud para restablecer la contraseña de tu cuenta.
+      Haz clic en el botón para crear una nueva contraseña. Este enlace expira en <strong>1 hora</strong>.
+    </p>
+    <div style="text-align:center;margin-bottom:24px;">
+      <a href="{reset_url}"
+         style="display:inline-block;background:#C9A84C;color:#1B2A4A;font-weight:800;
+                padding:14px 36px;border-radius:8px;text-decoration:none;font-size:.9rem;letter-spacing:1px;">
+        CAMBIAR CONTRASEÑA
+      </a>
+    </div>
+    <p style="color:#aaa;font-size:.78rem;text-align:center;line-height:1.5;">
+      Si no solicitaste este cambio, ignora este mensaje. Tu contraseña no será modificada.
+    </p>
+  </div>
+  <div style="background:#f8f9fa;padding:12px;text-align:center;">
+    <p style="color:#aaa;font-size:.72rem;margin:0;">© 2026 Inmersiva Grupo Inmobiliario</p>
+  </div>
+</div>
+</body></html>"""
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = "Restablecer contraseña — Inmersiva"
+        msg["From"] = f"Inmersiva Grupo Inmobiliario <{smtp_from}>"
+        msg["To"] = email_destino
+        msg.attach(MIMEText(html, "html"))
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, email_destino, msg.as_string())
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                server.ehlo(); server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, email_destino, msg.as_string())
+        print(f"[EMAIL] Reset password enviado a {email_destino}")
+        return {"ok": True}
+    except Exception as e:
+        print(f"[EMAIL] Error reset password: {e}")
+        return {"ok": False, "error": str(e)}
+
+
+def enviar_notificacion_solicitud(nombre_solicitante: str, email_solicitante: str, admin_email: str) -> dict:
+    """Notifies admin that a new corredor application has arrived."""
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_password = os.getenv("SMTP_PASSWORD", "")
+    smtp_from = os.getenv("SMTP_FROM", smtp_user)
+
+    if not smtp_user or not smtp_password:
+        print("[EMAIL] SMTP no configurado — omitiendo notificación solicitud")
+        return {"ok": False, "error": "SMTP no configurado"}
+
+    html = f"""<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:24px;background:#f4f6f9;font-family:Arial,sans-serif;">
+<div style="max-width:520px;margin:0 auto;background:#1B2A4A;border-radius:16px;overflow:hidden;">
+  <div style="padding:28px 36px;text-align:center;border-bottom:1px solid #2d4070;">
+    <h2 style="margin:0;color:#C9A84C;font-size:1.05rem;letter-spacing:1px;">NUEVA SOLICITUD DE CORREDOR</h2>
+  </div>
+  <div style="padding:28px 36px;">
+    <p style="color:#ccc;margin:0 0 20px;">Tienes una nueva solicitud para unirse al equipo Inmersiva:</p>
+    <div style="background:#111d30;border-radius:10px;padding:18px 22px;margin-bottom:24px;">
+      <p style="margin:0 0 8px;color:#C9A84C;font-size:.8rem;text-transform:uppercase;letter-spacing:1px;font-weight:700;">Solicitante</p>
+      <p style="margin:0;color:#fff;font-weight:700;font-size:1rem;">{nombre_solicitante}</p>
+      <p style="margin:4px 0 0;color:#aaa;font-size:.85rem;">{email_solicitante}</p>
+    </div>
+    <div style="text-align:center;">
+      <a href="https://inmobiliariainmersiva.com/dashboard"
+         style="display:inline-block;background:#C9A84C;color:#1B2A4A;font-weight:800;
+                padding:13px 32px;border-radius:8px;text-decoration:none;font-size:.9rem;">
+        VER EN EL PANEL ADMIN
+      </a>
+    </div>
+  </div>
+</div>
+</body></html>"""
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"Nueva solicitud de corredor — {nombre_solicitante}"
+        msg["From"] = f"Inmersiva <{smtp_from}>"
+        msg["To"] = admin_email
+        msg.attach(MIMEText(html, "html"))
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, admin_email, msg.as_string())
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                server.ehlo(); server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, admin_email, msg.as_string())
+        print(f"[EMAIL] Notificación solicitud enviada a admin {admin_email}")
+        return {"ok": True}
+    except Exception as e:
+        print(f"[EMAIL] Error notificación solicitud: {e}")
+        return {"ok": False, "error": str(e)}

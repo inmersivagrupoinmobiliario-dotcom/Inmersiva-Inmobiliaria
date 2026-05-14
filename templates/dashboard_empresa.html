@@ -839,6 +839,80 @@
     </div>
   </div>
 
+  <!-- ── Catálogo de Propiedades Publicadas ─────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header" style="cursor:pointer" onclick="toggleSection('sec-catalogo')">
+      <span class="section-title">🏘 Catálogo de Propiedades
+        <span style="font-size:.78rem;font-weight:500;color:#888;margin-left:6px;">({{ todas_props|length }} total)</span>
+      </span>
+      <span id="sec-catalogo-chevron" style="font-size:.8rem;color:#888;">▼</span>
+    </div>
+    <div id="sec-catalogo">
+    {% if not todas_props %}
+    <p style="color:#888;text-align:center;padding:20px 0">No hay propiedades publicadas.</p>
+    {% else %}
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Propiedad</th>
+            <th>Precio</th>
+            <th>Corredor</th>
+            <th>Vistas</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for p in todas_props %}
+          <tr>
+            <td style="color:#a0aec0;font-size:12px;">{{ loop.index }}</td>
+            <td>
+              <div style="font-weight:700;font-size:13px;max-width:240px;">{{ p.titulo }}</div>
+              <div style="font-size:11px;color:#888;margin-top:2px;">
+                <span style="background:#eef2f7;padding:1px 6px;border-radius:4px;">{{ p.tipo }}</span>
+                <span style="margin-left:4px;">{{ p.ciudad }}</span>
+              </div>
+            </td>
+            <td class="price-col" style="font-weight:700;color:#1B2A4A;">
+              {{ 'S/.' if p.moneda == 'PEN' else 'USD' }} {{ "{:,.0f}".format(p.precio) }}
+            </td>
+            <td style="font-size:12px;">{{ corredor_nombres.get(p.corredor_id, '—') }}</td>
+            <td style="text-align:center;font-weight:700;color:#6b7280;font-size:13px;">{{ p.vistas or 0 }}</td>
+            <td>
+              {% if p.publicado %}
+              <span style="background:#d4edda;color:#155724;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Publicada</span>
+              {% else %}
+              <span style="background:#fff3cd;color:#856404;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Oculta</span>
+              {% endif %}
+              {% if p.destacado %}
+              <span style="background:#fff3cd;color:#856404;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;margin-left:2px;">★</span>
+              {% endif %}
+            </td>
+            <td style="white-space:nowrap;">
+              <a href="/admin/propiedad/{{ p.id }}/editar"
+                 style="display:inline-block;padding:3px 10px;background:#1B2A4A;color:#C9A84C;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;margin-right:2px;">Editar</a>
+              <a href="/propiedad/{{ p.id }}" target="_blank"
+                 style="display:inline-block;padding:3px 10px;background:#eef2f7;color:#1B2A4A;border-radius:6px;font-size:11px;font-weight:700;text-decoration:none;margin-right:2px;">Ver</a>
+              <form method="POST" action="/admin/propiedad/{{ p.id }}/destacar" style="display:inline;">
+                <button type="submit" style="padding:3px 8px;background:{% if p.destacado %}#C9A84C{% else %}#eef2f7{% endif %};color:{% if p.destacado %}#1B2A4A{% else %}#888{% endif %};border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">★</button>
+              </form>
+              {% if p.publicado %}
+              <form method="POST" action="/admin/propiedad/{{ p.id }}/despublicar" style="display:inline;">
+                <button type="submit" style="padding:3px 8px;background:#fee2e2;color:#b91c1c;border:none;border-radius:6px;font-size:11px;font-weight:700;cursor:pointer;">Ocultar</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% endif %}
+    </div>
+  </div>
+
   <!-- Fichas Recientes -->
   <div class="section">
     <div class="section-header">

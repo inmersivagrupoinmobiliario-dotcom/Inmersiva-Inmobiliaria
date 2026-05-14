@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Recuperar contraseña — Inmersiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = { theme: { extend: { colors: { navy: '#1B2A4A', gold: '#C9A84C' } } } }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Sora', system-ui, sans-serif; }</style>
+</head>
+<body class="min-h-screen flex items-center justify-center px-4" style="background:#0f1623;">
+
+<div class="w-full max-w-md">
+  <!-- Logo -->
+  <div class="text-center mb-8">
+    <a href="/">
+      <div class="w-14 h-14 rounded-full mx-auto mb-4 flex items-center justify-center overflow-hidden bg-white">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" class="w-12 h-12 object-contain"
+             onerror="this.style.display='none'">
+      </div>
+      <div class="font-black text-white text-sm tracking-widest">INMERSIVA</div>
+      <div class="text-xs tracking-widest mt-0.5" style="color:#C9A84C;">GRUPO INMOBILIARIO</div>
+    </a>
+  </div>
+
+  <div class="rounded-2xl overflow-hidden" style="background:#1B2A4A;">
+    <div class="px-8 py-6 border-b" style="border-color:#2d4070;">
+      <h1 class="text-white font-bold text-lg">
+        {% if token %}Crear nueva contraseña{% else %}Recuperar contraseña{% endif %}
+      </h1>
+      <p class="text-sm mt-1" style="color:#8899bb;">
+        {% if token %}Ingresa tu nueva contraseña.
+        {% else %}Te enviaremos un enlace para restablecer tu contraseña.{% endif %}
+      </p>
+    </div>
+
+    <div class="px-8 py-6">
+
+      {% if ok %}
+      <div class="rounded-xl p-4 mb-4 text-sm font-semibold text-center"
+           style="background:#d4edda; color:#155724;">
+        Si el email existe en nuestro sistema, recibirás un enlace en los próximos minutos.
+        Revisa también tu carpeta de spam.
+      </div>
+      <div class="text-center mt-4">
+        <a href="/login" class="text-sm font-semibold hover:underline" style="color:#C9A84C;">Volver al inicio de sesión</a>
+      </div>
+
+      {% elif token %}
+      <!-- Reset password form -->
+      {% if error %}
+      <div class="rounded-xl p-3 mb-4 text-sm" style="background:#f8d7da;color:#721c24;">
+        ⚠️ {{ error }}
+      </div>
+      {% endif %}
+      <form method="POST" action="/reset-contrasena" class="space-y-4">
+        <input type="hidden" name="token" value="{{ token }}">
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#8899bb;">Nueva contraseña</label>
+          <input type="password" name="password_nueva" required minlength="6"
+                 placeholder="Mínimo 6 caracteres"
+                 class="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2"
+                 style="background:#111d30;border:1.5px solid #2d4070;font-family:inherit;--tw-ring-color:#C9A84C;">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#8899bb;">Confirmar nueva contraseña</label>
+          <input type="password" name="password_nueva2" required minlength="6"
+                 placeholder="Repite la contraseña"
+                 class="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2"
+                 style="background:#111d30;border:1.5px solid #2d4070;font-family:inherit;--tw-ring-color:#C9A84C;">
+        </div>
+        <button type="submit"
+                class="w-full py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90"
+                style="background:#C9A84C;color:#1B2A4A;">
+          Cambiar contraseña
+        </button>
+      </form>
+
+      {% else %}
+      <!-- Request reset form -->
+      {% if error %}
+      <div class="rounded-xl p-3 mb-4 text-sm" style="background:#f8d7da;color:#721c24;">
+        ⚠️ {{ error }}
+      </div>
+      {% endif %}
+      <form method="POST" action="/recuperar-contrasena" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold mb-1.5" style="color:#8899bb;">Email de tu cuenta</label>
+          <input type="email" name="email" required
+                 placeholder="corredor@inmersiva.com o tu email"
+                 class="w-full px-4 py-3 rounded-xl text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-2"
+                 style="background:#111d30;border:1.5px solid #2d4070;font-family:inherit;--tw-ring-color:#C9A84C;">
+        </div>
+        <button type="submit"
+                class="w-full py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90"
+                style="background:#C9A84C;color:#1B2A4A;">
+          Enviar enlace de recuperación
+        </button>
+      </form>
+      {% endif %}
+
+    </div>
+  </div>
+
+  <div class="text-center mt-6">
+    <a href="/login" class="text-sm hover:underline" style="color:#8899bb;">← Volver al inicio de sesión</a>
+  </div>
+</div>
+
+</body>
+</html>

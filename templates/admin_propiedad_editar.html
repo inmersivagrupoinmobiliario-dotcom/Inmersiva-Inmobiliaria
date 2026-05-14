@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Editar propiedad — Admin Inmersiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>tailwind.config={theme:{extend:{colors:{navy:'#1B2A4A',gold:'#C9A84C'}}}}</script>
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body{font-family:'Sora',system-ui,sans-serif;}
+    .field label{display:block;font-size:.75rem;font-weight:600;color:#6b7280;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;}
+    .field input,.field select,.field textarea{width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #e5e7eb;font-size:.875rem;font-family:inherit;background:#fff;transition:border-color .2s;}
+    .field input:focus,.field select:focus,.field textarea:focus{outline:none;border-color:#C9A84C;}
+  </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+
+<nav class="sticky top-0 z-40 shadow-lg" style="background:#1B2A4A;">
+  <div class="max-w-5xl mx-auto px-4 h-14 flex items-center justify-between">
+    <div class="flex items-center gap-3">
+      <a href="/dashboard" class="text-gray-400 hover:text-white text-sm transition-colors">← Panel Admin</a>
+      <span class="text-gray-600">/</span>
+      <span class="text-white text-sm font-semibold">Editar propiedad #{{ p.id }}</span>
+    </div>
+    <a href="/propiedad/{{ p.id }}" target="_blank"
+       class="text-xs font-semibold px-3 py-1.5 rounded-lg hover:opacity-90 transition-all"
+       style="background:#C9A84C;color:#1B2A4A;">Ver en portal ↗</a>
+  </div>
+</nav>
+
+<div class="max-w-3xl mx-auto px-4 py-8">
+
+  {% if ok_msg %}
+  <div class="rounded-xl p-4 mb-6 text-sm font-semibold" style="background:#d4edda;color:#155724;">
+    ✅ Propiedad actualizada correctamente.
+  </div>
+  {% endif %}
+
+  <div class="bg-white rounded-2xl shadow-sm overflow-hidden">
+    <div class="px-8 py-5 border-b border-gray-100">
+      <h1 class="font-black text-gray-900 text-xl">Editar propiedad</h1>
+      <p class="text-gray-500 text-sm mt-0.5">{{ p.titulo }}</p>
+    </div>
+
+    <form method="POST" action="/admin/propiedad/{{ p.id }}/editar" class="px-8 py-6 space-y-5">
+
+      <div class="field">
+        <label>Título</label>
+        <input type="text" name="titulo" value="{{ p.titulo }}" required>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>Tipo de propiedad</label>
+          <select name="tipo">
+            {% for opt in ['Departamento','Casa','Oficina','Local Comercial','Terreno','Estacionamiento','Almacén','Hotel','Otros'] %}
+            <option value="{{ opt }}" {% if p.tipo == opt %}selected{% endif %}>{{ opt }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        <div class="field">
+          <label>Operación</label>
+          <select name="operacion">
+            <option value="Venta" {% if p.operacion == 'Venta' %}selected{% endif %}>Venta</option>
+            <option value="Alquiler" {% if p.operacion == 'Alquiler' %}selected{% endif %}>Alquiler</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>Precio</label>
+          <input type="number" name="precio" value="{{ p.precio }}" required min="0">
+        </div>
+        <div class="field">
+          <label>Moneda</label>
+          <select name="moneda">
+            <option value="PEN" {% if p.moneda == 'PEN' %}selected{% endif %}>S/. Soles (PEN)</option>
+            <option value="USD" {% if p.moneda == 'USD' %}selected{% endif %}>USD Dólares</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>Ciudad</label>
+          <input type="text" name="ciudad" value="{{ p.ciudad }}" required>
+        </div>
+        <div class="field">
+          <label>Departamento / Estado</label>
+          <input type="text" name="estado_prop" value="{{ p.estado }}" required>
+        </div>
+      </div>
+
+      <div class="field">
+        <label>Dirección</label>
+        <input type="text" name="direccion" value="{{ p.direccion or '' }}">
+      </div>
+
+      <div class="field">
+        <label>Descripción</label>
+        <textarea name="descripcion" rows="5">{{ p.descripcion or '' }}</textarea>
+      </div>
+
+      <div class="grid grid-cols-3 gap-4">
+        <div class="field">
+          <label>Habitaciones</label>
+          <input type="number" name="habitaciones" value="{{ p.habitaciones or '' }}" min="0">
+        </div>
+        <div class="field">
+          <label>Baños</label>
+          <input type="number" name="banos" value="{{ p.banos or '' }}" min="0" step="0.5">
+        </div>
+        <div class="field">
+          <label>Estacionamientos</label>
+          <input type="number" name="estacionamientos" value="{{ p.estacionamientos or '' }}" min="0">
+        </div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4">
+        <div class="field">
+          <label>m² construidos</label>
+          <input type="number" name="m2_construidos" value="{{ p.m2_construidos or '' }}" min="0">
+        </div>
+        <div class="field">
+          <label>m² terreno</label>
+          <input type="number" name="m2_terreno" value="{{ p.m2_terreno or '' }}" min="0">
+        </div>
+      </div>
+
+      <div class="field">
+        <label>URL Tour 360°</label>
+        <input type="url" name="tour_360_url" value="{{ p.tour_360_url or '' }}" placeholder="https://...">
+      </div>
+
+      <div class="field">
+        <label>Corredor asignado</label>
+        <select name="corredor_id">
+          <option value="">— Sin asignar —</option>
+          {% for c in corredores %}
+          <option value="{{ c.id }}" {% if p.corredor_id == c.id %}selected{% endif %}>{{ c.nombre }}</option>
+          {% endfor %}
+        </select>
+      </div>
+
+      <div class="flex gap-3 pt-2">
+        <button type="submit"
+                class="flex-1 py-3 font-bold text-sm rounded-xl hover:opacity-90 transition-all"
+                style="background:#1B2A4A;color:#C9A84C;">
+          Guardar cambios
+        </button>
+        <a href="/dashboard"
+           class="px-6 py-3 font-semibold text-sm rounded-xl border border-gray-200 hover:bg-gray-50 transition-all text-gray-600 text-center">
+          Cancelar
+        </a>
+      </div>
+    </form>
+  </div>
+</div>
+</body>
+</html>
