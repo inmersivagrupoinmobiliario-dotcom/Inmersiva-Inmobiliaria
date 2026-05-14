@@ -2,15 +2,20 @@ import os
 import json
 import shutil
 import uuid
+import secrets as _sec
 from datetime import datetime
 from pathlib import Path
 from typing import Optional, List
 
-from fastapi import FastAPI, Form, File, UploadFile, Request
+from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
 from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
+from slowapi import Limiter, _rate_limit_exceeded_handler
+from slowapi.util import get_remote_address
+from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
 
 from models.listing import Listing
@@ -108,17 +113,58 @@ def _init_db():
 
 _init_db()
 
+# ── Configuración segura ───────────────────────────────────────────────────────
 EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
-EMPRESA_PASS = os.getenv("EMPRESA_PASS", "joan123")
 ADMIN_EMAIL  = os.getenv("ADMIN_EMAIL", "inmersivagrupoinmobiliario@gmail.com")
 
+_raw_pass = os.getenv("EMPRESA_PASS")
+if not _raw_pass:
+    _raw_pass = _sec.token_hex(16)
+    print("[⚠️  SEGURIDAD] EMPRESA_PASS no configurado. El acceso de administrador está deshabilitado hasta que se configure la variable de entorno.")
+EMPRESA_PASS = _raw_pass
+
+_session_secret = os.getenv("SESSION_SECRET")
+if not _session_secret:
+    _session_secret = _sec.token_hex(32)
+    print("[⚠️  SEGURIDAD] SESSION_SECRET no configurado. Las sesiones expirarán al reiniciar el servidor.")
+
+# ── CSRF helpers ───────────────────────────────────────────────────────────────
+class _CSRFMiddleware(BaseHTTPMiddleware):
+    """Genera y expone el token CSRF por sesión; no valida aquí (evita consumir body)."""
+    async def dispatch(self, request: Request, call_next):
+        if "csrf_token" not in request.session:
+            request.session["csrf_token"] = _sec.token_hex(32)
+        request.state.csrf_token = request.session["csrf_token"]
+        return await call_next(request)
+
+async def _require_csrf(request: Request, _csrf_token: str = Form(default="")):
+    """Dependencia FastAPI: valida que el form incluya el token CSRF de sesión."""
+    expected = request.session.get("csrf_token", "")
+    if not expected or not _sec.compare_digest(_csrf_token, expected):
+        raise HTTPException(
+            status_code=403,
+            detail="Token de seguridad inválido. Recarga la página e intenta de nuevo.",
+        )
+
+# ── App + Middleware ───────────────────────────────────────────────────────────
 app = FastAPI(title="Inmersiva Grupo Inmobiliario")
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_SECRET", "inmersiva-session-secret-2025"))
+
+_limiter = Limiter(key_func=get_remote_address)
+app.state.limiter = _limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+
+# Orden importa: SessionMiddleware (outer) → _CSRFMiddleware (inner, necesita sesión)
+app.add_middleware(_CSRFMiddleware)
+app.add_middleware(SessionMiddleware, secret_key=_session_secret)
+
+# Directorios estáticos públicos (los CVs van a private/, no a uploads/)
 app.mount("/static", StaticFiles(directory="static"), name="static")
 app.mount("/uploads", StaticFiles(directory="uploads"), name="uploads")
 app.mount("/generated", StaticFiles(directory="generated"), name="generated")
 Path("DOC").mkdir(exist_ok=True)
 app.mount("/doc", StaticFiles(directory="DOC"), name="doc")
+Path("private/cvs").mkdir(parents=True, exist_ok=True)
+
 templates = Jinja2Templates(directory="templates")
 
 UPLOADS = Path("uploads")
@@ -662,8 +708,12 @@ async def recuperar_contrasena_page(request: Request):
 
 
 @app.post("/recuperar-contrasena")
-async def recuperar_contrasena_submit(request: Request, email: str = Form(...)):
-    import secrets
+@_limiter.limit("3/minute")
+async def recuperar_contrasena_submit(
+    request: Request,
+    email: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
+):
     from datetime import timedelta
     from models.db_models import PasswordResetToken
     db = SessionLocal()
@@ -684,7 +734,7 @@ async def recuperar_contrasena_submit(request: Request, email: str = Form(...)):
         tipo = "corredor" if corredor_obj else "usuario"
         email_destino = corredor_obj.email_personal if (corredor_obj and corredor_obj.email_personal) else email.lower().strip()
 
-        token_str = secrets.token_urlsafe(40)
+        token_str = _sec.token_urlsafe(40)
         expires = datetime.utcnow() + timedelta(hours=1)
         db.add(PasswordResetToken(
             email=email.lower().strip(),
@@ -712,6 +762,7 @@ async def reset_contrasena_submit(
     token: str = Form(...),
     password_nueva: str = Form(...),
     password_nueva2: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
 ):
     from models.db_models import PasswordResetToken
     if password_nueva != password_nueva2:
@@ -765,6 +816,7 @@ async def registro_page(request: Request):
 
 
 @app.post("/registro")
+@_limiter.limit("5/minute")
 async def registro_submit(
     request: Request,
     nombre: str = Form(...),
@@ -772,6 +824,7 @@ async def registro_submit(
     telefono: str = Form(default=""),
     password: str = Form(...),
     password2: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
 ):
     if password != password2:
         return templates.TemplateResponse(request, "registro.html",
@@ -798,7 +851,13 @@ async def registro_submit(
 
 
 @app.post("/login/usuario")
-async def login_usuario(request: Request, email: str = Form(...), password: str = Form(...)):
+@_limiter.limit("10/minute")
+async def login_usuario(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
+):
     db = SessionLocal()
     try:
         usuario = db.query(UsuarioPublico).filter(
@@ -839,7 +898,13 @@ async def login_submit(request: Request, username: str = Form(...), password: st
 
 
 @app.post("/login/smart")
-async def login_smart(request: Request, email: str = Form(...), password: str = Form(...)):
+@_limiter.limit("10/minute")
+async def login_smart(
+    request: Request,
+    email: str = Form(...),
+    password: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
+):
     """Unified login — detects role by email and routes accordingly."""
     email = email.strip().lower()
 
@@ -1816,6 +1881,7 @@ async def registro_corredor_page(request: Request):
 
 
 @app.post("/corredor/registro")
+@_limiter.limit("5/minute")
 async def registro_corredor_submit(
     request: Request,
     nombre: str = Form(...),
@@ -1824,6 +1890,7 @@ async def registro_corredor_submit(
     dni: str = Form(default=""),
     mensaje: str = Form(default=""),
     cv: UploadFile = File(default=None),
+    _csrf: None = Depends(_require_csrf),
 ):
     from models.db_models import SolicitudCorredor
     db = SessionLocal()
@@ -1844,7 +1911,7 @@ async def registro_corredor_submit(
                     {"error": "El CV debe ser PDF, DOC o DOCX.", "success": False}
                 )
             cv_name = f"{uuid.uuid4()}{ext}"
-            cv_dest = Path("uploads/cvs") / cv_name
+            cv_dest = Path("private/cvs") / cv_name
             with open(cv_dest, "wb") as f:
                 f.write(await cv.read())
             cv_path = str(cv_dest)
@@ -2220,6 +2287,7 @@ async def cambiar_contrasena(
     password_actual: str = Form(...),
     password_nueva: str = Form(...),
     password_nueva2: str = Form(...),
+    _csrf: None = Depends(_require_csrf),
 ):
     corredor_tok = get_corredor_session(request)
     if not corredor_tok:

@@ -3,9 +3,17 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inmersiva — Recorre hoy, vive mañana</title>
+  <title>{% if filtros.ciudad %}Propiedades en {{ filtros.ciudad }}{% elif filtros.tipo %}{{ filtros.tipo }} en {{ filtros.operacion or 'Venta y Alquiler' }}{% else %}Inmersiva — Recorre hoy, vive mañana{% endif %}</title>
   <link rel="icon" href="/static/img/favicon.png" type="image/png">
   <meta name="description" content="Encuentra las mejores propiedades en venta y alquiler en Perú. Inmersiva Grupo Inmobiliario.">
+  <!-- Open Graph — para compartir en WhatsApp, Facebook, LinkedIn -->
+  <meta property="og:title" content="{% if filtros.ciudad %}Propiedades en {{ filtros.ciudad }} — Inmersiva{% else %}Inmersiva Grupo Inmobiliario — Propiedades en Perú{% endif %}">
+  <meta property="og:description" content="Encuentra las mejores propiedades en venta y alquiler en Perú. Inmersiva Grupo Inmobiliario.">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="/static/img/og-portal.jpg">
+  <meta property="og:locale" content="es_PE">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="canonical" href="{{ request.url.scheme }}://{{ request.url.netloc }}{% if filtros | selectattr is defined %}/{% endif %}">
 
   <!-- Sora (display) + Barlow (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -240,6 +248,7 @@
   </style>
 </head>
 <body>
+<a href="#main-content" style="position:absolute;left:-9999px;top:4px;padding:8px 16px;background:#C9A84C;color:#1B2A4A;font-weight:700;font-size:.85rem;border-radius:6px;z-index:9999;text-decoration:none;" onfocus="this.style.left='4px'" onblur="this.style.left='-9999px'">Saltar al contenido principal</a>
 
 <!-- ══════════════════════════════════════════════
      NAVBAR
@@ -444,16 +453,16 @@
         <div id="filtros-avanzados" style="display:{% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}block{% else %}none{% endif %};margin-top:10px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
             <div>
-              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio mín.</label>
-              <input type="number" name="precio_min" value="{{ filtros.precio_min }}" placeholder="S/ 0" class="adv-inp">
+              <label for="f-precio-min" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio mín.</label>
+              <input id="f-precio-min" type="number" name="precio_min" value="{{ filtros.precio_min }}" placeholder="S/ 0" class="adv-inp" inputmode="numeric" aria-label="Precio mínimo en soles">
             </div>
             <div>
-              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio máx.</label>
-              <input type="number" name="precio_max" value="{{ filtros.precio_max }}" placeholder="Sin límite" class="adv-inp">
+              <label for="f-precio-max" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio máx.</label>
+              <input id="f-precio-max" type="number" name="precio_max" value="{{ filtros.precio_max }}" placeholder="Sin límite" class="adv-inp" inputmode="numeric" aria-label="Precio máximo en soles">
             </div>
             <div>
-              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Habitaciones</label>
-              <select name="habitaciones" class="adv-inp">
+              <label for="f-habitaciones" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Habitaciones</label>
+              <select id="f-habitaciones" name="habitaciones" class="adv-inp" aria-label="Número mínimo de habitaciones">
                 <option value="">Cualquiera</option>
                 {% for n in [1,2,3,4,5] %}
                 <option value="{{ n }}" {% if filtros.habitaciones|string == n|string %}selected{% endif %}>{{ n }}+</option>
@@ -461,8 +470,8 @@
               </select>
             </div>
             <div>
-              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Área mín. (m²)</label>
-              <input type="number" name="m2_min" value="{{ filtros.m2_min }}" placeholder="m²" class="adv-inp">
+              <label for="f-m2" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Área mín. (m²)</label>
+              <input id="f-m2" type="number" name="m2_min" value="{{ filtros.m2_min }}" placeholder="m²" class="adv-inp" inputmode="numeric" aria-label="Área mínima en metros cuadrados">
             </div>
           </div>
         </div>
@@ -475,7 +484,7 @@
 <!-- ══════════════════════════════════════════════
      MAIN CONTENT
 ══════════════════════════════════════════════ -->
-<main style="max-width:1320px;margin:0 auto;padding:24px 20px 60px;">
+<main id="main-content" style="max-width:1320px;margin:0 auto;padding:24px 20px 60px;">
 
   <!-- ── Quick categories ── -->
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:24px;">
@@ -590,11 +599,11 @@
 
     <div style="position:relative;">
       <!-- Main card (clickable link) -->
-      <a href="/propiedad/{{ p.id }}" class="prop-card">
+      <a href="/propiedad/{{ p.id }}" class="prop-card" aria-label="{{ p.titulo }} — {{ p.tipo }} en {{ p.operacion }}, {{ p.ciudad }}">
         <!-- Image -->
         {% if p.foto_portada %}
-        <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}" class="prop-card-img"
-             onerror="this.style.display='none'">
+        <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }} — {{ p.tipo }} en {{ p.ciudad }}" class="prop-card-img"
+             loading="lazy" onerror="this.style.display='none'">
         {% else %}
         <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A4A,#243660);">
           <span style="font-size:4rem;opacity:.2;">🏠</span>
@@ -627,9 +636,9 @@
             {{ p.ciudad }}{% if p.estado %}, {{ p.estado }}{% endif %}
           </div>
           <div class="card-specs">
-            {% if p.habitaciones %}<span class="spec-item">🛏 {{ p.habitaciones }}</span>{% endif %}
-            {% if p.banos %}<span class="spec-item">🚿 {{ p.banos }}</span>{% endif %}
-            {% if p.m2_construidos %}<span class="spec-item">📐 {{ p.m2_construidos }}m²</span>{% endif %}
+            {% if p.habitaciones %}<span class="spec-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 12V20H21V12"/><rect x="2" y="7" width="20" height="5" rx="2"/></svg> {{ p.habitaciones }}</span>{% endif %}
+            {% if p.banos %}<span class="spec-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 12H20V15a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V12z"/></svg> {{ p.banos }}</span>{% endif %}
+            {% if p.m2_construidos %}<span class="spec-item"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9H21M9 3V21"/></svg> {{ p.m2_construidos }}m²</span>{% endif %}
             {% if wa_num %}
             <span style="margin-left:auto;">
               <span class="wa-pill" onclick="event.preventDefault();event.stopPropagation();window.open('https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}','_blank')">
@@ -646,8 +655,10 @@
       <button onclick="toggleFav(event, {{ p.id }}, this)"
               data-fav="{{ 'true' if is_fav else 'false' }}"
               class="heart-btn {% if is_fav %}active{% endif %}"
-              style="position:absolute;top:12px;right:12px;z-index:3;">
-        <svg width="16" height="16" viewBox="0 0 24 24"
+              aria-label="{% if is_fav %}Quitar de favoritos: {{ p.titulo }}{% else %}Guardar en favoritos: {{ p.titulo }}{% endif %}"
+              aria-pressed="{{ 'true' if is_fav else 'false' }}"
+              style="position:absolute;top:12px;right:12px;z-index:3;cursor:pointer;">
+        <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true"
              fill="{{ '#ef4444' if is_fav else 'none' }}"
              stroke="{{ '#ef4444' if is_fav else 'rgba(255,255,255,.9)' }}"
              stroke-width="2">

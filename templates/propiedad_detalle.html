@@ -9,12 +9,15 @@
   <meta property="og:description" content="{{ (p.descripcion or '')[:200] }}">
   <meta property="og:type" content="website">
   {% if p.foto_portada %}
-  <meta property="og:image" content="/uploads/{{ p.foto_portada }}">
+  <meta property="og:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/uploads/{{ p.foto_portada }}">
+  <meta name="twitter:image" content="{{ request.url.scheme }}://{{ request.url.netloc }}/uploads/{{ p.foto_portada }}">
   {% endif %}
+  <meta property="og:url" content="{{ request.url }}">
   <meta property="og:locale" content="es_PE">
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="{{ p.titulo }} — Inmersiva">
   <meta name="twitter:description" content="{{ (p.descripcion or '')[:200] }}">
+  <link rel="canonical" href="{{ request.url.scheme }}://{{ request.url.netloc }}/propiedad/{{ p.id }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -31,8 +34,10 @@
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css"
+        integrity="sha384-gAPqlBuTCdtVcYt9ocMOYWrnBZ4XSL6q+4eXqwNycOr4iFczhNKtnYhF3NEXJM51" crossorigin="anonymous">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+        integrity="sha384-sHL9NAb7lN7rfvG5lfHpm643Xkcjzp4jFvuavGOndn6pjVqS6ny56CAt3nsEVT4H" crossorigin="anonymous">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
     .gold-bar { background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%); }
@@ -109,8 +114,9 @@
             {% for foto in all_fotos %}
             {% if foto %}
             <div class="swiper-slide">
-              <img src="/uploads/{{ foto }}" alt="Foto {{ loop.index }}"
+              <img src="/uploads/{{ foto }}" alt="{{ p.titulo }} — foto {{ loop.index }}"
                    class="w-full h-full object-cover"
+                   loading="lazy"
                    onerror="this.parentElement.style.background='#1B2A4A'">
             </div>
             {% endif %}
@@ -123,11 +129,12 @@
         {% elif p.foto_portada %}
         <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}"
              class="w-full h-full object-cover cursor-pointer"
+             loading="lazy"
              onclick="openLb(0)"
              onerror="this.style.display='none'">
         {% else %}
         <div class="w-full h-full flex items-center justify-center" style="background:#1B2A4A;">
-          <span style="font-size:80px;opacity:0.3;">🏠</span>
+          <span style="font-size:80px;opacity:0.3;" aria-hidden="true">🏠</span>
         </div>
         {% endif %}
 
@@ -172,35 +179,35 @@
         <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 pt-5 border-t border-gray-100">
           {% if p.habitaciones %}
           <div class="spec-item">
-            <span class="text-2xl">🛏</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" aria-hidden="true"><path d="M3 12V20H21V12"/><rect x="2" y="7" width="20" height="5" rx="2"/><path d="M7 7V5a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v2"/></svg>
             <span class="font-bold text-gray-900">{{ p.habitaciones }}</span>
             <span class="text-gray-500 text-xs">Habitaciones</span>
           </div>
           {% endif %}
           {% if p.banos %}
           <div class="spec-item">
-            <span class="text-2xl">🚿</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" aria-hidden="true"><path d="M4 12H20V15a6 6 0 0 1-6 6H10a6 6 0 0 1-6-6V12z"/><path d="M4 12V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v1"/></svg>
             <span class="font-bold text-gray-900">{{ p.banos }}</span>
             <span class="text-gray-500 text-xs">Baños</span>
           </div>
           {% endif %}
           {% if p.m2_construidos %}
           <div class="spec-item">
-            <span class="text-2xl">📐</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9H21M9 3V21"/></svg>
             <span class="font-bold text-gray-900">{{ p.m2_construidos }} m²</span>
             <span class="text-gray-500 text-xs">Área construida</span>
           </div>
           {% endif %}
           {% if p.m2_terreno %}
           <div class="spec-item">
-            <span class="text-2xl">🌳</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" aria-hidden="true"><path d="M3 21L21 3M3 3v18h18"/></svg>
             <span class="font-bold text-gray-900">{{ p.m2_terreno }} m²</span>
             <span class="text-gray-500 text-xs">Terreno</span>
           </div>
           {% endif %}
           {% if p.estacionamientos %}
           <div class="spec-item">
-            <span class="text-2xl">🚗</span>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#1B2A4A" stroke-width="1.8" aria-hidden="true"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2"/><circle cx="7" cy="17" r="1"/><circle cx="17" cy="17" r="1"/></svg>
             <span class="font-bold text-gray-900">{{ p.estacionamientos }}</span>
             <span class="text-gray-500 text-xs">Estacionamientos</span>
           </div>
@@ -266,16 +273,20 @@
           {% if wa_num %}
           <a href="https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}"
              target="_blank"
-             class="flex items-center justify-center gap-2 w-full font-bold text-sm py-3 rounded-xl transition-all hover:opacity-90 text-white"
-             style="background:#22C55E;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+             rel="noopener noreferrer"
+             aria-label="Contactar a {{ corredor.nombre if corredor else 'corredor' }} por WhatsApp sobre {{ p.titulo }}"
+             class="flex items-center justify-center gap-2 w-full font-bold text-sm py-3 rounded-xl transition-all hover:opacity-90 text-white cursor-pointer"
+             style="background:#22C55E; min-height:44px;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
             WhatsApp
           </a>
           {% if corredor and corredor.telefono %}
           <a href="tel:{{ corredor.telefono }}"
-             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-2.5 rounded-xl border-2 transition-all hover:bg-gray-50"
-             style="border-color:#1B2A4A; color:#1B2A4A;">
-            📞 Llamar
+             aria-label="Llamar a {{ corredor.nombre if corredor else 'corredor' }}: {{ corredor.telefono }}"
+             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-2.5 rounded-xl border-2 transition-all hover:bg-gray-50 cursor-pointer"
+             style="border-color:#1B2A4A; color:#1B2A4A; min-height:44px;">
+            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.53 11.5a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.44 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.29 6.29l1.28-1.28a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+            Llamar
           </a>
           {% endif %}
           {% endif %}
@@ -298,6 +309,7 @@
 
           <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Enviar consulta</div>
           <form method="POST" action="/propiedad/{{ p.id }}/contactar" class="space-y-2">
+            <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
             <input type="text" name="nombre" required
                    placeholder="Tu nombre *"
                    {% if usuario %}value="{{ usuario.get('nombre', '') }}"{% endif %}
@@ -317,8 +329,10 @@
                       class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors resize-none"
                       style="font-family:inherit;"></textarea>
             <button type="submit"
-                    class="w-full py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90"
-                    style="background:#1B2A4A; color:#C9A84C;">
+                    class="w-full py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90 cursor-pointer"
+                    style="background:#1B2A4A; color:#C9A84C; min-height:44px;"
+                    aria-label="Enviar consulta sobre {{ p.titulo }}"
+                    onclick="this.disabled=true; this.textContent='Enviando...'; this.form.submit();">
               Enviar mensaje
             </button>
           </form>
@@ -376,8 +390,10 @@
   <div id="lb-counter" style="position:absolute;bottom:20px;left:0;right:0;text-align:center;color:rgba(255,255,255,0.55);font-size:0.85rem;letter-spacing:.05em;"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"
+        integrity="sha384-2UI1PfnXFjVMQ7/ZDEF70CR943oH3v6uZrFQGGqJYlvhh4g6z6uVktxYbOlAczav" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
+        integrity="sha384-cxOPjt7s7Iz04uaHJceBmS+qpjv2JkIHNVcuOrM+YHwZOmJGBXI00mdUXEq65HTH" crossorigin="anonymous"></script>
 <script>
   // ── Lightbox ──────────────────────────────────────────────
   const lbPhotos = [];
@@ -414,10 +430,12 @@
   });
 
   // ── Swiper ────────────────────────────────────────────────
+  const _prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   const swiperEl = document.querySelector('.swiper');
   if (swiperEl) {
     const swiper = new Swiper(swiperEl, {
-      loop: true,
+      loop: !_prefersReduced,
+      speed: _prefersReduced ? 0 : 400,
       navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
       pagination: { el: '.swiper-pagination', clickable: true },
     });

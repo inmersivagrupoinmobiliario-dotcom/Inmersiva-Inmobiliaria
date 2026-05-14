@@ -6,7 +6,11 @@ from fastapi import Request
 from authlib.integrations.starlette_client import OAuth
 import os
 
-SECRET_KEY = os.getenv("SECRET_KEY", "inmersiva-secret-2025")
+SECRET_KEY = os.getenv("SECRET_KEY") or os.getenv("SESSION_SECRET", "")
+if not SECRET_KEY:
+    import secrets as _auth_sec
+    SECRET_KEY = _auth_sec.token_hex(32)
+    print("[⚠️  SEGURIDAD] SECRET_KEY no configurado — generando clave aleatoria. Los tokens JWT expirarán al reiniciar.")
 ALGORITHM = "HS256"
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")

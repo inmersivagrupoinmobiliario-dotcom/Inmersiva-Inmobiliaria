@@ -58,6 +58,7 @@
       {% endif %}
       <form method="POST" action="/reset-contrasena" class="space-y-4">
         <input type="hidden" name="token" value="{{ token }}">
+        <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
         <div>
           <label class="block text-xs font-semibold mb-1.5" style="color:#8899bb;">Nueva contraseña</label>
           <input type="password" name="password_nueva" required minlength="6"
@@ -87,6 +88,7 @@
       </div>
       {% endif %}
       <form method="POST" action="/recuperar-contrasena" class="space-y-4">
+        <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
         <div>
           <label class="block text-xs font-semibold mb-1.5" style="color:#8899bb;">Email de tu cuenta</label>
           <input type="email" name="email" required

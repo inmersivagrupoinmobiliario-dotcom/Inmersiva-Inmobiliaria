@@ -165,6 +165,7 @@
       {% endif %}
 
       <form method="POST" action="/registro">
+        <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
         <div class="form-group">
           <label for="nombre">Nombre completo</label>
           <input type="text" id="nombre" name="nombre" placeholder="Juan Pérez" required autocomplete="name">
