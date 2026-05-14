@@ -3,65 +3,367 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Únete como Corredor — Inmersiva</title>
-  <link rel="stylesheet" href="/static/css/style.css">
+  <title>Quiero ser Corredor — Inmersiva Grupo Inmobiliario</title>
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
   <style>
-    body { background: #0f1623; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
-    .reg-card { background: #1B2A4A; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 520px; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
-    .reg-logo { text-align: center; margin-bottom: 32px; }
-    .reg-logo img { height: 72px; }
-    h2 { color: #fff; font-size: 1.5rem; font-weight: 800; margin: 0 0 4px; }
-    .subtitle { color: #C9A84C; font-size: .8rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; display: block; }
-    label { color: #ccc; font-size: .85rem; display: block; margin-bottom: 6px; margin-top: 18px; }
-    input, textarea { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #2d4070; background: #111d30; color: #fff; font-size: .95rem; box-sizing: border-box; transition: border-color .2s; }
-    input:focus, textarea:focus { border-color: #C9A84C; outline: none; }
-    textarea { height: 90px; resize: vertical; }
-    .btn-submit { width: 100%; padding: 14px; background: #C9A84C; color: #1B2A4A; font-weight: 800; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 28px; letter-spacing: 1px; transition: background .2s; }
-    .btn-submit:hover { background: #e0c060; }
-    .success-box { background: #0d3d2a; border: 1.5px solid #2ecc71; border-radius: 10px; padding: 24px; color: #2ecc71; text-align: center; }
-    .success-box h3 { margin: 0 0 8px; font-size: 1.1rem; }
-    .success-box p { margin: 0; font-size: .9rem; color: #a8e6c8; }
-    .error-box { background: #3d0d0d; border: 1.5px solid #e74c3c; border-radius: 10px; padding: 14px 18px; color: #e74c3c; margin-bottom: 20px; font-size: .9rem; }
-    .login-link { text-align: center; margin-top: 24px; color: #888; font-size: .85rem; }
-    .login-link a { color: #C9A84C; text-decoration: none; font-weight: 600; }
-    .login-link a:hover { text-decoration: underline; }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy: #1B2A4A;
+      --navy-dark: #0f1623;
+      --gold: #C9A84C;
+      --gold-light: #e0c060;
+      --border: #2d4070;
+      --text-muted: #8a9bb5;
+    }
+    body {
+      background: var(--navy-dark);
+      color: #fff;
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      min-height: 100vh;
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: sticky; top: 0; z-index: 100;
+      background: rgba(15,22,35,.95);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 14px 32px;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-logo img { height: 38px; }
+    .nav-logo-text { display: flex; flex-direction: column; }
+    .nav-logo-name { font-size: .9rem; font-weight: 800; color: #fff; letter-spacing: .5px; }
+    .nav-logo-sub { font-size: .6rem; color: var(--gold); letter-spacing: 2px; text-transform: uppercase; }
+    .nav-links { display: flex; gap: 20px; align-items: center; }
+    .nav-links a { color: var(--text-muted); text-decoration: none; font-size: .85rem; transition: color .2s; }
+    .nav-links a:hover { color: #fff; }
+    .nav-cta { background: var(--gold); color: var(--navy); font-weight: 700;
+               padding: 8px 18px; border-radius: 8px; font-size: .85rem; text-decoration: none;
+               transition: background .2s; }
+    .nav-cta:hover { background: var(--gold-light); color: var(--navy); }
+
+    /* ── HERO ── */
+    .hero {
+      padding: 72px 32px 56px;
+      text-align: center;
+      background: linear-gradient(180deg, rgba(201,168,76,.08) 0%, transparent 100%);
+      border-bottom: 1px solid rgba(201,168,76,.15);
+    }
+    .hero-badge {
+      display: inline-block; background: rgba(201,168,76,.12); color: var(--gold);
+      border: 1px solid rgba(201,168,76,.3); border-radius: 20px;
+      padding: 5px 16px; font-size: .72rem; font-weight: 700;
+      letter-spacing: 2px; text-transform: uppercase; margin-bottom: 24px;
+    }
+    .hero h1 {
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      font-weight: 900; line-height: 1.15; margin-bottom: 16px;
+    }
+    .hero h1 span { color: var(--gold); }
+    .hero p {
+      font-size: 1.05rem; color: var(--text-muted);
+      max-width: 560px; margin: 0 auto; line-height: 1.7;
+    }
+
+    /* ── BENEFITS ── */
+    .benefits { padding: 56px 32px; max-width: 1000px; margin: 0 auto; }
+    .benefits-grid {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 20px; margin-top: 32px;
+    }
+    .benefit-card {
+      background: var(--navy); border: 1.5px solid var(--border);
+      border-radius: 14px; padding: 24px 22px;
+      transition: border-color .25s, transform .25s;
+    }
+    .benefit-card:hover { border-color: var(--gold); transform: translateY(-3px); }
+    .benefit-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .benefit-title { font-weight: 700; font-size: .95rem; margin-bottom: 6px; }
+    .benefit-desc { color: var(--text-muted); font-size: .82rem; line-height: 1.55; }
+
+    /* ── FORM SECTION ── */
+    .form-section {
+      max-width: 680px; margin: 0 auto; padding: 0 32px 80px;
+    }
+    .form-card {
+      background: var(--navy); border: 1.5px solid var(--border);
+      border-radius: 20px; overflow: hidden;
+    }
+    .form-card-header {
+      background: linear-gradient(135deg, var(--navy) 0%, #0f1e38 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 28px 36px;
+    }
+    .form-card-header h2 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+    .form-card-header p { color: var(--text-muted); font-size: .85rem; }
+    .form-body { padding: 32px 36px; }
+
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .full { grid-column: 1 / -1; }
+
+    label {
+      display: block; color: #a0b0cc; font-size: .78rem;
+      font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
+      margin-bottom: 7px;
+    }
+    label .opt { color: #556080; font-weight: 400; text-transform: none; font-size: .75rem; letter-spacing: 0; }
+
+    input[type=text], input[type=email], input[type=tel], textarea {
+      width: 100%; padding: 11px 14px;
+      background: #111d30; border: 1.5px solid var(--border);
+      border-radius: 9px; color: #fff; font-size: .9rem;
+      transition: border-color .2s;
+    }
+    input:focus, textarea:focus { outline: none; border-color: var(--gold); }
+    textarea { height: 100px; resize: vertical; }
+
+    .file-upload {
+      width: 100%;
+      padding: 18px 14px;
+      background: #111d30;
+      border: 1.5px dashed var(--border);
+      border-radius: 9px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .2s, background .2s;
+    }
+    .file-upload:hover { border-color: var(--gold); background: #14223a; }
+    .file-upload-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .file-upload-text { color: var(--text-muted); font-size: .82rem; }
+    .file-upload-text strong { color: var(--gold); }
+    .file-input { display: none; }
+    .file-name { color: var(--gold); font-size: .82rem; margin-top: 6px; font-weight: 600; }
+
+    .form-divider {
+      border: none; border-top: 1px solid var(--border);
+      margin: 24px 0;
+    }
+    .section-label {
+      font-size: .7rem; font-weight: 700; letter-spacing: 2px;
+      text-transform: uppercase; color: var(--gold);
+      margin-bottom: 18px; display: flex; align-items: center; gap: 10px;
+    }
+    .section-label::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    .btn-submit {
+      width: 100%; padding: 14px;
+      background: var(--gold); color: var(--navy);
+      font-weight: 800; font-size: 1rem; letter-spacing: 1px;
+      border: none; border-radius: 10px; cursor: pointer;
+      margin-top: 8px; transition: background .2s, transform .15s;
+    }
+    .btn-submit:hover { background: var(--gold-light); transform: translateY(-1px); }
+
+    .alert-error {
+      background: rgba(220,53,69,.12); border: 1.5px solid rgba(220,53,69,.4);
+      border-radius: 10px; padding: 14px 18px; color: #ff7b87;
+      font-size: .88rem; margin-bottom: 24px;
+    }
+
+    /* ── SUCCESS ── */
+    .success-page {
+      min-height: calc(100vh - 70px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 40px 24px;
+    }
+    .success-card {
+      background: var(--navy); border: 1.5px solid #2ecc71;
+      border-radius: 20px; padding: 48px 40px;
+      max-width: 480px; text-align: center;
+    }
+    .success-icon { font-size: 3rem; margin-bottom: 16px; }
+    .success-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
+    .success-card p { color: var(--text-muted); line-height: 1.65; font-size: .9rem; }
+    .success-steps {
+      background: #111d30; border-radius: 10px;
+      padding: 20px; margin: 24px 0; text-align: left;
+    }
+    .success-step { display: flex; gap: 12px; margin-bottom: 12px; align-items: flex-start; }
+    .success-step:last-child { margin-bottom: 0; }
+    .step-num {
+      background: var(--gold); color: var(--navy);
+      width: 22px; height: 22px; border-radius: 50%;
+      font-size: .72rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; margin-top: 1px;
+    }
+    .step-text { color: #a0b0cc; font-size: .82rem; line-height: 1.5; }
+    .btn-back {
+      display: inline-block; margin-top: 4px;
+      background: transparent; border: 1.5px solid var(--gold);
+      color: var(--gold); padding: 10px 28px; border-radius: 8px;
+      text-decoration: none; font-weight: 700; font-size: .85rem;
+      transition: background .2s, color .2s;
+    }
+    .btn-back:hover { background: var(--gold); color: var(--navy); }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      .form-body { padding: 24px 20px; }
+      .form-card-header { padding: 22px 20px; }
+      nav { padding: 12px 16px; }
+      .nav-links { display: none; }
+    }
   </style>
 </head>
 <body>
-  <div class="reg-card">
-    <div class="reg-logo">
-      <img src="/static/img/logo.jpeg" alt="Inmersiva Grupo Inmobiliario">
+
+<nav>
+  <a href="/" class="nav-logo">
+    <img src="/static/img/logo_nuevo.png" alt="Inmersiva"
+         onerror="this.src='/static/img/logo.jpeg'">
+    <div class="nav-logo-text">
+      <span class="nav-logo-name">INMERSIVA</span>
+      <span class="nav-logo-sub">Grupo Inmobiliario</span>
     </div>
-    <h2>Únete como Corredor</h2>
-    <span class="subtitle">Inmersiva Grupo Inmobiliario</span>
+  </a>
+  <div class="nav-links">
+    <a href="/">Ver propiedades</a>
+    <a href="/login">Iniciar sesión</a>
+    <a href="/login" class="nav-cta">Acceso corredor</a>
+  </div>
+</nav>
 
-    {% if success %}
-    <div class="success-box">
-      <h3>✅ Solicitud enviada</h3>
-      <p>Tu solicitud fue recibida. Te contactaremos pronto para activar tu cuenta y darte acceso al sistema.</p>
+{% if success %}
+<div class="success-page">
+  <div class="success-card">
+    <div class="success-icon">✅</div>
+    <h2>Solicitud enviada</h2>
+    <p>Tu solicitud fue recibida exitosamente. Nuestro equipo la revisará y se pondrá en contacto contigo a la brevedad.</p>
+    <div class="success-steps">
+      <div class="success-step">
+        <div class="step-num">1</div>
+        <div class="step-text">El equipo de Inmersiva revisará tu solicitud y CV.</div>
+      </div>
+      <div class="success-step">
+        <div class="step-num">2</div>
+        <div class="step-text">Recibirás un email con tu cuenta corporativa <strong>@inmersiva.com</strong> y tus credenciales de acceso.</div>
+      </div>
+      <div class="success-step">
+        <div class="step-num">3</div>
+        <div class="step-text">Ingresa al dashboard con tu email corporativo y empieza a gestionar tus propiedades.</div>
+      </div>
     </div>
-    {% else %}
-      {% if error %}<div class="error-box">⚠️ {{ error }}</div>{% endif %}
-      <form method="post" action="/corredor/registro">
-        <label>Nombre completo *</label>
-        <input type="text" name="nombre" required placeholder="Juan Pérez" autocomplete="name">
+    <a href="/" class="btn-back">← Volver al portal</a>
+  </div>
+</div>
 
-        <label>Email *</label>
-        <input type="email" name="email" required placeholder="juan@ejemplo.com" autocomplete="email">
+{% else %}
 
-        <label>Teléfono</label>
-        <input type="tel" name="telefono" placeholder="+51 999 999 999" autocomplete="tel">
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-badge">Oportunidad profesional</div>
+  <h1>Trabaja con<br><span>Inmersiva Grupo Inmobiliario</span></h1>
+  <p>Únete a nuestro equipo de corredores y accede a herramientas profesionales para gestionar propiedades, clientes y publicaciones en redes sociales.</p>
+</section>
 
-        <label>¿Por qué quieres unirte a Inmersiva?</label>
-        <textarea name="mensaje" placeholder="Cuéntanos sobre tu experiencia en bienes raíces..."></textarea>
-
-        <button type="submit" class="btn-submit">ENVIAR SOLICITUD</button>
-      </form>
-    {% endif %}
-
-    <div class="login-link">
-      ¿Ya tienes cuenta? <a href="/login?tab=corredor">Iniciar sesión</a>
+<!-- BENEFITS -->
+<section class="benefits">
+  <div style="text-align:center;margin-bottom:8px;">
+    <span style="color:var(--gold);font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;">
+      Por qué elegirnos
+    </span>
+    <h2 style="font-size:1.5rem;font-weight:800;margin-top:8px;">Lo que obtienes como corredor</h2>
+  </div>
+  <div class="benefits-grid">
+    <div class="benefit-card">
+      <div class="benefit-icon">📊</div>
+      <div class="benefit-title">Dashboard profesional</div>
+      <div class="benefit-desc">Panel de control completo para gestionar todas tus fichas, documentos y estadísticas en tiempo real.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">👥</div>
+      <div class="benefit-title">CRM integrado</div>
+      <div class="benefit-desc">Gestiona tus contactos, agenda citas y lleva un seguimiento completo de cada cliente potencial.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">📱</div>
+      <div class="benefit-title">Marketing en RRSS</div>
+      <div class="benefit-desc">Genera y solicita publicaciones para Instagram, Facebook y WhatsApp con un solo clic.</div>
+    </div>
+    <div class="benefit-card">
+      <div class="benefit-icon">📧</div>
+      <div class="benefit-title">Email corporativo</div>
+      <div class="benefit-desc">Recibe tu propio correo <strong>@inmersiva.com</strong> para dar una imagen profesional ante tus clientes.</div>
     </div>
   </div>
+</section>
+
+<!-- FORM -->
+<section class="form-section">
+  <div class="form-card">
+    <div class="form-card-header">
+      <h2>Envía tu solicitud</h2>
+      <p>Completa el formulario y nos pondremos en contacto contigo a la brevedad.</p>
+    </div>
+    <div class="form-body">
+      {% if error %}
+      <div class="alert-error">⚠️ {{ error }}</div>
+      {% endif %}
+
+      <form method="post" action="/corredor/registro" enctype="multipart/form-data">
+
+        <div class="section-label">Datos personales</div>
+        <div class="form-grid">
+          <div class="full">
+            <label>Nombre completo *</label>
+            <input type="text" name="nombre" required placeholder="Juan Pérez">
+          </div>
+          <div>
+            <label>DNI <span class="opt">(opcional)</span></label>
+            <input type="text" name="dni" placeholder="12345678" maxlength="20">
+          </div>
+          <div>
+            <label>Teléfono <span class="opt">(opcional)</span></label>
+            <input type="tel" name="telefono" placeholder="+51 999 999 999">
+          </div>
+          <div class="full">
+            <label>Email personal *</label>
+            <input type="email" name="email" required placeholder="juan@gmail.com">
+            <p style="color:#556080;font-size:.75rem;margin-top:6px;line-height:1.4;">
+              Aquí recibirás tu email corporativo <strong style="color:var(--gold);">@inmersiva.com</strong> y tus credenciales de acceso.
+            </p>
+          </div>
+        </div>
+
+        <hr class="form-divider">
+        <div class="section-label">Tu candidatura</div>
+        <div class="form-grid">
+          <div class="full">
+            <label>¿Por qué quieres unirte a Inmersiva? <span class="opt">(opcional)</span></label>
+            <textarea name="mensaje" placeholder="Cuéntanos sobre tu experiencia en bienes raíces, tus objetivos y por qué te gustaría trabajar con nosotros..."></textarea>
+          </div>
+          <div class="full">
+            <label>CV / Hoja de vida <span class="opt">(opcional — PDF, DOC, DOCX)</span></label>
+            <div class="file-upload" onclick="document.getElementById('cv_input').click()">
+              <div class="file-upload-icon">📄</div>
+              <div class="file-upload-text">
+                <strong>Haz clic para adjuntar tu CV</strong><br>
+                PDF, DOC o DOCX · máx. 5 MB
+              </div>
+              <div class="file-name" id="file_name_display" style="display:none;"></div>
+            </div>
+            <input type="file" id="cv_input" name="cv" class="file-input"
+                   accept=".pdf,.doc,.docx"
+                   onchange="document.getElementById('file_name_display').textContent='📎 '+this.files[0].name;document.getElementById('file_name_display').style.display='block';">
+          </div>
+        </div>
+
+        <button type="submit" class="btn-submit">ENVIAR SOLICITUD →</button>
+      </form>
+
+      <p style="text-align:center;margin-top:20px;color:#556080;font-size:.82rem;">
+        ¿Ya tienes cuenta? <a href="/login" style="color:var(--gold);font-weight:600;">Iniciar sesión</a>
+      </p>
+    </div>
+  </div>
+</section>
+
+{% endif %}
+
 </body>
 </html>

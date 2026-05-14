@@ -49,6 +49,12 @@ def _run_migrations():
             ("corredores", "bio", "TEXT"),
             ("corredores", "instagram", "VARCHAR(100)"),
             ("corredores", "whatsapp", "VARCHAR(30)"),
+            ("corredores", "dni", "VARCHAR(20)"),
+            ("corredores", "direccion", "VARCHAR(200)"),
+            ("corredores", "email_personal", "VARCHAR(100)"),
+            # solicitudes_corredor new columns
+            ("solicitudes_corredor", "dni", "VARCHAR(20)"),
+            ("solicitudes_corredor", "cv_archivo", "VARCHAR(300)"),
         ]
         for table, col, col_type in migrations:
             try:
@@ -575,19 +581,14 @@ async def google_callback(request: Request):
         resp.set_cookie("empresa_token", t, httponly=True, samesite="lax")
         return resp
 
-    # ¿Es corredor registrado?
-    db = SessionLocal()
-    try:
-        corredor = db.query(CorredorModel).filter(
-            CorredorModel.email == email, CorredorModel.activo == True
-        ).first()
-        if corredor:
-            t = create_token({"sub": corredor.username, "email": corredor.email, "nombre": corredor.nombre})
-            resp = RedirectResponse("/corredor/dashboard", status_code=302)
-            resp.set_cookie("corredor_token", t, httponly=True, samesite="lax")
-            return resp
-    finally:
-        db.close()
+    # Corredores NUNCA acceden vía Google — solo con email corporativo + contraseña
+    company_domain = os.getenv("COMPANY_EMAIL_DOMAIN", "inmersiva.com")
+    if email.endswith(f"@{company_domain}"):
+        return templates.TemplateResponse(
+            request, "login.html",
+            {"error": "Los corredores deben iniciar sesión con su email corporativo y contraseña, no con Google."},
+            status_code=400,
+        )
 
     # Auto-create or login as UsuarioPublico
     db2 = SessionLocal()
@@ -1061,6 +1062,9 @@ async def crear_corredor(
     telefono: str = Form(default=""),
     username: str = Form(...),
     password: str = Form(...),
+    dni: str = Form(default=""),
+    direccion: str = Form(default=""),
+    email_personal: str = Form(default=""),
 ):
     empresa = get_empresa_session(request)
     if not empresa:
@@ -1075,6 +1079,8 @@ async def crear_corredor(
         db.add(CorredorModel(
             nombre=nombre, email=email, telefono=telefono,
             username=username, hashed_password=hash_password(password),
+            dni=dni or None, direccion=direccion or None,
+            email_personal=email_personal or None,
         ))
         db.commit()
     except Exception as e:
@@ -1085,7 +1091,12 @@ async def crear_corredor(
         return RedirectResponse(f"/dashboard?corredor_error={msg}", status_code=302)
     finally:
         db.close()
-    return RedirectResponse("/dashboard", status_code=302)
+    # Cloudflare email routing + envío de credenciales si se proporcionó email personal
+    if email_personal:
+        from services.email_service import setup_cloudflare_email_routing, enviar_credenciales_corredor
+        setup_cloudflare_email_routing(email, email_personal)
+        enviar_credenciales_corredor(nombre, email, email_personal, username, password)
+    return RedirectResponse("/dashboard?ok=Corredor+creado+exitosamente", status_code=302)
 
 
 # ── Form submit (protected) ───────────────────────────────────────────────────
@@ -1408,10 +1419,13 @@ async def registro_corredor_submit(
     nombre: str = Form(...),
     email: str = Form(...),
     telefono: str = Form(default=""),
+    dni: str = Form(default=""),
     mensaje: str = Form(default=""),
+    cv: UploadFile = File(default=None),
 ):
     from models.db_models import SolicitudCorredor
     db = SessionLocal()
+    cv_path = None
     try:
         existe_sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.email == email).first()
         existe_corredor = db.query(CorredorModel).filter(CorredorModel.email == email).first()
@@ -1420,7 +1434,22 @@ async def registro_corredor_submit(
                 request, "registro_corredor.html",
                 {"error": "Ya existe una solicitud o cuenta con ese email.", "success": False}
             )
-        db.add(SolicitudCorredor(nombre=nombre, email=email, telefono=telefono, mensaje=mensaje))
+        if cv and cv.filename:
+            ext = Path(cv.filename).suffix.lower()
+            if ext not in (".pdf", ".doc", ".docx"):
+                return templates.TemplateResponse(
+                    request, "registro_corredor.html",
+                    {"error": "El CV debe ser PDF, DOC o DOCX.", "success": False}
+                )
+            cv_name = f"{uuid.uuid4()}{ext}"
+            cv_dest = Path("uploads/cvs") / cv_name
+            with open(cv_dest, "wb") as f:
+                f.write(await cv.read())
+            cv_path = str(cv_dest)
+        db.add(SolicitudCorredor(
+            nombre=nombre, email=email, telefono=telefono,
+            dni=dni or None, mensaje=mensaje, cv_archivo=cv_path,
+        ))
         db.commit()
     except Exception as e:
         db.rollback()
@@ -1441,29 +1470,35 @@ async def aprobar_solicitud_corredor(
     solicitud_id: int,
     username: str = Form(...),
     password: str = Form(...),
+    email_corp: str = Form(...),
 ):
     if not get_empresa_session(request):
         return RedirectResponse("/login", status_code=302)
     from models.db_models import SolicitudCorredor
+    from services.email_service import setup_cloudflare_email_routing, enviar_credenciales_corredor
     db = SessionLocal()
     try:
         sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
         if not sol:
             return RedirectResponse("/dashboard?error=Solicitud+no+encontrada", status_code=302)
         existe = db.query(CorredorModel).filter(
-            (CorredorModel.email == sol.email) | (CorredorModel.username == username)
+            (CorredorModel.email == email_corp) | (CorredorModel.username == username)
         ).first()
         if existe:
-            return RedirectResponse("/dashboard?error=Email+o+usuario+ya+existe", status_code=302)
+            return RedirectResponse("/dashboard?error=Email+corporativo+o+usuario+ya+existe", status_code=302)
         db.add(CorredorModel(
-            nombre=sol.nombre, email=sol.email, telefono=sol.telefono,
+            nombre=sol.nombre, email=email_corp, telefono=sol.telefono,
             username=username, hashed_password=hash_password(password),
+            dni=sol.dni, email_personal=sol.email,
         ))
         sol.estado = "Aprobado"
         db.commit()
     finally:
         db.close()
-    return RedirectResponse("/dashboard?ok=Corredor+creado+exitosamente", status_code=302)
+    # Cloudflare email routing + envío de credenciales (no bloquean si fallan)
+    setup_cloudflare_email_routing(email_corp, sol.email)
+    enviar_credenciales_corredor(sol.nombre, email_corp, sol.email, username, password)
+    return RedirectResponse("/dashboard?ok=Corredor+aprobado+y+credenciales+enviadas", status_code=302)
 
 
 @app.post("/admin/solicitud/{solicitud_id}/rechazar")
@@ -1480,6 +1515,21 @@ async def rechazar_solicitud_corredor(request: Request, solicitud_id: int):
     finally:
         db.close()
     return RedirectResponse("/dashboard", status_code=302)
+
+
+@app.get("/admin/solicitud/{solicitud_id}/cv")
+async def descargar_cv_solicitud(request: Request, solicitud_id: int):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    from models.db_models import SolicitudCorredor
+    db = SessionLocal()
+    try:
+        sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
+        if not sol or not sol.cv_archivo or not Path(sol.cv_archivo).exists():
+            return HTMLResponse("<p>CV no disponible</p>", status_code=404)
+        return FileResponse(sol.cv_archivo, filename=f"CV_{sol.nombre.replace(' ','_')}{Path(sol.cv_archivo).suffix}")
+    finally:
+        db.close()
 
 
 # ── Solicitar publicación en RRSS (corredor) ──────────────────────────────────

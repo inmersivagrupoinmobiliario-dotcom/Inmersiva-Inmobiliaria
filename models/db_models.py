@@ -8,9 +8,11 @@ class SolicitudCorredor(Base):
     __tablename__ = "solicitudes_corredor"
     id = Column(Integer, primary_key=True)
     nombre = Column(String(100), nullable=False)
-    email = Column(String(100), unique=True, nullable=False)
+    email = Column(String(100), unique=True, nullable=False)  # email personal del solicitante
     telefono = Column(String(30), default="")
+    dni = Column(String(20), nullable=True)
     mensaje = Column(Text, default="")
+    cv_archivo = Column(String(300), nullable=True)  # ruta al CV subido
     estado = Column(String(20), default="Pendiente")  # Pendiente / Aprobado / Rechazado
     created_at = Column(DateTime, default=datetime.utcnow)
 
@@ -95,6 +97,9 @@ class Corredor(Base):
     bio = Column(Text, nullable=True)
     instagram = Column(String(100), nullable=True)
     whatsapp = Column(String(30), nullable=True)
+    dni = Column(String(20), nullable=True)
+    direccion = Column(String(200), nullable=True)
+    email_personal = Column(String(100), nullable=True)  # Gmail personal para reenvío Cloudflare
 
 
 class UsuarioPublico(Base):
