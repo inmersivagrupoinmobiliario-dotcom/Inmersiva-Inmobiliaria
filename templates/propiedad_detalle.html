@@ -309,7 +309,7 @@
 
           <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Enviar consulta</div>
           <form method="POST" action="/propiedad/{{ p.id }}/contactar" class="space-y-2">
-            <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
+            <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
             <input type="text" name="nombre" required
                    placeholder="Tu nombre *"
                    autocomplete="name"

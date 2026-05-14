@@ -952,7 +952,7 @@
     {% endif %}
 
     <form method="post" action="/corredor/cambiar-contrasena" style="padding:24px 28px;">
-      <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
+      <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
       <div style="display:grid;gap:16px;">
         <div>
           <label style="display:block;font-size:.78rem;font-weight:700;color:#374151;letter-spacing:.5px;text-transform:uppercase;margin-bottom:8px;">Contraseña actual</label>

@@ -139,7 +139,7 @@
         {% endif %}
 
         <form method="post" action="/login/smart" autocomplete="on">
-          <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
+          <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
           <div class="field">
             <label for="login-email">Email</label>
             <input id="login-email" type="email" name="email" placeholder="tu@email.com" required autofocus autocomplete="email" aria-label="Correo electrónico">

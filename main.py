@@ -143,10 +143,10 @@ class _CSRFMiddleware(BaseHTTPMiddleware):
         request.state.csrf_token = request.session["csrf_token"]
         return await call_next(request)
 
-async def _require_csrf(request: Request, _csrf_token: str = Form(default="")):
+async def _require_csrf(request: Request, csrf_token: str = Form(default="")):
     """Dependencia FastAPI: valida que el form incluya el token CSRF de sesión."""
     expected = request.session.get("csrf_token", "")
-    if not expected or not _sec.compare_digest(_csrf_token, expected):
+    if not expected or not _sec.compare_digest(csrf_token, expected):
         raise HTTPException(
             status_code=403,
             detail="Token de seguridad inválido. Recarga la página e intenta de nuevo.",
