@@ -17,7 +17,7 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'Barlow', system-ui, sans-serif; background: #f5f6f8; }
+    body { font-family: 'Barlow', system-ui, sans-serif; background: #eef0f5; }
     h1, h2, h3, .font-sora { font-family: 'Sora', system-ui, sans-serif; }
 
     .prop-card {
@@ -38,8 +38,8 @@
     .card-bottom { position:absolute;bottom:0;left:0;right:0;padding:14px 12px;z-index:2; }
     .card-price { font-family:'Sora',sans-serif;font-size:1.05rem;font-weight:800;color:#C9A84C;line-height:1;margin-bottom:4px; }
     .card-title { font-size:.8rem;font-weight:600;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:3px; }
-    .card-loc { font-size:.7rem;color:rgba(255,255,255,.6);display:flex;align-items:center;gap:3px; }
-    .card-specs { display:flex;align-items:center;gap:8px;font-size:.7rem;color:rgba(255,255,255,.75);font-weight:500;margin-top:6px; }
+    .card-loc { font-size:.7rem;color:rgba(255,255,255,.8);display:flex;align-items:center;gap:3px; }
+    .card-specs { display:flex;align-items:center;gap:8px;font-size:.7rem;color:rgba(255,255,255,.85);font-weight:500;margin-top:6px; }
     .op-badge { font-size:.63rem;font-weight:700;padding:3px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.4px; }
     .op-venta { background:#C9A84C;color:#1B2A4A; }
     .op-renta { background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(201,168,76,.4); }
@@ -59,13 +59,13 @@
         <div style="color:#C9A84C;font-size:7px;letter-spacing:2px;font-weight:600;">GRUPO INMOBILIARIO</div>
       </div>
     </a>
-    <a href="/" style="color:rgba(255,255,255,.55);font-size:.82rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,.55)'">← Volver al portal</a>
+    <a href="/" style="color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='rgba(255,255,255,.75)'">← Volver al portal</a>
     <div style="flex:1;"></div>
     {% if user %}
       {% if user.get('role') == 'empresa' %}
-      <a href="/dashboard" style="color:rgba(255,255,255,.6);font-size:.82rem;text-decoration:none;">Panel</a>
+      <a href="/dashboard" style="color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;">Panel</a>
       {% else %}
-      <a href="/corredor/dashboard" style="color:rgba(255,255,255,.6);font-size:.82rem;text-decoration:none;">Dashboard</a>
+      <a href="/corredor/dashboard" style="color:rgba(255,255,255,.75);font-size:.82rem;text-decoration:none;">Dashboard</a>
       {% endif %}
     {% else %}
     <a href="/login" style="font-family:'Sora',sans-serif;font-size:.78rem;font-weight:700;padding:7px 16px;background:#C9A84C;color:#1B2A4A;border-radius:8px;text-decoration:none;">Ingresar</a>
@@ -103,23 +103,26 @@
           <h1 class="font-sora" style="color:#fff;font-size:1.6rem;font-weight:800;margin:0 0 12px;letter-spacing:-.5px;">{{ corredor.nombre }}</h1>
 
           <div style="display:flex;flex-wrap:wrap;gap:10px;">
-            <span style="background:rgba(201,168,76,.15);color:#C9A84C;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.3);">
-              📧 {{ corredor.email }}
+            <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(201,168,76,.15);color:#C9A84C;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(201,168,76,.3);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+              {{ corredor.email }}
             </span>
             {% if corredor.telefono %}
-            <span style="background:rgba(255,255,255,.07);color:#aaa;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.1);">
-              📞 {{ corredor.telefono }}
+            <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,.09);color:rgba(255,255,255,.85);font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.15);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12a19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 3.6 1.1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.69a16 16 0 0 0 6.07 6.07l.95-.95a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7a2 2 0 0 1 1.72 2.01z"/></svg>
+              {{ corredor.telefono }}
             </span>
             {% endif %}
             {% if corredor.instagram %}
-            <span style="background:rgba(225,48,108,.12);color:#f472b6;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(225,48,108,.2);">
-              IG @{{ corredor.instagram }}
+            <span style="display:inline-flex;align-items:center;gap:6px;background:rgba(225,48,108,.12);color:#f472b6;font-size:.75rem;font-weight:600;padding:5px 12px;border-radius:20px;border:1px solid rgba(225,48,108,.2);">
+              <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+              @{{ corredor.instagram }}
             </span>
             {% endif %}
           </div>
 
           {% if corredor.bio %}
-          <p style="color:rgba(255,255,255,.6);font-size:.88rem;margin-top:14px;line-height:1.65;max-width:560px;">{{ corredor.bio }}</p>
+          <p style="color:rgba(255,255,255,.78);font-size:.88rem;margin-top:14px;line-height:1.65;max-width:560px;">{{ corredor.bio }}</p>
           {% endif %}
         </div>
 
@@ -135,8 +138,9 @@
           </a>
           {% endif %}
           <a href="mailto:{{ corredor.email }}"
-             style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:10px 20px;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.2);border-radius:10px;text-decoration:none;white-space:nowrap;">
-            ✉️ Enviar email
+             style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:10px 20px;background:rgba(255,255,255,.08);color:#fff;border:1.5px solid rgba(255,255,255,.22);border-radius:10px;text-decoration:none;white-space:nowrap;">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Enviar email
           </a>
         </div>
       </div>
@@ -146,15 +150,15 @@
     <div style="display:flex;border-top:1.5px solid #f1f5f9;">
       <div style="flex:1;padding:18px;text-align:center;border-right:1px solid #f1f5f9;">
         <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#1B2A4A;">{{ propiedades|length }}</div>
-        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">Propiedades</div>
+        <div style="font-size:.72rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">Propiedades</div>
       </div>
       <div style="flex:1;padding:18px;text-align:center;border-right:1px solid #f1f5f9;">
         <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#C9A84C;">{{ propiedades|selectattr('operacion','eq','Venta')|list|length }}</div>
-        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Venta</div>
+        <div style="font-size:.72rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Venta</div>
       </div>
       <div style="flex:1;padding:18px;text-align:center;">
         <div class="font-sora" style="font-size:1.6rem;font-weight:800;color:#1B2A4A;">{{ propiedades|selectattr('operacion','eq','Renta')|list|length }}</div>
-        <div style="font-size:.72rem;color:#9ca3af;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Alquiler</div>
+        <div style="font-size:.72rem;color:#6b7280;font-weight:600;text-transform:uppercase;letter-spacing:1px;margin-top:3px;">En Alquiler</div>
       </div>
     </div>
   </div>
@@ -173,7 +177,7 @@
       <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}" onerror="this.style.display='none'">
       {% else %}
       <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A4A,#243660);">
-        <span style="font-size:3rem;opacity:.2;">🏠</span>
+        <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
       </div>
       {% endif %}
       <div class="card-top-shadow"></div>
@@ -203,9 +207,11 @@
 
   {% else %}
   <div style="text-align:center;padding:64px 20px;">
-    <div style="font-size:56px;margin-bottom:16px;opacity:.6;">🏠</div>
+    <div style="width:72px;height:72px;background:rgba(27,42,74,.06);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+      <svg width="32" height="32" fill="none" stroke="#1B2A4A" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true" style="opacity:.3;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
     <h3 class="font-sora" style="font-size:1.1rem;font-weight:700;color:#1B2A4A;margin:0 0 8px;">Sin propiedades publicadas aún</h3>
-    <p style="color:#9ca3af;font-size:.88rem;margin:0 0 20px;">Este corredor no tiene propiedades disponibles actualmente.</p>
+    <p style="color:#6b7280;font-size:.88rem;margin:0 0 20px;">Este corredor no tiene propiedades disponibles actualmente.</p>
     <a href="/" style="display:inline-flex;align-items:center;gap:6px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;padding:10px 22px;background:#1B2A4A;color:#C9A84C;border-radius:10px;text-decoration:none;">
       ← Ver todas las propiedades
     </a>

@@ -113,8 +113,8 @@
     .footer-links { text-align: center; margin-top: 22px; font-size: .82rem; color: #6b7280; }
     .footer-links a { color: #C9A84C; font-weight: 700; text-decoration: none; }
     .footer-links a:hover { text-decoration: underline; }
-    .site-link { text-align: center; margin-top: 24px; font-size: .75rem; color: rgba(255,255,255,.4); }
-    .site-link a { color: rgba(201,168,76,.7); text-decoration: none; }
+    .site-link { text-align: center; margin-top: 24px; font-size: .75rem; color: rgba(255,255,255,.62); }
+    .site-link a { color: rgba(201,168,76,.9); text-decoration: none; }
     .site-link a:hover { color: #C9A84C; }
   </style>
 </head>
@@ -129,7 +129,7 @@
 
       <div class="form-body">
         {% if error %}
-        <div class="error-box"><span>⚠️</span> {{ error }}</div>
+        <div class="error-box"><svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> {{ error }}</div>
         {% endif %}
 
         {% if show_register %}

@@ -79,7 +79,7 @@
       transition: border-color .25s, transform .25s;
     }
     .benefit-card:hover { border-color: var(--gold); transform: translateY(-3px); }
-    .benefit-icon { font-size: 1.8rem; margin-bottom: 12px; }
+    .benefit-icon { width:40px; height:40px; border-radius:10px; background:rgba(201,168,76,.1); display:flex; align-items:center; justify-content:center; margin-bottom:14px; }
     .benefit-title { font-weight: 700; font-size: .95rem; margin-bottom: 6px; }
     .benefit-desc { color: var(--text-muted); font-size: .82rem; line-height: 1.55; }
 
@@ -108,7 +108,7 @@
       font-weight: 600; letter-spacing: .5px; text-transform: uppercase;
       margin-bottom: 7px;
     }
-    label .opt { color: #556080; font-weight: 400; text-transform: none; font-size: .75rem; letter-spacing: 0; }
+    label .opt { color: #8a9bb5; font-weight: 400; text-transform: none; font-size: .75rem; letter-spacing: 0; }
 
     input[type=text], input[type=email], input[type=tel], textarea {
       width: 100%; padding: 11px 14px;
@@ -130,7 +130,7 @@
       transition: border-color .2s, background .2s;
     }
     .file-upload:hover { border-color: var(--gold); background: #14223a; }
-    .file-upload-icon { font-size: 1.5rem; margin-bottom: 6px; }
+    .file-upload-icon { margin-bottom: 8px; display:flex; justify-content:center; }
     .file-upload-text { color: var(--text-muted); font-size: .82rem; }
     .file-upload-text strong { color: var(--gold); }
     .file-input { display: none; }
@@ -175,7 +175,7 @@
       border-radius: 20px; padding: 48px 40px;
       max-width: 480px; text-align: center;
     }
-    .success-icon { font-size: 3rem; margin-bottom: 16px; }
+    .success-icon { width:64px; height:64px; border-radius:50%; background:rgba(46,204,113,.12); border:2px solid rgba(46,204,113,.4); display:flex; align-items:center; justify-content:center; margin:0 auto 16px; }
     .success-card h2 { font-size: 1.5rem; font-weight: 800; margin-bottom: 10px; }
     .success-card p { color: var(--text-muted); line-height: 1.65; font-size: .9rem; }
     .success-steps {
@@ -231,7 +231,9 @@
 {% if success %}
 <div class="success-page">
   <div class="success-card">
-    <div class="success-icon">✅</div>
+    <div class="success-icon">
+      <svg width="28" height="28" fill="none" stroke="#2ecc71" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>
+    </div>
     <h2>Solicitud enviada</h2>
     <p>Tu solicitud fue recibida exitosamente. Nuestro equipo la revisará y se pondrá en contacto contigo a la brevedad.</p>
     <div class="success-steps">
@@ -271,22 +273,30 @@
   </div>
   <div class="benefits-grid">
     <div class="benefit-card">
-      <div class="benefit-icon">📊</div>
+      <div class="benefit-icon">
+        <svg width="20" height="20" fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      </div>
       <div class="benefit-title">Dashboard profesional</div>
       <div class="benefit-desc">Panel de control completo para gestionar todas tus fichas, documentos y estadísticas en tiempo real.</div>
     </div>
     <div class="benefit-card">
-      <div class="benefit-icon">👥</div>
+      <div class="benefit-icon">
+        <svg width="20" height="20" fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      </div>
       <div class="benefit-title">CRM integrado</div>
       <div class="benefit-desc">Gestiona tus contactos, agenda citas y lleva un seguimiento completo de cada cliente potencial.</div>
     </div>
     <div class="benefit-card">
-      <div class="benefit-icon">📱</div>
+      <div class="benefit-icon">
+        <svg width="20" height="20" fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+      </div>
       <div class="benefit-title">Marketing en RRSS</div>
       <div class="benefit-desc">Genera y solicita publicaciones para Instagram, Facebook y WhatsApp con un solo clic.</div>
     </div>
     <div class="benefit-card">
-      <div class="benefit-icon">📧</div>
+      <div class="benefit-icon">
+        <svg width="20" height="20" fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+      </div>
       <div class="benefit-title">Email corporativo</div>
       <div class="benefit-desc">Recibe tu propio correo <strong>@inmersiva.com</strong> para dar una imagen profesional ante tus clientes.</div>
     </div>
@@ -302,7 +312,10 @@
     </div>
     <div class="form-body">
       {% if error %}
-      <div class="alert-error">⚠️ {{ error }}</div>
+      <div class="alert-error" style="display:flex;align-items:center;gap:8px;">
+        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" flex-shrink="0" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        {{ error }}
+      </div>
       {% endif %}
 
       <form method="post" action="/corredor/registro" enctype="multipart/form-data">
@@ -341,7 +354,9 @@
           <div class="full">
             <label>CV / Hoja de vida <span class="opt">(opcional — PDF, DOC, DOCX)</span></label>
             <div class="file-upload" onclick="document.getElementById('cv_input').click()">
-              <div class="file-upload-icon">📄</div>
+              <div class="file-upload-icon">
+              <svg width="28" height="28" fill="none" stroke="#C9A84C" stroke-width="1.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><line x1="9" y1="15" x2="15" y2="15"/></svg>
+            </div>
               <div class="file-upload-text">
                 <strong>Haz clic para adjuntar tu CV</strong><br>
                 PDF, DOC o DOCX · máx. 5 MB
