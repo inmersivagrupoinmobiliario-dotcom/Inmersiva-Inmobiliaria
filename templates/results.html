@@ -52,8 +52,8 @@
     <div class="card-title">Descargas y Publicación</div>
     <div class="actions-row">
       <a href="/pdf/{{ listing.id }}" class="btn btn-primary" target="_blank">📄 Descargar PDF</a>
-      <a href="/imagen/{{ listing.id }}" class="btn btn-gold" download>🖼 Imagen Instagram</a>
-      <button onclick="publicarInstagram('{{ listing.id }}')" class="btn btn-outline">📲 Publicar en Instagram</button>
+      <a href="/imagen/{{ listing.id }}" class="btn btn-gold" download>🖼 Imagen Cuadrada</a>
+      <a href="/imagen-vertical/{{ listing.id }}" class="btn btn-gold" download>📱 Imagen Stories (1080×1920)</a>
       <button onclick="generarVideo('{{ listing.id }}')" class="btn btn-outline" id="btn-video">🎬 Generar Video Reel</button>
     </div>
 
@@ -64,6 +64,31 @@
     </div>
     <div id="video-download" style="display:none;margin-top:1rem">
       <a id="video-link" href="#" class="btn btn-gold" download>⬇️ Descargar Video</a>
+    </div>
+
+    <!-- Solicitar publicación en RRSS -->
+    <div style="margin-top:28px;padding:24px;background:#f8f9fa;border-radius:12px;border:1.5px solid #e0e0e0">
+      <h3 style="margin:0 0 6px;font-size:1rem;color:#1B2A4A;font-weight:700">📢 Solicitar publicación en redes sociales</h3>
+      <p style="color:#666;font-size:.85rem;margin:0 0 16px">El admin revisará y publicará en las redes seleccionadas via UploadPost.</p>
+      <form method="post" action="/corredor/solicitar-publicacion/{{ listing.id }}">
+        <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px">
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
+            <input type="checkbox" name="redes" value="instagram" checked> Instagram
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
+            <input type="checkbox" name="redes" value="facebook" checked> Facebook
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
+            <input type="checkbox" name="redes" value="whatsapp" checked> WhatsApp
+          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
+            <input type="checkbox" name="redes" value="tiktok"> TikTok
+          </label>
+        </div>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem">
+          🚀 Enviar al admin para publicar
+        </button>
+      </form>
     </div>
   </div>
 

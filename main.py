@@ -102,6 +102,42 @@ def list_fichas(corredor_email: str = None) -> list:
     return fichas
 
 
+def _publicar_en_portal(db, listing_id: str, corredor_id):
+    """Crea o actualiza PropiedadPublica cuando un post es aprobado y publicado."""
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return
+    existing = db.query(PropiedadPublica).filter(PropiedadPublica.listing_id == listing_id).first()
+    if existing:
+        existing.publicado = True
+        db.commit()
+        return
+    corredor_obj = db.query(CorredorModel).filter(CorredorModel.id == corredor_id).first() if corredor_id else None
+    db.add(PropiedadPublica(
+        listing_id=listing_id,
+        titulo=f"{listing.tipo} en {listing.operacion} — {listing.ciudad}",
+        tipo=listing.tipo,
+        operacion=listing.operacion,
+        precio=listing.precio,
+        moneda=getattr(listing, "moneda", "PEN"),
+        ciudad=listing.ciudad,
+        estado=listing.estado,
+        direccion=listing.direccion,
+        descripcion=listing.descripcion_generada or getattr(listing, "descripcion_agente", ""),
+        habitaciones=listing.recamaras,
+        banos=listing.banos,
+        m2_construidos=listing.m2_construidos,
+        m2_terreno=listing.m2_terreno,
+        estacionamientos=listing.estacionamientos,
+        foto_portada=listing.foto_portada,
+        fotos_extras=json.dumps(listing.fotos_extras or []),
+        tour_360_url=getattr(listing, "tour_360_url", ""),
+        corredor_id=corredor_obj.id if corredor_obj else None,
+    ))
+    db.commit()
+
+
 def fichas_stats(fichas: list) -> dict:
     now = datetime.now()
     fichas_mes = sum(
@@ -468,19 +504,53 @@ async def dashboard_empresa(request: Request):
     finally:
         db.close()
 
+    db2 = SessionLocal()
+    try:
+        from models.db_models import SolicitudCorredor
+        posts_pendientes = db2.query(PostRRSS).filter(
+            PostRRSS.estado == "Pendiente",
+            PostRRSS.listing_id != None,
+        ).order_by(PostRRSS.created_at.asc()).all()
+        solicitudes = db2.query(SolicitudCorredor).order_by(
+            SolicitudCorredor.created_at.desc()
+        ).limit(50).all()
+        actividad_corredores = []
+        for c in corredores:
+            fichas_c = list_fichas(c.email)
+            posts_c = db2.query(PostRRSS).filter(
+                PostRRSS.corredor_id == c.id,
+                PostRRSS.listing_id != None,
+            ).all()
+            actividad_corredores.append({
+                "corredor": c,
+                "fichas": len(fichas_c),
+                "posts_pendientes": sum(1 for p in posts_c if p.estado == "Pendiente"),
+                "posts_publicados": sum(1 for p in posts_c if p.estado == "Publicado"),
+            })
+    finally:
+        db2.close()
+
     fichas = list_fichas()
     s = fichas_stats(fichas)
+    ok_msg = request.query_params.get("ok", "")
+    error_msg = request.query_params.get("error", "")
     return templates.TemplateResponse(request, "dashboard_empresa.html", {
         "empresa_user": empresa["sub"],
         "corredor": corredor_obj,
         "fichas": fichas,
         "corredores": corredores,
         "corredor_error": corredor_error,
+        "ok_msg": ok_msg,
+        "error_msg": error_msg,
+        "posts_pendientes": posts_pendientes,
+        "solicitudes": solicitudes,
+        "actividad_corredores": actividad_corredores,
         "stats": {
             "total_fichas": s["total"],
             "fichas_mes": s["fichas_mes"],
             "corredores_activos": corredores_activos,
             "pdfs_generados": s["pdfs"],
+            "posts_pendientes": len(posts_pendientes),
         },
     })
 
@@ -577,6 +647,10 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
                        .order_by(DocumentoCorredor.created_at.desc()).all()
         posts = db.query(PostRRSS).filter(PostRRSS.corredor_id == corredor.id)\
                   .order_by(PostRRSS.fecha_publicacion.desc()).all()
+        posts_rrss = db.query(PostRRSS).filter(
+            PostRRSS.corredor_id == corredor.id,
+            PostRRSS.listing_id != None,
+        ).order_by(PostRRSS.created_at.desc()).limit(50).all()
         contactos_map = {c.id: c for c in contactos}
     finally:
         db.close()
@@ -608,7 +682,10 @@ async def dashboard_corredor(request: Request, seccion: str = "resumen"):
         "documentos": documentos,
         "docs_empresa": docs_empresa,
         "posts": posts,
+        "posts_rrss": posts_rrss,
         "contactos_map": contactos_map,
+        "ok_msg": request.query_params.get("ok", ""),
+        "error_msg": request.query_params.get("error", ""),
     })
 
 
@@ -1132,3 +1209,283 @@ async def generar_video(listing_id: str):
 @app.get("/video/status/{listing_id}")
 async def video_status(listing_id: str):
     return JSONResponse(content={"status": get_status(listing_id)})
+
+
+# ── Registro corredor (auto-registro público) ──────────────────────────────────
+@app.get("/corredor/registro", response_class=HTMLResponse)
+async def registro_corredor_page(request: Request):
+    if get_corredor_session(request):
+        return RedirectResponse("/corredor/dashboard", status_code=302)
+    return templates.TemplateResponse(request, "registro_corredor.html",
+                                      {"error": "", "success": False})
+
+
+@app.post("/corredor/registro")
+async def registro_corredor_submit(
+    request: Request,
+    nombre: str = Form(...),
+    email: str = Form(...),
+    telefono: str = Form(default=""),
+    mensaje: str = Form(default=""),
+):
+    from models.db_models import SolicitudCorredor
+    db = SessionLocal()
+    try:
+        existe_sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.email == email).first()
+        existe_corredor = db.query(CorredorModel).filter(CorredorModel.email == email).first()
+        if existe_sol or existe_corredor:
+            return templates.TemplateResponse(
+                request, "registro_corredor.html",
+                {"error": "Ya existe una solicitud o cuenta con ese email.", "success": False}
+            )
+        db.add(SolicitudCorredor(nombre=nombre, email=email, telefono=telefono, mensaje=mensaje))
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        return templates.TemplateResponse(
+            request, "registro_corredor.html",
+            {"error": f"Error al enviar solicitud: {e}", "success": False}
+        )
+    finally:
+        db.close()
+    return templates.TemplateResponse(request, "registro_corredor.html",
+                                      {"error": "", "success": True})
+
+
+# ── Admin: aprobar / rechazar solicitud de corredor ───────────────────────────
+@app.post("/admin/solicitud/{solicitud_id}/aprobar")
+async def aprobar_solicitud_corredor(
+    request: Request,
+    solicitud_id: int,
+    username: str = Form(...),
+    password: str = Form(...),
+):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    from models.db_models import SolicitudCorredor
+    db = SessionLocal()
+    try:
+        sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
+        if not sol:
+            return RedirectResponse("/dashboard?error=Solicitud+no+encontrada", status_code=302)
+        existe = db.query(CorredorModel).filter(
+            (CorredorModel.email == sol.email) | (CorredorModel.username == username)
+        ).first()
+        if existe:
+            return RedirectResponse("/dashboard?error=Email+o+usuario+ya+existe", status_code=302)
+        db.add(CorredorModel(
+            nombre=sol.nombre, email=sol.email, telefono=sol.telefono,
+            username=username, hashed_password=hash_password(password),
+        ))
+        sol.estado = "Aprobado"
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard?ok=Corredor+creado+exitosamente", status_code=302)
+
+
+@app.post("/admin/solicitud/{solicitud_id}/rechazar")
+async def rechazar_solicitud_corredor(request: Request, solicitud_id: int):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    from models.db_models import SolicitudCorredor
+    db = SessionLocal()
+    try:
+        sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
+        if sol:
+            sol.estado = "Rechazado"
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard", status_code=302)
+
+
+# ── Solicitar publicación en RRSS (corredor) ──────────────────────────────────
+@app.post("/corredor/solicitar-publicacion/{listing_id}")
+async def solicitar_publicacion(
+    request: Request,
+    listing_id: str,
+    redes: List[str] = Form(default=["instagram", "facebook", "whatsapp", "tiktok"]),
+):
+    corredor_session = get_corredor_session(request)
+    empresa_session = get_empresa_session(request)
+    if not corredor_session and not empresa_session:
+        return RedirectResponse("/login", status_code=302)
+
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return RedirectResponse("/corredor/dashboard?error=Ficha+no+encontrada", status_code=302)
+
+    img_path = GENERATED / "images" / f"{listing_id}_vertical.jpg"
+    if not img_path.exists():
+        img_path.parent.mkdir(parents=True, exist_ok=True)
+        portada_path = (UPLOADS / listing.foto_portada) if listing.foto_portada else None
+        from services.image_service import generar_imagen_vertical
+        generar_imagen_vertical(
+            listing,
+            str(portada_path) if portada_path and portada_path.exists() else None,
+            str(img_path),
+        )
+
+    moneda = getattr(listing, "moneda", "PEN")
+    sym = "S/." if moneda == "PEN" else "USD"
+    caption = (
+        f"{listing.tipo} en {listing.operacion} | {sym} {listing.precio:,}\n"
+        f"📍 {listing.ciudad}, {listing.estado}\n\n"
+        f"{listing.copy_instagram or listing.descripcion_generada or ''}\n\n"
+        f"#InmersivaInmobiliaria #BienesRaices #Inmuebles"
+    )
+
+    db = SessionLocal()
+    try:
+        corredor_obj = None
+        if corredor_session:
+            corredor_obj = db.query(CorredorModel).filter(
+                CorredorModel.username == corredor_session["sub"]
+            ).first()
+        existing = db.query(PostRRSS).filter(
+            PostRRSS.listing_id == listing_id,
+            PostRRSS.estado.in_(["Pendiente", "Aprobado", "Publicado"]),
+        ).first()
+        if existing:
+            return RedirectResponse(
+                "/corredor/dashboard?error=Ya+existe+solicitud+para+esta+ficha",
+                status_code=302,
+            )
+        post = PostRRSS(
+            corredor_id=corredor_obj.id if corredor_obj else 1,
+            red=",".join(redes),
+            contenido=caption,
+            listing_id=listing_id,
+            titulo=f"{listing.tipo} en {listing.operacion} — {listing.ciudad}",
+            imagen_url=str(img_path),
+            estado="Pendiente",
+            redes=",".join(redes),
+            caption=caption,
+        )
+        db.add(post)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=publicaciones&ok=Solicitud+enviada+al+admin", status_code=302)
+
+
+# ── Admin: aprobar / rechazar / reintentar post RRSS ──────────────────────────
+@app.post("/admin/post/{post_id}/aprobar")
+async def aprobar_post(
+    request: Request,
+    post_id: int,
+    comentario: str = Form(default=""),
+):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        post = db.query(PostRRSS).filter(PostRRSS.id == post_id).first()
+        if not post:
+            return RedirectResponse("/dashboard?error=Post+no+encontrado", status_code=302)
+        post.estado = "Aprobado"
+        post.comentario_admin = comentario
+        db.commit()
+
+        from services.uploadpost_service import publicar_en_redes, UploadPostError
+        redes = post.redes_list if post.redes_list else ["instagram"]
+        try:
+            resultado = publicar_en_redes(post.caption or post.contenido or "", post.imagen_url or "", redes)
+            post.upload_post_id = resultado.get("post_id", "")
+            post.estado = "Publicado"
+            post.publicado_at = datetime.utcnow()
+            db.commit()
+            if post.listing_id:
+                _publicar_en_portal(db, post.listing_id, post.corredor_id)
+        except Exception as e:
+            print(f"[UploadPost ERROR] post_id={post_id}: {e}")
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard?seccion=aprobacion&ok=Post+aprobado", status_code=302)
+
+
+@app.post("/admin/post/{post_id}/rechazar")
+async def rechazar_post(
+    request: Request,
+    post_id: int,
+    comentario: str = Form(...),
+):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        post = db.query(PostRRSS).filter(PostRRSS.id == post_id).first()
+        if post:
+            post.estado = "Rechazado"
+            post.comentario_admin = comentario
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard?seccion=aprobacion", status_code=302)
+
+
+@app.post("/admin/post/{post_id}/reintentar")
+async def reintentar_post(request: Request, post_id: int):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        post = db.query(PostRRSS).filter(PostRRSS.id == post_id).first()
+        if not post or post.estado != "Aprobado":
+            return RedirectResponse("/dashboard?error=Post+no+válido+para+reintento", status_code=302)
+        from services.uploadpost_service import publicar_en_redes, UploadPostError
+        redes = post.redes_list if post.redes_list else ["instagram"]
+        try:
+            resultado = publicar_en_redes(post.caption or post.contenido or "", post.imagen_url or "", redes)
+            post.upload_post_id = resultado.get("post_id", "")
+            post.estado = "Publicado"
+            post.publicado_at = datetime.utcnow()
+            db.commit()
+            if post.listing_id:
+                _publicar_en_portal(db, post.listing_id, post.corredor_id)
+        except Exception as e:
+            return RedirectResponse(f"/dashboard?error=UploadPost+error", status_code=302)
+    finally:
+        db.close()
+    return RedirectResponse("/dashboard?ok=Post+publicado+exitosamente", status_code=302)
+
+
+# ── Perfil corredor ────────────────────────────────────────────────────────────
+@app.get("/corredor/perfil", response_class=HTMLResponse)
+async def perfil_corredor_page(request: Request):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    return RedirectResponse("/corredor/dashboard?seccion=perfil", status_code=302)
+
+
+@app.post("/corredor/perfil")
+async def actualizar_perfil(
+    request: Request,
+    bio: str = Form(default=""),
+    instagram: str = Form(default=""),
+    whatsapp: str = Form(default=""),
+    foto_perfil: UploadFile = File(default=None),
+):
+    corredor, redir = _corredor_or_redirect(request)
+    if redir:
+        return redir
+    db = SessionLocal()
+    try:
+        corredor_obj = db.query(CorredorModel).filter(CorredorModel.id == corredor.id).first()
+        if corredor_obj:
+            corredor_obj.bio = bio
+            corredor_obj.instagram = instagram
+            corredor_obj.whatsapp = whatsapp
+            if foto_perfil and foto_perfil.filename:
+                ext = Path(foto_perfil.filename).suffix
+                fname = f"perfil_{corredor_obj.id}{ext}"
+                dest = UPLOADS / fname
+                save_upload(foto_perfil, dest)
+                corredor_obj.foto_perfil = fname
+            db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=perfil&ok=Perfil+actualizado", status_code=302)

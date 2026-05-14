@@ -653,6 +653,174 @@
     </div>
   </div>
 
+  <!-- Mensajes de estado -->
+  {% if ok_msg %}<div style="background:#d4edda;border:1.5px solid #28a745;border-radius:10px;padding:14px 20px;color:#155724;margin-bottom:16px;font-size:.9rem">✅ {{ ok_msg }}</div>{% endif %}
+  {% if error_msg %}<div style="background:#f8d7da;border:1.5px solid #dc3545;border-radius:10px;padding:14px 20px;color:#721c24;margin-bottom:16px;font-size:.9rem">⚠️ {{ error_msg }}</div>{% endif %}
+
+  <!-- Cola de aprobación: alerta -->
+  {% if posts_pendientes %}
+  <div style="background:#fff3cd;border:1.5px solid #ffc107;border-radius:10px;padding:14px 20px;margin-bottom:16px;display:flex;align-items:center;gap:12px;flex-wrap:wrap">
+    <span style="font-size:1.4rem">⏳</span>
+    <span style="font-weight:600;color:#856404;flex:1">
+      <strong>{{ posts_pendientes|length }}</strong> publicación(es) esperando tu aprobación
+    </span>
+    <button onclick="toggleSection('cola-aprobacion')"
+            style="padding:8px 16px;background:#1B2A4A;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:600">
+      Ver cola →
+    </button>
+  </div>
+  {% endif %}
+
+  <!-- ── Cola de Aprobación ─────────────────────────────────────────────────── -->
+  <div class="section" id="cola-aprobacion" style="{% if not posts_pendientes %}display:none{% endif %}">
+    <div class="section-header" style="cursor:pointer" onclick="toggleSection('cola-aprobacion')">
+      <span class="section-title">📋 Cola de Aprobación
+        {% if posts_pendientes %}<span style="background:#dc3545;color:white;border-radius:20px;padding:2px 10px;font-size:.75rem;margin-left:8px">{{ posts_pendientes|length }}</span>{% endif %}
+      </span>
+    </div>
+    {% if not posts_pendientes %}
+    <p style="color:#888;text-align:center;padding:24px 0">No hay publicaciones pendientes. ✅</p>
+    {% else %}
+    {% for post in posts_pendientes %}
+    <div style="display:flex;gap:14px;padding:16px;border:1.5px solid #e0e0e0;border-radius:10px;margin-bottom:12px;align-items:flex-start;flex-wrap:wrap">
+      <img src="/generated/images/{{ post.listing_id }}_vertical.jpg"
+           onerror="this.src='/static/img/logo.jpeg'"
+           style="width:70px;height:124px;object-fit:cover;border-radius:7px;flex-shrink:0">
+      <div style="flex:1;min-width:200px">
+        <div style="font-weight:700;font-size:.95rem;margin-bottom:3px">{{ post.titulo or 'Propiedad' }}</div>
+        <div style="font-size:.82rem;color:#666;margin-bottom:6px">
+          Redes: <strong>{{ post.redes or post.red }}</strong> &nbsp;·&nbsp;
+          {{ post.created_at.strftime('%d/%m/%Y %H:%M') }}
+        </div>
+        <div style="font-size:.8rem;color:#555;background:#f8f9fa;padding:8px 10px;border-radius:6px;max-height:56px;overflow:hidden">
+          {{ (post.caption or post.contenido or '')[:200] }}
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:7px;flex-shrink:0;min-width:150px">
+        <a href="/imagen-vertical/{{ post.listing_id }}" target="_blank"
+           style="padding:7px 12px;background:#f5f5f5;border:1px solid #ddd;border-radius:6px;text-align:center;font-size:.82rem;text-decoration:none;color:#333">
+          👁 Ver imagen
+        </a>
+        <form method="post" action="/admin/post/{{ post.id }}/aprobar" style="margin:0">
+          <input type="hidden" name="comentario" value="">
+          <button type="submit"
+                  style="width:100%;padding:8px;background:#28a745;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:700">
+            ✅ Aprobar y publicar
+          </button>
+        </form>
+        <button onclick="toggleEl('rechazar-{{ post.id }}')"
+                style="padding:8px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.85rem;font-weight:700">
+          ❌ Rechazar
+        </button>
+        <div id="rechazar-{{ post.id }}" style="display:none">
+          <form method="post" action="/admin/post/{{ post.id }}/rechazar">
+            <textarea name="comentario" required placeholder="Motivo del rechazo..."
+                      style="width:100%;padding:8px;border:1.5px solid #ddd;border-radius:6px;font-size:.8rem;box-sizing:border-box;height:65px;resize:none"></textarea>
+            <button type="submit"
+                    style="width:100%;padding:6px;background:#dc3545;color:white;border:none;border-radius:5px;cursor:pointer;font-size:.8rem;margin-top:4px">
+              Confirmar rechazo
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- ── Actividad de Corredores ───────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header" style="cursor:pointer" onclick="toggleSection('sec-actividad')">
+      <span class="section-title">📊 Actividad de Corredores</span>
+    </div>
+    <div id="sec-actividad">
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th>Corredor</th>
+            <th style="text-align:center">Fichas</th>
+            <th style="text-align:center">Posts pendientes</th>
+            <th style="text-align:center">Posts publicados</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for a in actividad_corredores %}
+          <tr>
+            <td>
+              <div style="font-weight:600">{{ a.corredor.nombre }}</div>
+              <div style="font-size:.8rem;color:#888">{{ a.corredor.email }}</div>
+            </td>
+            <td style="text-align:center;font-weight:700">{{ a.fichas }}</td>
+            <td style="text-align:center">
+              {% if a.posts_pendientes > 0 %}
+              <span style="background:#fff3cd;color:#856404;padding:3px 10px;border-radius:20px;font-size:.82rem;font-weight:600">{{ a.posts_pendientes }}</span>
+              {% else %}0{% endif %}
+            </td>
+            <td style="text-align:center">
+              <span style="background:#d4edda;color:#155724;padding:3px 10px;border-radius:20px;font-size:.82rem;font-weight:600">{{ a.posts_publicados }}</span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    </div>
+  </div>
+
+  <!-- ── Solicitudes de Registro ──────────────────────────────────────────── -->
+  <div class="section">
+    <div class="section-header" style="cursor:pointer" onclick="toggleSection('sec-solicitudes')">
+      <span class="section-title">🙋 Solicitudes de Registro
+        {% set pend_count = solicitudes | selectattr('estado','eq','Pendiente') | list | length %}
+        {% if pend_count > 0 %}<span style="background:#dc3545;color:white;border-radius:20px;padding:2px 10px;font-size:.75rem;margin-left:8px">{{ pend_count }}</span>{% endif %}
+      </span>
+    </div>
+    <div id="sec-solicitudes">
+    {% if not solicitudes %}
+    <p style="color:#888;text-align:center;padding:20px 0">No hay solicitudes.</p>
+    {% else %}
+    {% for sol in solicitudes %}
+    <div style="padding:14px 16px;border:1.5px solid #e0e0e0;border-radius:8px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap">
+      <div style="flex:1">
+        <div style="font-weight:700">{{ sol.nombre }}</div>
+        <div style="font-size:.82rem;color:#666">{{ sol.email }} &nbsp;·&nbsp; {{ sol.telefono or '—' }}</div>
+        {% if sol.mensaje %}<div style="font-size:.8rem;color:#555;margin-top:4px;font-style:italic">"{{ sol.mensaje }}"</div>{% endif %}
+        <div style="font-size:.76rem;color:#aaa;margin-top:3px">{{ sol.created_at.strftime('%d/%m/%Y %H:%M') }}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0">
+        {% if sol.estado == 'Pendiente' %}
+        <button onclick="toggleEl('aprobar-sol-{{ sol.id }}')"
+                style="padding:6px 12px;background:#28a745;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.82rem">✅ Aprobar</button>
+        <div id="aprobar-sol-{{ sol.id }}" style="display:none">
+          <form method="post" action="/admin/solicitud/{{ sol.id }}/aprobar">
+            <input type="text" name="username" required placeholder="Username"
+                   style="padding:6px 10px;border:1.5px solid #ddd;border-radius:4px;width:140px;font-size:.82rem;margin-bottom:4px;display:block">
+            <input type="password" name="password" required placeholder="Contraseña temporal"
+                   style="padding:6px 10px;border:1.5px solid #ddd;border-radius:4px;width:140px;font-size:.82rem;margin-bottom:4px;display:block">
+            <button type="submit"
+                    style="width:100%;padding:6px;background:#1B2A4A;color:white;border:none;border-radius:4px;cursor:pointer;font-size:.82rem">
+              Crear cuenta
+            </button>
+          </form>
+        </div>
+        <form method="post" action="/admin/solicitud/{{ sol.id }}/rechazar" style="margin:0">
+          <button type="submit"
+                  style="padding:6px 12px;background:#dc3545;color:white;border:none;border-radius:6px;cursor:pointer;font-size:.82rem">❌ Rechazar</button>
+        </form>
+        {% else %}
+        <span style="padding:4px 12px;border-radius:20px;font-size:.8rem;font-weight:600;
+              {% if sol.estado == 'Aprobado' %}background:#d4edda;color:#155724{% else %}background:#f8d7da;color:#721c24{% endif %}">
+          {{ sol.estado }}
+        </span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+    {% endif %}
+    </div>
+  </div>
+
   <!-- Fichas Recientes -->
   <div class="section">
     <div class="section-header">
@@ -810,6 +978,26 @@
   {% if corredor_error %}
   document.addEventListener('DOMContentLoaded', openModal);
   {% endif %}
+
+  function toggleSection(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  function toggleEl(id) {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.style.display = el.style.display === 'none' ? 'block' : 'none';
+  }
+
+  // Auto-mostrar sección si viene en query param
+  const urlParams = new URLSearchParams(window.location.search);
+  const seccion = urlParams.get('seccion');
+  if (seccion === 'aprobacion') {
+    const el = document.getElementById('cola-aprobacion');
+    if (el) el.style.display = 'block';
+  }
 </script>
 </body>
 </html>

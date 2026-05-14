@@ -103,6 +103,12 @@
     <a class="sidebar-link" onclick="nav('rrss')" id="nav-rrss">
       <span class="icon">📱</span> Redes Sociales
     </a>
+    <a class="sidebar-link" onclick="nav('publicaciones')" id="nav-publicaciones">
+      <span class="icon">📢</span> Mis Publicaciones
+    </a>
+    <a class="sidebar-link" onclick="nav('perfil')" id="nav-perfil">
+      <span class="icon">👤</span> Mi Perfil
+    </a>
 
     <div class="mt-auto pt-4 border-t border-gray-800">
       <a href="/nueva-ficha" class="sidebar-link" style="color:#C9A84C; font-weight:700;">
@@ -698,18 +704,127 @@
   </div>
 </div>
 
+<!-- ══════ SECCIÓN: Mis Publicaciones RRSS ══════ -->
+<div class="section" id="sec-publicaciones">
+  <h2 class="text-xl font-black text-gray-900 mb-4">📢 Mis Publicaciones en Redes Sociales</h2>
+
+  {% if ok_msg %}<div style="background:#d4edda;border:1.5px solid #28a745;border-radius:8px;padding:12px 16px;color:#155724;margin-bottom:16px;font-size:.9rem">✅ {{ ok_msg }}</div>{% endif %}
+  {% if error_msg %}<div style="background:#f8d7da;border:1.5px solid #dc3545;border-radius:8px;padding:12px 16px;color:#721c24;margin-bottom:16px;font-size:.9rem">⚠️ {{ error_msg }}</div>{% endif %}
+
+  {% if not posts_rrss %}
+  <div class="card-section p-8 text-center text-gray-400">
+    <p class="text-4xl mb-3">📭</p>
+    <p class="font-semibold">Aún no tienes publicaciones solicitadas.</p>
+    <p class="text-sm mt-1">Llena una ficha y usa el botón "Enviar al admin para publicar".</p>
+  </div>
+  {% else %}
+  <div class="overflow-x-auto rounded-xl border border-gray-200">
+    <table style="width:100%;border-collapse:collapse;background:white">
+      <thead>
+        <tr style="background:#f5f7fa;font-size:.78rem;color:#666;text-transform:uppercase;letter-spacing:1px">
+          <th style="padding:12px 16px;text-align:left">Propiedad</th>
+          <th style="padding:12px 16px;text-align:left">Redes</th>
+          <th style="padding:12px 16px;text-align:center">Estado</th>
+          <th style="padding:12px 16px;text-align:left">Fecha</th>
+          <th style="padding:12px 16px;text-align:left">Comentario Admin</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for post in posts_rrss %}
+        <tr style="border-bottom:1px solid #eee">
+          <td style="padding:14px 16px">
+            <div style="font-weight:600;font-size:.88rem">{{ post.titulo or '—' }}</div>
+            {% if post.listing_id %}
+            <img src="/generated/images/{{ post.listing_id }}_vertical.jpg"
+                 onerror="this.style.display='none'"
+                 style="height:55px;border-radius:4px;margin-top:6px;object-fit:cover">
+            {% endif %}
+          </td>
+          <td style="padding:14px 16px;font-size:.82rem;color:#555">{{ post.redes or post.red }}</td>
+          <td style="padding:14px 16px;text-align:center">
+            {% if post.estado == 'Publicado' %}
+              <span style="background:#d4edda;color:#155724;padding:4px 10px;border-radius:20px;font-size:.78rem;font-weight:700">✅ Publicado</span>
+            {% elif post.estado == 'Aprobado' %}
+              <span style="background:#cce5ff;color:#004085;padding:4px 10px;border-radius:20px;font-size:.78rem;font-weight:700">🔄 Aprobado</span>
+            {% elif post.estado == 'Rechazado' %}
+              <span style="background:#f8d7da;color:#721c24;padding:4px 10px;border-radius:20px;font-size:.78rem;font-weight:700">❌ Rechazado</span>
+            {% else %}
+              <span style="background:#fff3cd;color:#856404;padding:4px 10px;border-radius:20px;font-size:.78rem;font-weight:700">⏳ Pendiente</span>
+            {% endif %}
+          </td>
+          <td style="padding:14px 16px;font-size:.82rem;color:#666">
+            {{ post.publicado_at.strftime('%d/%m/%Y') if post.publicado_at else post.created_at.strftime('%d/%m/%Y') }}
+          </td>
+          <td style="padding:14px 16px;font-size:.82rem;color:{% if post.estado == 'Rechazado' %}#721c24{% else %}#555{% endif %}">
+            {{ post.comentario_admin or '—' }}
+            {% if post.estado == 'Rechazado' and post.listing_id %}
+            <br><a href="/nueva-ficha" style="color:#C9A84C;font-size:.8rem;font-weight:600">Crear nueva ficha →</a>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</div>
+
+<!-- ══════ SECCIÓN: Mi Perfil ══════ -->
+<div class="section" id="sec-perfil">
+  <h2 class="text-xl font-black text-gray-900 mb-4">👤 Mi Perfil Profesional</h2>
+  {% if ok_msg and seccion == 'perfil' %}<div style="background:#d4edda;border:1.5px solid #28a745;border-radius:8px;padding:12px 16px;color:#155724;margin-bottom:16px;font-size:.9rem">✅ {{ ok_msg }}</div>{% endif %}
+
+  <div class="card-section p-6">
+    <form method="post" action="/corredor/perfil" enctype="multipart/form-data">
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:20px" class="sm:grid-cols-1">
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-2">Foto de perfil</label>
+          {% if corredor.foto_perfil %}
+          <img src="/uploads/{{ corredor.foto_perfil }}"
+               style="height:80px;width:80px;border-radius:50%;object-fit:cover;margin-bottom:10px;border:3px solid #C9A84C;display:block">
+          {% endif %}
+          <input type="file" name="foto_perfil" accept="image/*" class="text-sm text-gray-600">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-gray-700 mb-1">Instagram (@usuario)</label>
+          <input type="text" name="instagram" value="{{ corredor.instagram or '' }}"
+                 placeholder="@tu_usuario"
+                 style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;box-sizing:border-box;margin-bottom:14px">
+
+          <label class="block text-sm font-semibold text-gray-700 mb-1">WhatsApp</label>
+          <input type="tel" name="whatsapp" value="{{ corredor.whatsapp or '' }}"
+                 placeholder="+51 999 999 999"
+                 style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;box-sizing:border-box">
+        </div>
+      </div>
+
+      <label class="block text-sm font-semibold text-gray-700 mb-1">Bio profesional</label>
+      <textarea name="bio" rows="4"
+                style="width:100%;padding:10px 12px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;box-sizing:border-box;resize:vertical"
+                placeholder="Cuéntanos sobre tu experiencia y especialidad en bienes raíces...">{{ corredor.bio or '' }}</textarea>
+
+      <div class="mt-4 pt-4 border-t border-gray-100">
+        <p class="text-xs text-gray-400 mb-3">
+          📧 {{ corredor.email }} &nbsp;·&nbsp; 📞 {{ corredor.telefono or '—' }}
+        </p>
+        <button type="submit" class="btn-gold w-full">Guardar perfil</button>
+      </div>
+    </form>
+  </div>
+</div>
+
 <!-- Mobile bottom nav -->
 <nav class="md:hidden fixed bottom-0 left-0 right-0 z-40 flex border-t border-gray-200 bg-white text-xs">
-  <button onclick="nav('resumen')"    class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-resumen">📊<span>Inicio</span></button>
-  <button onclick="nav('contactos')"  class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-contactos">👥<span>Leads</span></button>
-  <button onclick="nav('pipeline')"   class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-pipeline">📈<span>Pipeline</span></button>
-  <button onclick="nav('agenda')"     class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-agenda">📅<span>Agenda</span></button>
-  <button onclick="nav('rrss')"       class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-rrss">📱<span>RRSS</span></button>
+  <button onclick="nav('resumen')"         class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-resumen">📊<span>Inicio</span></button>
+  <button onclick="nav('contactos')"       class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-contactos">👥<span>Leads</span></button>
+  <button onclick="nav('pipeline')"        class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-pipeline">📈<span>Pipeline</span></button>
+  <button onclick="nav('agenda')"          class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-agenda">📅<span>Agenda</span></button>
+  <button onclick="nav('publicaciones')"   class="flex-1 py-2 flex flex-col items-center gap-0.5 text-gray-500" id="mob-publicaciones">📢<span>Posts</span></button>
 </nav>
 <div class="h-16 md:hidden"></div>
 
 <script>
-  const SECS = ['resumen','fichas','contactos','pipeline','agenda','documentos','rrss'];
+  const SECS = ['resumen','fichas','contactos','pipeline','agenda','documentos','rrss','publicaciones','perfil'];
 
   function nav(id) {
     SECS.forEach(s => {

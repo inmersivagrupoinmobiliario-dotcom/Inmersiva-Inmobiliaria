@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Únete como Corredor — Inmersiva</title>
+  <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    body { background: #0f1623; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 24px; }
+    .reg-card { background: #1B2A4A; border-radius: 16px; padding: 48px 40px; width: 100%; max-width: 520px; box-shadow: 0 8px 40px rgba(0,0,0,.5); }
+    .reg-logo { text-align: center; margin-bottom: 32px; }
+    .reg-logo img { height: 72px; }
+    h2 { color: #fff; font-size: 1.5rem; font-weight: 800; margin: 0 0 4px; }
+    .subtitle { color: #C9A84C; font-size: .8rem; letter-spacing: 3px; text-transform: uppercase; margin-bottom: 32px; display: block; }
+    label { color: #ccc; font-size: .85rem; display: block; margin-bottom: 6px; margin-top: 18px; }
+    input, textarea { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1.5px solid #2d4070; background: #111d30; color: #fff; font-size: .95rem; box-sizing: border-box; transition: border-color .2s; }
+    input:focus, textarea:focus { border-color: #C9A84C; outline: none; }
+    textarea { height: 90px; resize: vertical; }
+    .btn-submit { width: 100%; padding: 14px; background: #C9A84C; color: #1B2A4A; font-weight: 800; font-size: 1rem; border: none; border-radius: 8px; cursor: pointer; margin-top: 28px; letter-spacing: 1px; transition: background .2s; }
+    .btn-submit:hover { background: #e0c060; }
+    .success-box { background: #0d3d2a; border: 1.5px solid #2ecc71; border-radius: 10px; padding: 24px; color: #2ecc71; text-align: center; }
+    .success-box h3 { margin: 0 0 8px; font-size: 1.1rem; }
+    .success-box p { margin: 0; font-size: .9rem; color: #a8e6c8; }
+    .error-box { background: #3d0d0d; border: 1.5px solid #e74c3c; border-radius: 10px; padding: 14px 18px; color: #e74c3c; margin-bottom: 20px; font-size: .9rem; }
+    .login-link { text-align: center; margin-top: 24px; color: #888; font-size: .85rem; }
+    .login-link a { color: #C9A84C; text-decoration: none; font-weight: 600; }
+    .login-link a:hover { text-decoration: underline; }
+  </style>
+</head>
+<body>
+  <div class="reg-card">
+    <div class="reg-logo">
+      <img src="/static/img/logo.jpeg" alt="Inmersiva Grupo Inmobiliario">
+    </div>
+    <h2>Únete como Corredor</h2>
+    <span class="subtitle">Inmersiva Grupo Inmobiliario</span>
+
+    {% if success %}
+    <div class="success-box">
+      <h3>✅ Solicitud enviada</h3>
+      <p>Tu solicitud fue recibida. Te contactaremos pronto para activar tu cuenta y darte acceso al sistema.</p>
+    </div>
+    {% else %}
+      {% if error %}<div class="error-box">⚠️ {{ error }}</div>{% endif %}
+      <form method="post" action="/corredor/registro">
+        <label>Nombre completo *</label>
+        <input type="text" name="nombre" required placeholder="Juan Pérez" autocomplete="name">
+
+        <label>Email *</label>
+        <input type="email" name="email" required placeholder="juan@ejemplo.com" autocomplete="email">
+
+        <label>Teléfono</label>
+        <input type="tel" name="telefono" placeholder="+51 999 999 999" autocomplete="tel">
+
+        <label>¿Por qué quieres unirte a Inmersiva?</label>
+        <textarea name="mensaje" placeholder="Cuéntanos sobre tu experiencia en bienes raíces..."></textarea>
+
+        <button type="submit" class="btn-submit">ENVIAR SOLICITUD</button>
+      </form>
+    {% endif %}
+
+    <div class="login-link">
+      ¿Ya tienes cuenta? <a href="/login?tab=corredor">Iniciar sesión</a>
+    </div>
+  </div>
+</body>
+</html>
