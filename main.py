@@ -1484,6 +1484,8 @@ async def aprobar_solicitud_corredor(request: Request, solicitud_id: int):
         sol = db.query(SolicitudCorredor).filter(SolicitudCorredor.id == solicitud_id).first()
         if not sol:
             return RedirectResponse("/dashboard?error=Solicitud+no+encontrada", status_code=302)
+        if sol.estado == "Aprobado":
+            return RedirectResponse("/dashboard?error=Esta+solicitud+ya+fue+aprobada", status_code=302)
 
         # Generar email corporativo: primer_nombre.apellido@inmersiva.com
         partes = sol.nombre.strip().split()
@@ -1560,6 +1562,57 @@ async def descargar_cv_solicitud(request: Request, solicitud_id: int):
         return FileResponse(sol.cv_archivo, filename=f"CV_{sol.nombre.replace(' ','_')}{Path(sol.cv_archivo).suffix}")
     finally:
         db.close()
+
+
+@app.get("/admin/corredor/{corredor_id}", response_class=HTMLResponse)
+async def admin_corredor_detalle(request: Request, corredor_id: int):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(CorredorModel.id == corredor_id).first()
+        if not corredor:
+            return RedirectResponse("/dashboard?error=Corredor+no+encontrado", status_code=302)
+        fichas = list_fichas(corredor.email)
+        contactos = db.query(Contacto).filter(Contacto.corredor_id == corredor_id)\
+                      .order_by(Contacto.updated_at.desc()).limit(20).all()
+        citas = db.query(Cita).filter(Cita.corredor_id == corredor_id)\
+                  .order_by(Cita.fecha.desc()).limit(20).all()
+        posts = db.query(PostRRSS).filter(PostRRSS.corredor_id == corredor_id)\
+                  .order_by(PostRRSS.created_at.desc()).limit(20).all()
+        return templates.TemplateResponse(request, "admin_corredor_detalle.html", {
+            "corredor": corredor,
+            "fichas": fichas,
+            "contactos": contactos,
+            "citas": citas,
+            "posts": posts,
+        })
+    finally:
+        db.close()
+
+
+@app.post("/admin/corredor/{corredor_id}/eliminar")
+async def eliminar_corredor(request: Request, corredor_id: int, admin_password: str = Form(...)):
+    if not get_empresa_session(request):
+        return RedirectResponse("/login", status_code=302)
+    if admin_password != EMPRESA_PASS:
+        return RedirectResponse("/dashboard?error=Contraseña+de+administrador+incorrecta", status_code=302)
+    db = SessionLocal()
+    try:
+        corredor = db.query(CorredorModel).filter(CorredorModel.id == corredor_id).first()
+        if not corredor:
+            return RedirectResponse("/dashboard?error=Corredor+no+encontrado", status_code=302)
+        nombre = corredor.nombre
+        db.delete(corredor)
+        db.commit()
+    except Exception as e:
+        db.rollback()
+        import urllib.parse
+        return RedirectResponse(f"/dashboard?error={urllib.parse.quote(str(e)[:150])}", status_code=302)
+    finally:
+        db.close()
+    import urllib.parse
+    return RedirectResponse(f"/dashboard?ok={urllib.parse.quote(f'Corredor {nombre} eliminado')}", status_code=302)
 
 
 # ── Solicitar publicación en RRSS (corredor) ──────────────────────────────────

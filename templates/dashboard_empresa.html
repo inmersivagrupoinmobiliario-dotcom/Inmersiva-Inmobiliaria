@@ -911,12 +911,18 @@
             <th>Teléfono</th>
             <th>Estado</th>
             <th>Registrado</th>
+            <th></th>
           </tr>
         </thead>
         <tbody>
           {% for c in corredores %}
           <tr>
-            <td style="font-weight:600;">{{ c.nombre }}</td>
+            <td style="font-weight:600;">
+              <a href="/admin/corredor/{{ c.id }}"
+                 style="color:#1B2A4A;text-decoration:none;border-bottom:1.5px solid #C9A84C;padding-bottom:1px;">
+                {{ c.nombre }}
+              </a>
+            </td>
             <td><span class="mono">{{ c.username }}</span></td>
             <td>{{ c.email }}</td>
             <td>{{ c.telefono or '—' }}</td>
@@ -925,6 +931,13 @@
               {{ 'Activo' if c.activo else 'Inactivo' }}
             </td>
             <td class="date-col">{{ c.created_at.strftime('%d/%m/%Y') if c.created_at else '—' }}</td>
+            <td>
+              <button onclick="abrirModalEliminar({{ c.id }}, '{{ c.nombre }}')"
+                      style="padding:4px 10px;background:#fff;border:1.5px solid #dc3545;color:#dc3545;
+                             border-radius:6px;cursor:pointer;font-size:.75rem;font-weight:600;">
+                Eliminar
+              </button>
+            </td>
           </tr>
           {% endfor %}
         </tbody>
@@ -937,6 +950,39 @@
     </div>
   </div>
 </main>
+
+<!-- Modal Eliminar Corredor -->
+<div class="modal-overlay" id="modalEliminar" onclick="if(event.target===this)cerrarModalEliminar()">
+  <div class="modal" id="modalEliminarBox" style="max-width:400px;">
+    <div class="modal-header" style="background:#7f1d1d;">
+      <span class="modal-title">Eliminar Corredor</span>
+      <button class="modal-close" onclick="cerrarModalEliminar()">&times;</button>
+    </div>
+    <div class="modal-body" style="padding:24px;">
+      <p style="color:#333;margin-bottom:6px;">
+        Vas a eliminar permanentemente a <strong id="del_nombre"></strong>.
+        Esta acción no se puede deshacer.
+      </p>
+      <form method="POST" id="del_form">
+        <div class="form-group full" style="margin-top:16px;">
+          <label for="del_password" style="color:#555;font-size:.8rem;font-weight:600;letter-spacing:.5px;text-transform:uppercase;">
+            Contraseña de administrador
+          </label>
+          <input type="password" id="del_password" name="admin_password" required
+                 placeholder="••••••••"
+                 style="width:100%;padding:10px 14px;border:1.5px solid #ddd;border-radius:8px;font-size:.9rem;margin-top:6px;">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button class="btn-cancel" onclick="cerrarModalEliminar()">Cancelar</button>
+      <button form="del_form" type="submit"
+              style="padding:10px 22px;background:#dc3545;color:white;border:none;border-radius:8px;cursor:pointer;font-weight:700;">
+        Eliminar definitivamente
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Modal Nuevo Corredor -->
 <div class="modal-overlay" id="modalOverlay" onclick="closeModalOutside(event)">
@@ -999,6 +1045,16 @@
   }
   function closeModalOutside(e) {
     if (e.target === document.getElementById('modalOverlay')) closeModal();
+  }
+
+  function abrirModalEliminar(id, nombre) {
+    document.getElementById('del_nombre').textContent = nombre;
+    document.getElementById('del_form').action = '/admin/corredor/' + id + '/eliminar';
+    document.getElementById('del_password').value = '';
+    document.getElementById('modalEliminar').classList.add('open');
+  }
+  function cerrarModalEliminar() {
+    document.getElementById('modalEliminar').classList.remove('open');
   }
 
   // Auto-open modal if there is a corredor_error

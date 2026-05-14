@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ corredor.nombre }} — Admin Inmersiva</title>
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: #f4f6f9; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; color: #1a1a2e; }
+
+    /* NAV */
+    nav {
+      background: #1B2A4A; padding: 0 28px; height: 58px;
+      display: flex; align-items: center; justify-content: space-between;
+      position: sticky; top: 0; z-index: 100;
+    }
+    .nav-brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+    .nav-brand img { height: 34px; }
+    .nav-brand span { color: #fff; font-weight: 800; font-size: .9rem; }
+    .nav-links { display: flex; gap: 12px; align-items: center; }
+    .nav-links a { color: #a0b4cc; text-decoration: none; font-size: .85rem; }
+    .nav-links a:hover { color: #fff; }
+    .nav-back {
+      background: rgba(255,255,255,.1); color: #fff !important;
+      padding: 6px 14px; border-radius: 6px; font-weight: 600; font-size: .82rem !important;
+    }
+
+    /* LAYOUT */
+    main { max-width: 1000px; margin: 0 auto; padding: 28px 20px 60px; }
+
+    /* HEADER CARD */
+    .corredor-header {
+      background: #fff; border-radius: 14px; padding: 28px 32px;
+      margin-bottom: 22px; display: flex; align-items: center; gap: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,.06);
+    }
+    .avatar {
+      width: 64px; height: 64px; border-radius: 50%;
+      background: linear-gradient(135deg, #1B2A4A, #2d4a7a);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem; font-weight: 800; color: #C9A84C; flex-shrink: 0;
+    }
+    .corredor-info h1 { font-size: 1.3rem; font-weight: 800; margin-bottom: 4px; }
+    .corredor-info .email { color: #C9A84C; font-size: .85rem; font-weight: 600; }
+    .corredor-meta {
+      display: flex; flex-wrap: wrap; gap: 16px; margin-top: 10px;
+    }
+    .meta-item { font-size: .8rem; color: #666; }
+    .meta-item strong { color: #333; }
+
+    /* STATS ROW */
+    .stats-row {
+      display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px;
+    }
+    .stat-card {
+      background: #fff; border-radius: 12px; padding: 18px 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05); text-align: center;
+    }
+    .stat-num { font-size: 1.8rem; font-weight: 900; color: #1B2A4A; }
+    .stat-label { font-size: .72rem; color: #999; text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    /* SECTIONS */
+    .section {
+      background: #fff; border-radius: 14px; margin-bottom: 18px;
+      box-shadow: 0 2px 8px rgba(0,0,0,.05); overflow: hidden;
+    }
+    .section-head {
+      padding: 14px 20px; border-bottom: 1px solid #f0f0f0;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .section-head h2 { font-size: .9rem; font-weight: 700; color: #1B2A4A; }
+    .count-badge {
+      background: #1B2A4A; color: #fff; border-radius: 20px;
+      padding: 2px 10px; font-size: .72rem; font-weight: 700;
+    }
+    .section-body { padding: 0; }
+
+    /* TABLE */
+    table { width: 100%; border-collapse: collapse; }
+    th { padding: 10px 16px; text-align: left; font-size: .72rem; color: #999;
+         text-transform: uppercase; letter-spacing: .8px; border-bottom: 1px solid #f0f0f0; }
+    td { padding: 11px 16px; font-size: .85rem; border-bottom: 1px solid #f8f8f8; }
+    tr:last-child td { border-bottom: none; }
+
+    /* EMPTY */
+    .empty { padding: 28px; text-align: center; color: #aaa; font-size: .85rem; }
+
+    /* BADGES */
+    .badge {
+      display: inline-block; padding: 3px 10px; border-radius: 20px;
+      font-size: .72rem; font-weight: 700;
+    }
+    .badge-green { background: #d4edda; color: #155724; }
+    .badge-yellow { background: #fff3cd; color: #856404; }
+    .badge-red { background: #f8d7da; color: #721c24; }
+    .badge-blue { background: #d1ecf1; color: #0c5460; }
+    .badge-gray { background: #e9ecef; color: #495057; }
+
+    @media (max-width: 640px) {
+      .stats-row { grid-template-columns: repeat(2, 1fr); }
+      .corredor-header { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/dashboard" class="nav-brand">
+    <img src="/static/img/logo_nuevo.png" alt="Inmersiva" onerror="this.src='/static/img/logo.jpeg'">
+    <span>INMERSIVA · Admin</span>
+  </a>
+  <div class="nav-links">
+    <a href="/dashboard" class="nav-back">← Panel de control</a>
+  </div>
+</nav>
+
+<main>
+
+  <!-- HEADER -->
+  <div class="corredor-header">
+    <div class="avatar">{{ corredor.nombre[0] | upper }}</div>
+    <div class="corredor-info" style="flex:1;">
+      <h1>{{ corredor.nombre }}</h1>
+      <div class="email">{{ corredor.email }}</div>
+      <div class="corredor-meta">
+        {% if corredor.dni %}
+        <div class="meta-item">🪪 <strong>DNI:</strong> {{ corredor.dni }}</div>
+        {% endif %}
+        {% if corredor.telefono %}
+        <div class="meta-item">📞 <strong>Tel:</strong> {{ corredor.telefono }}</div>
+        {% endif %}
+        {% if corredor.direccion %}
+        <div class="meta-item">📍 <strong>Dir:</strong> {{ corredor.direccion }}</div>
+        {% endif %}
+        {% if corredor.email_personal %}
+        <div class="meta-item">📧 <strong>Gmail:</strong> {{ corredor.email_personal }}</div>
+        {% endif %}
+        <div class="meta-item">📅 <strong>Registrado:</strong> {{ corredor.created_at.strftime('%d/%m/%Y') if corredor.created_at else '—' }}</div>
+        <div class="meta-item">
+          {% if corredor.activo %}
+          <span class="badge badge-green">● Activo</span>
+          {% else %}
+          <span class="badge badge-red">● Inactivo</span>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- STATS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-num">{{ fichas | length }}</div>
+      <div class="stat-label">Fichas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ contactos | length }}</div>
+      <div class="stat-label">Contactos</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ citas | length }}</div>
+      <div class="stat-label">Citas</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-num">{{ posts | length }}</div>
+      <div class="stat-label">Posts RRSS</div>
+    </div>
+  </div>
+
+  <!-- FICHAS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Fichas de propiedades</h2>
+      <span class="count-badge">{{ fichas | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if fichas %}
+      <table>
+        <thead>
+          <tr>
+            <th>Propiedad</th>
+            <th>Tipo / Op.</th>
+            <th>Precio</th>
+            <th>Estado</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for f in fichas %}
+          <tr>
+            <td style="font-weight:600;">{{ f.direccion }}, {{ f.ciudad }}</td>
+            <td>{{ f.tipo }} · {{ f.operacion }}</td>
+            <td>S/ {{ f.precio }}</td>
+            <td>
+              <span class="badge badge-{{ 'green' if f.estado == 'Disponible' else 'gray' }}">
+                {{ f.estado }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Sin fichas registradas.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- CONTACTOS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Contactos (CRM)</h2>
+      <span class="count-badge">{{ contactos | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if contactos %}
+      <table>
+        <thead>
+          <tr><th>Nombre</th><th>Email</th><th>Teléfono</th><th>Estado</th><th>Interés</th></tr>
+        </thead>
+        <tbody>
+          {% for c in contactos %}
+          <tr>
+            <td style="font-weight:600;">{{ c.nombre }}</td>
+            <td>{{ c.email or '—' }}</td>
+            <td>{{ c.telefono or '—' }}</td>
+            <td>
+              <span class="badge badge-{{ 'green' if c.estado == 'Cerrado' else ('blue' if c.estado == 'En proceso' else 'yellow') }}">
+                {{ c.estado }}
+              </span>
+            </td>
+            <td style="color:#666;font-size:.8rem;">{{ c.interes[:50] if c.interes else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Sin contactos registrados.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- CITAS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Citas agendadas</h2>
+      <span class="count-badge">{{ citas | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if citas %}
+      <table>
+        <thead>
+          <tr><th>Título</th><th>Fecha</th><th>Lugar</th><th>Estado</th></tr>
+        </thead>
+        <tbody>
+          {% for c in citas %}
+          <tr>
+            <td style="font-weight:600;">{{ c.titulo }}</td>
+            <td>{{ c.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
+            <td>{{ c.lugar or '—' }}</td>
+            <td>
+              <span class="badge badge-{{ 'green' if c.estado == 'Completada' else ('red' if c.estado == 'Cancelada' else 'yellow') }}">
+                {{ c.estado }}
+              </span>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Sin citas registradas.</div>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- POSTS RRSS -->
+  <div class="section">
+    <div class="section-head">
+      <h2>Posts en redes sociales</h2>
+      <span class="count-badge">{{ posts | length }}</span>
+    </div>
+    <div class="section-body">
+      {% if posts %}
+      <table>
+        <thead>
+          <tr><th>Título</th><th>Redes</th><th>Estado</th><th>Fecha</th></tr>
+        </thead>
+        <tbody>
+          {% for p in posts %}
+          <tr>
+            <td style="font-weight:600;">{{ p.titulo or p.contenido[:50] if p.contenido else '—' }}</td>
+            <td style="font-size:.78rem;color:#666;">{{ p.redes or p.red or '—' }}</td>
+            <td>
+              <span class="badge badge-{{ 'green' if p.estado == 'Publicado' else ('yellow' if p.estado == 'Pendiente' else 'red') }}">
+                {{ p.estado }}
+              </span>
+            </td>
+            <td style="color:#999;font-size:.8rem;">{{ p.created_at.strftime('%d/%m/%Y') if p.created_at else '—' }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty">Sin posts registrados.</div>
+      {% endif %}
+    </div>
+  </div>
+
+</main>
+</body>
+</html>
