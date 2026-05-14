@@ -3,227 +3,736 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Inmersiva — Encuentra tu próximo hogar en Perú</title>
+  <title>Inmersiva — Recorre hoy, vive mañana</title>
+  <link rel="icon" href="/static/img/favicon.png" type="image/png">
+  <meta name="description" content="Encuentra las mejores propiedades en venta y alquiler en Perú. Inmersiva Grupo Inmobiliario.">
+
+  <!-- Sora (display) + Barlow (body) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
       theme: {
         extend: {
           colors: {
-            navy: { DEFAULT: '#1B2A4A', 800: '#243660', 900: '#0f1a2e' },
-            gold: { DEFAULT: '#C9A84C', light: '#E8C96A', dark: '#a88a3a' },
-          },
-          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+            navy: { DEFAULT: '#1B2A4A', dark: '#0f1a2e', light: '#243660' },
+            gold:  { DEFAULT: '#C9A84C', light: '#E8C96A', dark: '#a88a3a' },
+          }
         }
       }
     }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
   <style>
-    body { font-family: 'Inter', system-ui, sans-serif; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family: 'Barlow', system-ui, sans-serif; background: #f5f6f8; }
+    h1, h2, h3, .font-sora { font-family: 'Sora', system-ui, sans-serif; }
 
-    /* Hero background: uses uploaded cover photo or gradient */
-    .hero-bg {
-      background-image:
-        linear-gradient(135deg, rgba(27,42,74,0.82) 0%, rgba(10,22,40,0.72) 100%),
-        url('/static/img/hero-bg.jpg');
-      background-size: cover;
-      background-position: center;
-      background-color: #1B2A4A;
+    /* ── NAVBAR ── */
+    .nav-link { color: rgba(255,255,255,.55); font-size: .83rem; font-weight: 500; text-decoration: none; transition: color .15s; }
+    .nav-link:hover, .nav-link.active { color: #fff; }
+    .nav-link.active { font-weight: 700; }
+
+    /* ── SEARCH STRIP ── */
+    .search-strip { background: linear-gradient(135deg, #1B2A4A 0%, #0f1a2e 100%); }
+    .search-pattern { background-image: radial-gradient(circle, rgba(201,168,76,.07) 1px, transparent 1px); background-size: 28px 28px; }
+    .search-inp {
+      background: rgba(255,255,255,.09);
+      border: 1.5px solid rgba(255,255,255,.18);
+      color: #fff;
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-family: 'Barlow', sans-serif;
+      font-size: .88rem;
+      outline: none;
+      transition: border-color .2s;
+      width: 100%;
     }
-    .hero-dots {
-      background-image: radial-gradient(circle, rgba(201,168,76,0.10) 1px, transparent 1px);
-      background-size: 28px 28px;
+    .search-inp::placeholder { color: rgba(255,255,255,.38); }
+    .search-inp:focus { border-color: #C9A84C; }
+    .search-inp option { background: #1B2A4A; color: #fff; }
+
+    /* ── FILTER STRIP ── */
+    .filter-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
+    .filter-strip::-webkit-scrollbar { display: none; }
+    .fpill {
+      flex-shrink: 0;
+      padding: 6px 16px;
+      border-radius: 20px;
+      font-family: 'Barlow', sans-serif;
+      font-size: .78rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: 1.5px solid #e2e4e8;
+      background: #fff;
+      color: #555;
+      text-decoration: none;
+      transition: all .18s;
+      white-space: nowrap;
     }
-    .gold-bar { background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%); }
+    .fpill:hover { border-color: #1B2A4A; color: #1B2A4A; }
+    .fpill.active-navy { background: #1B2A4A; border-color: #1B2A4A; color: #fff; }
+    .fpill.active-gold { background: #C9A84C; border-color: #C9A84C; color: #1B2A4A; }
 
-    /* Search tabs */
-    .search-tab { border-bottom: 3px solid transparent; transition: all .2s; }
-    .search-tab.active { border-bottom-color: #C9A84C; color: #fff; font-weight: 700; }
-    .search-tab:not(.active) { color: rgba(255,255,255,0.6); }
-    .search-tab:not(.active):hover { color: rgba(255,255,255,0.85); }
+    /* ── PROPERTY CARDS (portrait 3:4) ── */
+    .prop-card {
+      position: relative;
+      border-radius: 16px;
+      overflow: hidden;
+      background: #1B2A4A;
+      aspect-ratio: 3 / 4;
+      display: block;
+      text-decoration: none;
+      cursor: pointer;
+      transition: transform .28s cubic-bezier(.25,.46,.45,.94), box-shadow .28s ease;
+      box-shadow: 0 4px 16px rgba(0,0,0,.10);
+    }
+    .prop-card:hover {
+      transform: translateY(-7px);
+      box-shadow: 0 24px 56px rgba(0,0,0,.16);
+    }
+    .prop-card-img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+      transition: transform .6s ease;
+      display: block;
+    }
+    .prop-card:hover .prop-card-img { transform: scale(1.05); }
 
-    /* Property cards */
-    .card-prop { transition: transform 0.25s ease, box-shadow 0.25s ease; }
-    .card-prop:hover { transform: translateY(-6px); box-shadow: 0 24px 48px rgba(0,0,0,0.14); }
-    .card-prop:hover .card-img { transform: scale(1.05); }
-    .card-img { transition: transform 0.5s ease; }
+    /* Gradient overlay — stronger at bottom */
+    .card-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(0,0,0,0)     0%,
+        rgba(0,0,0,0)     30%,
+        rgba(10,20,38,.55) 60%,
+        rgba(10,20,38,.92) 100%
+      );
+    }
+    /* Subtle top gradient for badges readability */
+    .card-top-shadow {
+      position: absolute; top: 0; left: 0; right: 0; height: 80px;
+      background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+    }
 
-    /* Category cards */
-    .cat-card { transition: transform .2s, box-shadow .2s; }
-    .cat-card:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(0,0,0,0.1); }
+    /* Card top row: badges + heart */
+    .card-top {
+      position: absolute; top: 12px; left: 12px; right: 12px;
+      display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; z-index: 2;
+    }
+    /* Card bottom: price, title, specs */
+    .card-bottom {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 16px 14px 14px; z-index: 2;
+    }
+    .card-price {
+      font-family: 'Sora', sans-serif;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #C9A84C;
+      line-height: 1;
+      margin-bottom: 4px;
+    }
+    .card-title {
+      font-family: 'Barlow', sans-serif;
+      font-size: .83rem;
+      font-weight: 600;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin-bottom: 4px;
+    }
+    .card-location {
+      font-size: .72rem;
+      color: rgba(255,255,255,.65);
+      margin-bottom: 8px;
+      display: flex; align-items: center; gap: 4px;
+    }
+    .card-specs {
+      display: flex; align-items: center; gap: 10px;
+      font-size: .72rem; color: rgba(255,255,255,.8); font-weight: 500;
+    }
+    .spec-item { display: flex; align-items: center; gap: 3px; }
 
-    /* Filter pills */
-    .filter-active { background-color: #1B2A4A; color: #fff; }
-    .filter-gold   { background-color: #C9A84C; color: #1B2A4A; }
+    /* Op badge */
+    .op-badge {
+      font-family: 'Barlow', sans-serif;
+      font-size: .65rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px;
+      text-transform: uppercase; letter-spacing: .5px;
+    }
+    .op-badge.venta { background: #C9A84C; color: #1B2A4A; }
+    .op-badge.renta { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(201,168,76,.5); }
 
-    .search-input:focus { outline: none; }
+    /* Heart */
+    .heart-btn {
+      width: 34px; height: 34px; border-radius: 50%;
+      background: rgba(255,255,255,.18);
+      backdrop-filter: blur(6px);
+      border: none; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: transform .2s, background .2s;
+      flex-shrink: 0;
+    }
+    .heart-btn:hover { transform: scale(1.15); background: rgba(255,255,255,.28); }
 
-    /* Stat counter */
-    .stat-num { font-size: 2rem; font-weight: 900; color: #C9A84C; line-height: 1; }
+    /* WhatsApp pill */
+    .wa-pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: #22C55E; color: #fff;
+      border-radius: 20px; padding: 3px 9px;
+      font-size: .65rem; font-weight: 700; text-decoration: none;
+      transition: opacity .2s; letter-spacing: .3px; text-transform: uppercase;
+    }
+    .wa-pill:hover { opacity: .88; }
+
+    /* Destacado shimmer */
+    .badge-dest {
+      font-size: .63rem; font-weight: 700;
+      padding: 3px 8px; border-radius: 20px;
+      background: #C9A84C; color: #1B2A4A;
+      text-transform: uppercase; letter-spacing: .5px;
+    }
+
+    /* Advanced filter panel */
+    .adv-panel {
+      background: #fff; border-radius: 12px;
+      border: 1.5px solid #e8eaee;
+      padding: 14px 16px;
+      margin-top: 10px;
+    }
+    .adv-inp {
+      width: 100%; padding: 8px 12px;
+      border: 1.5px solid #e2e4e8; border-radius: 8px;
+      font-family: 'Barlow', sans-serif; font-size: .83rem;
+      outline: none; background: #f8f9fb;
+      transition: border-color .15s;
+    }
+    .adv-inp:focus { border-color: #C9A84C; }
+
+    /* Corredor modal */
+    #modal-corredor {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+      z-index: 999; align-items: center; justify-content: center;
+      display: none;
+    }
+
+    /* Category quick links */
+    .cat-link {
+      display: flex; align-items: center; gap: 10px;
+      background: #fff; border-radius: 12px; padding: 12px 16px;
+      text-decoration: none; border: 1.5px solid #eff0f2;
+      transition: all .18s; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+    }
+    .cat-link:hover { border-color: #C9A84C; box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-2px); }
+
+    /* Section title */
+    .section-kicker {
+      font-family: 'Barlow', sans-serif;
+      font-size: .7rem; font-weight: 700; letter-spacing: 2.5px;
+      text-transform: uppercase; color: #C9A84C;
+    }
   </style>
 </head>
-<body class="bg-gray-50 text-gray-900">
+<body>
 
-<!-- ══════════════ NAVBAR ══════════════ -->
-<nav class="sticky top-0 z-50 shadow-lg" style="background-color:#1B2A4A;">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+<!-- ══════════════════════════════════════════════
+     NAVBAR
+══════════════════════════════════════════════ -->
+<nav style="background:#1B2A4A; position:sticky; top:0; z-index:50; box-shadow:0 2px 20px rgba(0,0,0,.25);">
+  <div style="max-width:1320px; margin:0 auto; padding:0 20px; height:58px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
 
     <!-- Logo -->
-    <a href="/" class="flex items-center gap-3 flex-shrink-0">
-      <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md">
-        <img src="/static/img/logo.jpeg" alt="Inmersiva" class="w-8 h-8 object-contain"
-             onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
-        <span class="hidden w-8 h-8 items-center justify-center font-black text-sm" style="color:#1B2A4A">I</span>
+    <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0;">
+      <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.2);">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" style="width:32px;height:32px;object-fit:contain;" onerror="this.style.display='none'">
       </div>
       <div class="hidden sm:block">
-        <div class="text-white font-black text-sm tracking-widest leading-none">INMERSIVA</div>
-        <div class="font-semibold tracking-widest leading-none" style="font-size:8px; color:#C9A84C;">GRUPO INMOBILIARIO</div>
+        <div class="font-sora" style="color:#fff;font-weight:800;font-size:.82rem;letter-spacing:3px;line-height:1;">INMERSIVA</div>
+        <div style="color:#C9A84C;font-size:7.5px;font-weight:600;letter-spacing:2.5px;line-height:1;margin-top:2px;">GRUPO INMOBILIARIO</div>
       </div>
     </a>
 
-    <!-- Nav links (desktop) -->
-    <div class="hidden md:flex items-center gap-6 text-sm">
-      <a href="/" class="text-white font-semibold border-b-2 pb-0.5" style="border-color:#C9A84C;">Inicio</a>
-      <a href="/?operacion=Venta" class="text-gray-400 hover:text-white transition-colors">Comprar</a>
-      <a href="/?operacion=Renta" class="text-gray-400 hover:text-white transition-colors">Alquilar</a>
-      <a href="/#contacto" class="text-gray-400 hover:text-white transition-colors">Contacto</a>
+    <!-- Nav links -->
+    <div class="hidden md:flex items-center gap-6">
+      <a href="/" class="nav-link active">Inicio</a>
+      <a href="/?operacion=Venta" class="nav-link">Comprar</a>
+      <a href="/?operacion=Renta" class="nav-link">Alquilar</a>
+      <a href="/#contacto" class="nav-link">Contacto</a>
     </div>
 
-    <!-- Auth section -->
-    <div class="flex items-center gap-3 flex-shrink-0">
-      {% if usuario and not user or (usuario and user.get('role') == 'usuario') %}
-        <!-- Public user dropdown -->
-        {% set nombre_display = usuario.get('nombre', usuario.get('sub', 'Usuario')) %}
-        {% set inicial = nombre_display[0]|upper %}
-        <div class="relative" id="user-menu-wrap">
-          <button onclick="toggleMenu()" class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-white/10 transition-colors">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
-                 style="background:#C9A84C;color:#1B2A4A;">{{ inicial }}</div>
-            <span class="hidden md:block text-white text-sm font-semibold max-w-[110px] truncate">{{ nombre_display }}</span>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+    <!-- Auth area -->
+    <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
+
+      {% if usuario and (not user or user.get('role') == 'usuario') %}
+        {% set nd = usuario.get('nombre', usuario.get('sub','U')) %}
+        {% set ini = nd[0]|upper %}
+        <div style="position:relative;" id="user-menu-wrap">
+          <button onclick="toggleMenu()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:none;border-radius:24px;padding:5px 12px 5px 5px;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.14)'" onmouseleave="this.style.background='rgba(255,255,255,.08)'">
+            <div style="width:30px;height:30px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;color:#1B2A4A;">{{ ini }}</div>
+            <span class="hidden md:block" style="color:#fff;font-size:.82rem;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ nd }}</span>
+            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
           </button>
 
           <!-- Dropdown -->
-          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-64 rounded-2xl shadow-2xl overflow-hidden z-50"
-               style="background:#fff;border:1.5px solid #e5e7eb;">
-            <!-- Header -->
-            <div class="px-4 py-4 border-b" style="background:linear-gradient(135deg,#1B2A4A,#2d4070);">
-              <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
-                     style="background:#C9A84C;color:#1B2A4A;">{{ inicial }}</div>
+          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:240px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);overflow:hidden;border:1.5px solid #eff0f2;">
+            <div style="background:linear-gradient(135deg,#1B2A4A,#243660);padding:14px 16px;">
+              <div style="display:flex;align-items:center;gap:10px;">
+                <div style="width:36px;height:36px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;color:#1B2A4A;">{{ ini }}</div>
                 <div>
-                  <div class="text-white font-bold text-sm leading-tight">{{ nombre_display }}</div>
-                  <div class="text-xs leading-tight" style="color:#C9A84C;">{{ usuario.get('sub','') }}</div>
+                  <div style="color:#fff;font-weight:700;font-size:.85rem;line-height:1.2;">{{ nd }}</div>
+                  <div style="color:#C9A84C;font-size:.7rem;margin-top:2px;">{{ usuario.get('sub','') }}</div>
                 </div>
               </div>
             </div>
-            <!-- Menu items -->
-            <div class="py-2">
-              <a href="/mis-favoritos" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <span class="text-lg">🏠</span> Casas guardadas
+            <div style="padding:6px 0;">
+              <a href="/mis-favoritos" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#333;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">
+                <span style="font-size:1rem;">🏠</span> Casas guardadas
               </a>
-              <a href="/mi-perfil" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <span class="text-lg">👤</span> Mis datos
-              </a>
-              <a href="/mis-contactos" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors">
-                <span class="text-lg">📞</span> Mis consultas
+              <a href="/mi-perfil" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#333;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">
+                <span style="font-size:1rem;">👤</span> Mis datos
               </a>
               {% if usuario_es_corredor %}
-              <div class="mx-3 my-1 h-px bg-gray-100"></div>
-              <button onclick="document.getElementById('modal-corredor').style.display='flex'"
-                      class="w-full flex items-center gap-3 px-4 py-2.5 text-sm font-semibold transition-colors text-left"
-                      style="color:#C9A84C;">
-                <span class="text-lg">🏢</span> Acceder como Corredor
+              <div style="height:1px;background:#f0f0f0;margin:4px 12px;"></div>
+              <button onclick="document.getElementById('modal-corredor').style.display='flex'" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:#C9A84C;background:none;border:none;cursor:pointer;text-align:left;" onmouseenter="this.style.background='#fffbf0'" onmouseleave="this.style.background='transparent'">
+                <span style="font-size:1rem;">🏢</span> Acceder como Corredor
               </button>
               {% endif %}
-              <div class="mx-3 my-1 h-px bg-gray-100"></div>
-              <a href="/usuario/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                <span class="text-lg">🚪</span> Cerrar sesión
+              <div style="height:1px;background:#f0f0f0;margin:4px 12px;"></div>
+              <a href="/usuario/logout" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#dc2626;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='transparent'">
+                <span style="font-size:1rem;">🚪</span> Cerrar sesión
               </a>
             </div>
           </div>
         </div>
 
       {% elif user %}
-        <!-- Empresa / Corredor session dropdown -->
-        {% set nombre_adm = user.get('nombre', user.get('sub','')) %}
-        {% set inicial_adm = nombre_adm[0]|upper %}
-        <div class="relative" id="user-menu-wrap">
-          <button onclick="toggleMenu()" class="flex items-center gap-2 rounded-full px-2 py-1 hover:bg-white/10 transition-colors">
-            <div class="w-8 h-8 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
-                 style="background:#C9A84C;color:#1B2A4A;">{{ inicial_adm }}</div>
-            <span class="hidden md:block text-white text-sm font-semibold max-w-[110px] truncate">{{ nombre_adm }}</span>
-            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+        {% set nad = user.get('nombre', user.get('sub','')) %}
+        {% set iad = nad[0]|upper %}
+        <div style="position:relative;" id="user-menu-wrap">
+          <button onclick="toggleMenu()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:none;border-radius:24px;padding:5px 12px 5px 5px;cursor:pointer;" onmouseenter="this.style.background='rgba(255,255,255,.14)'" onmouseleave="this.style.background='rgba(255,255,255,.08)'">
+            <div style="width:30px;height:30px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;color:#1B2A4A;">{{ iad }}</div>
+            <span class="hidden md:block" style="color:#fff;font-size:.82rem;font-weight:600;">{{ nad }}</span>
+            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
           </button>
-          <div id="user-dropdown" class="hidden absolute right-0 mt-2 w-56 rounded-2xl shadow-2xl overflow-hidden z-50"
-               style="background:#fff;border:1.5px solid #e5e7eb;">
-            <div class="px-4 py-3 border-b" style="background:linear-gradient(135deg,#1B2A4A,#2d4070);">
-              <div class="text-white font-bold text-sm">{{ nombre_adm }}</div>
-              <div class="text-xs" style="color:#C9A84C;">
-                {% if user.get('role') == 'empresa' %}Administrador{% else %}Corredor{% endif %}
-              </div>
+          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:200px;background:#fff;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.15);overflow:hidden;border:1.5px solid #eff0f2;">
+            <div style="background:linear-gradient(135deg,#1B2A4A,#243660);padding:12px 14px;">
+              <div style="color:#fff;font-weight:700;font-size:.85rem;">{{ nad }}</div>
+              <div style="color:#C9A84C;font-size:.7rem;margin-top:2px;">{% if user.get('role') == 'empresa' %}Administrador{% else %}Corredor{% endif %}</div>
             </div>
-            <div class="py-2">
+            <div style="padding:6px 0;">
               {% if user.get('role') == 'empresa' %}
-              <a href="/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-                <span class="text-lg">⚙️</span> Panel Admin
-              </a>
+              <a href="/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#333;text-decoration:none;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">⚙️ Panel Admin</a>
               {% else %}
-              <a href="/corredor/dashboard" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50">
-                <span class="text-lg">🏢</span> Mi Dashboard
-              </a>
+              <a href="/corredor/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#333;text-decoration:none;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">🏢 Mi Dashboard</a>
               {% endif %}
-              <div class="mx-3 my-1 h-px bg-gray-100"></div>
-              <a href="/logout" class="flex items-center gap-3 px-4 py-2.5 text-sm text-red-600 hover:bg-red-50">
-                <span class="text-lg">🚪</span> Cerrar sesión
-              </a>
+              <div style="height:1px;background:#f0f0f0;margin:4px 10px;"></div>
+              <a href="/logout" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#dc2626;text-decoration:none;" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='transparent'">🚪 Cerrar sesión</a>
             </div>
           </div>
         </div>
 
       {% else %}
-        <a href="/registro" class="hidden sm:block text-gray-300 text-sm hover:text-white transition-colors font-medium">
-          Registrarse
-        </a>
-        <a href="/login" class="text-sm font-bold px-4 py-2 rounded-lg transition-all hover:opacity-90"
-           style="background-color:#C9A84C; color:#1B2A4A;">
-          Ingresar
-        </a>
+        <a href="/registro" class="nav-link hidden md:block">Registrarse</a>
+        <a href="/login" style="font-family:'Sora',sans-serif;font-size:.78rem;font-weight:700;padding:8px 18px;background:#C9A84C;color:#1B2A4A;border-radius:8px;text-decoration:none;letter-spacing:.3px;transition:opacity .15s;" onmouseenter="this.style.opacity='.88'" onmouseleave="this.style.opacity='1'">Ingresar</a>
       {% endif %}
     </div>
   </div>
 </nav>
 
-<!-- Modal: Acceder como Corredor -->
-<div id="modal-corredor" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:999;align-items:center;justify-content:center;" onclick="if(event.target===this)this.style.display='none'">
-  <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:380px;box-shadow:0 24px 60px rgba(0,0,0,.3);">
+
+<!-- ══════════════════════════════════════════════
+     MODAL — Acceder como Corredor
+══════════════════════════════════════════════ -->
+<div id="modal-corredor" onclick="if(event.target===this)this.style.display='none'">
+  <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:360px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
     <div style="text-align:center;margin-bottom:24px;">
-      <div style="font-size:2rem;margin-bottom:8px;">🏢</div>
-      <h3 style="font-size:1.1rem;font-weight:800;color:#1B2A4A;margin:0 0 4px;">Acceder como Corredor</h3>
-      <p style="font-size:.82rem;color:#6b7280;margin:0;">Ingresa tu contraseña de corredor para acceder al CRM.</p>
+      <div style="width:56px;height:56px;background:rgba(27,42,74,.07);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 14px;">🏢</div>
+      <h3 class="font-sora" style="font-size:1rem;font-weight:800;color:#1B2A4A;margin:0 0 6px;">Acceder como Corredor</h3>
+      <p style="font-size:.8rem;color:#6b7280;margin:0;">Ingresa tu contraseña del CRM.</p>
     </div>
     {% if portal_error == 'corredor_pass' %}
-    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;color:#991b1b;font-size:.83rem;margin-bottom:16px;">⚠️ Contraseña incorrecta.</div>
+    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;color:#991b1b;font-size:.82rem;margin-bottom:14px;">⚠️ Contraseña incorrecta.</div>
     {% endif %}
     <form method="post" action="/usuario/acceder-como-corredor">
-      <label style="display:block;font-size:.72rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:#374151;margin-bottom:7px;">Contraseña</label>
+      <label style="display:block;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#374151;margin-bottom:7px;">Contraseña</label>
       <input type="password" name="password" required autofocus
-             style="width:100%;box-sizing:border-box;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-size:.95rem;font-family:inherit;outline:none;margin-bottom:16px;"
+             style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-family:'Barlow',sans-serif;font-size:.9rem;outline:none;margin-bottom:14px;transition:border-color .15s;"
+             onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#e5e7eb'"
              placeholder="••••••••">
-      <button type="submit"
-              style="width:100%;padding:13px;background:linear-gradient(135deg,#C9A84C,#e8c96d);color:#1B2A4A;font-weight:800;font-size:.95rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;">
+      <button type="submit" style="width:100%;padding:12px;background:#C9A84C;color:#1B2A4A;font-family:'Sora',sans-serif;font-weight:800;font-size:.88rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.5px;">
         Entrar al CRM
       </button>
     </form>
   </div>
 </div>
 
+
+<!-- ══════════════════════════════════════════════
+     SEARCH STRIP
+══════════════════════════════════════════════ -->
+<section class="search-strip search-pattern">
+  <div style="max-width:1320px;margin:0 auto;padding:24px 20px 20px;">
+
+    <!-- Slogan -->
+    <div style="text-align:center;margin-bottom:18px;">
+      <p class="font-sora" style="color:rgba(255,255,255,.45);font-size:.65rem;letter-spacing:4px;text-transform:uppercase;margin:0 0 6px;">Inmersiva Grupo Inmobiliario</p>
+      <h1 class="font-sora" style="color:#fff;font-size:clamp(1.2rem,3vw,1.7rem);font-weight:800;margin:0;letter-spacing:-.5px;">
+        Recorre hoy, <span style="color:#C9A84C;">vive mañana</span>
+      </h1>
+    </div>
+
+    <!-- Search form -->
+    <form method="GET" action="/" id="search-form">
+      <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;">
+
+        <!-- Op toggle tabs -->
+        <div style="display:flex;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.15);flex-shrink:0;">
+          <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+             style="padding:10px 16px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .15s;
+                    {% if filtros.operacion == 'Renta' or not filtros.operacion %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.55);{% endif %}">
+            Alquilar
+          </a>
+          <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+             style="padding:10px 16px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .15s;
+                    {% if filtros.operacion == 'Venta' %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.55);{% endif %}">
+            Comprar
+          </a>
+        </div>
+
+        <input type="hidden" name="operacion" value="{{ filtros.operacion }}">
+
+        <select name="tipo" class="search-inp" style="flex:0 0 auto;width:auto;">
+          <option value="">Tipo de propiedad</option>
+          {% for t in ["Casa","Departamento","Terreno","Penthouse","Local","Oficina"] %}
+          <option value="{{ t }}" {% if filtros.tipo == t %}selected{% endif %}>{{ t }}</option>
+          {% endfor %}
+        </select>
+
+        <input type="text" name="ciudad" value="{{ filtros.ciudad }}" placeholder="Ciudad, zona o distrito..."
+               class="search-inp" style="flex:1;min-width:160px;">
+
+        <button type="submit"
+                style="padding:10px 20px;background:#C9A84C;color:#1B2A4A;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0;display:flex;align-items:center;gap:6px;white-space:nowrap;">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          Buscar
+        </button>
+      </div>
+
+      <!-- Advanced filters toggle -->
+      <div style="margin-top:10px;">
+        <button type="button" onclick="toggleFiltros()" id="filtros-btn"
+                style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:rgba(255,255,255,.75);font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s;">
+          <svg id="filtros-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+          Más filtros
+          {% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}
+          <span style="background:#C9A84C;color:#1B2A4A;border-radius:20px;padding:1px 7px;font-size:.68rem;font-weight:800;">
+            {{ [filtros.precio_min, filtros.precio_max, filtros.habitaciones, filtros.m2_min]|select|list|length }}
+          </span>
+          {% endif %}
+        </button>
+
+        <!-- Advanced panel -->
+        <div id="filtros-avanzados" style="display:{% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}block{% else %}none{% endif %};margin-top:10px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;">
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio mín.</label>
+              <input type="number" name="precio_min" value="{{ filtros.precio_min }}" placeholder="S/ 0" class="adv-inp">
+            </div>
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio máx.</label>
+              <input type="number" name="precio_max" value="{{ filtros.precio_max }}" placeholder="Sin límite" class="adv-inp">
+            </div>
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Habitaciones</label>
+              <select name="habitaciones" class="adv-inp">
+                <option value="">Cualquiera</option>
+                {% for n in [1,2,3,4,5] %}
+                <option value="{{ n }}" {% if filtros.habitaciones|string == n|string %}selected{% endif %}>{{ n }}+</option>
+                {% endfor %}
+              </select>
+            </div>
+            <div>
+              <label style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Área mín. (m²)</label>
+              <input type="number" name="m2_min" value="{{ filtros.m2_min }}" placeholder="m²" class="adv-inp">
+            </div>
+          </div>
+        </div>
+      </div>
+    </form>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     MAIN CONTENT
+══════════════════════════════════════════════ -->
+<main style="max-width:1320px;margin:0 auto;padding:24px 20px 60px;">
+
+  <!-- ── Quick categories ── -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:24px;">
+    <a href="/?tipo=Departamento" class="cat-link">
+      <span style="font-size:1.3rem;">🏢</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Departamentos</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Alquiler y venta</div>
+      </div>
+    </a>
+    <a href="/?tipo=Casa" class="cat-link">
+      <span style="font-size:1.3rem;">🏠</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Casas</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Alquiler y venta</div>
+      </div>
+    </a>
+    <a href="/?tipo=Terreno" class="cat-link">
+      <span style="font-size:1.3rem;">🌳</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Terrenos</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Inversión</div>
+      </div>
+    </a>
+    <a href="/?tipo=Penthouse" class="cat-link">
+      <span style="font-size:1.3rem;">✨</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Penthouses</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Premium</div>
+      </div>
+    </a>
+    <a href="/?tipo=Oficina" class="cat-link">
+      <span style="font-size:1.3rem;">💼</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Oficinas</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Comercial</div>
+      </div>
+    </a>
+    <a href="/?tour=1" class="cat-link">
+      <span style="font-size:1.3rem;">🔮</span>
+      <div>
+        <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Tour 360°</div>
+        <div style="font-size:.7rem;color:#999;margin-top:1px;">Inmersivo</div>
+      </div>
+    </a>
+  </div>
+
+  <!-- ── Header + filter strip ── -->
+  <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;">
+    <div>
+      <div class="section-kicker">
+        {% if filtros.operacion == 'Renta' %}Alquiler
+        {% elif filtros.operacion == 'Venta' %}Venta
+        {% else %}Propiedades{% endif %}
+      </div>
+      <h2 class="font-sora" style="font-size:1.15rem;font-weight:800;color:#1B2A4A;margin:3px 0 0;">
+        {% if filtros.operacion == 'Renta' %}En Alquiler
+        {% elif filtros.operacion == 'Venta' %}En Venta
+        {% else %}Todas las propiedades{% endif %}
+        {% if propiedades %}
+        <span style="font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:400;color:#999;margin-left:6px;">({{ propiedades|length }})</span>
+        {% endif %}
+      </h2>
+
+      <!-- Active filter badges -->
+      {% if filtros.tipo or filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min or filtros.ciudad %}
+      <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center;">
+        {% if filtros.tipo %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">{{ filtros.tipo }}</span>{% endif %}
+        {% if filtros.ciudad %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">📍 {{ filtros.ciudad }}</span>{% endif %}
+        {% if filtros.precio_min %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">Desde S/ {{ filtros.precio_min }}</span>{% endif %}
+        {% if filtros.precio_max %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">Hasta S/ {{ filtros.precio_max }}</span>{% endif %}
+        {% if filtros.habitaciones %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">🛏 {{ filtros.habitaciones }}+</span>{% endif %}
+        {% if filtros.m2_min %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">📐 {{ filtros.m2_min }}m²+</span>{% endif %}
+        <a href="/" style="font-size:.72rem;font-weight:700;color:#C9A84C;text-decoration:none;">✕ Limpiar</a>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- Filter pills -->
+    <div class="filter-strip">
+      <a href="/" class="fpill {% if not filtros.operacion and not filtros.tipo %}active-navy{% endif %}">Todas</a>
+      <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+         class="fpill {% if filtros.operacion == 'Venta' %}active-gold{% endif %}">Venta</a>
+      <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
+         class="fpill {% if filtros.operacion == 'Renta' %}active-navy{% endif %}">Alquiler</a>
+      <a href="/?tour=1{% if filtros.operacion %}&operacion={{ filtros.operacion }}{% endif %}"
+         class="fpill {% if filtros.get('tour') %}active-navy{% endif %}">🔮 Tour 360°</a>
+    </div>
+  </div>
+
+  <!-- ── CARD GRID ── -->
+  {% if propiedades %}
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
+    {% for p in propiedades %}
+    {% set c_wa = corredores_dict.get(p.corredor_id, {}) %}
+    {% set wa_num = c_wa.get('whatsapp') or c_wa.get('telefono') %}
+    {% set is_fav = p.id in favoritos %}
+
+    <div style="position:relative;">
+      <!-- Main card (clickable link) -->
+      <a href="/propiedad/{{ p.id }}" class="prop-card">
+        <!-- Image -->
+        {% if p.foto_portada %}
+        <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}" class="prop-card-img"
+             onerror="this.style.display='none'">
+        {% else %}
+        <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A4A,#243660);">
+          <span style="font-size:4rem;opacity:.2;">🏠</span>
+        </div>
+        {% endif %}
+
+        <!-- Overlays -->
+        <div class="card-top-shadow"></div>
+        <div class="card-overlay"></div>
+
+        <!-- Top: badge + tour/dest tags -->
+        <div class="card-top">
+          <div style="display:flex;flex-wrap:wrap;gap:4px;">
+            <span class="op-badge {% if p.operacion == 'Venta' %}venta{% else %}renta{% endif %}">
+              {{ p.operacion }}
+            </span>
+            {% if p.destacado %}<span class="badge-dest">★ Top</span>{% endif %}
+            {% if p.tour_360_url %}<span class="op-badge" style="background:rgba(0,0,0,.5);color:#fff;">360°</span>{% endif %}
+          </div>
+          <!-- Heart (placeholder spacing — real button is absolute sibling) -->
+          <div style="width:34px;flex-shrink:0;"></div>
+        </div>
+
+        <!-- Bottom: price + info -->
+        <div class="card-bottom">
+          <div class="card-price">{{ p.precio_fmt }}</div>
+          <div class="card-title">{{ p.titulo }}</div>
+          <div class="card-location">
+            <svg width="10" height="10" fill="#C9A84C" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            {{ p.ciudad }}{% if p.estado %}, {{ p.estado }}{% endif %}
+          </div>
+          <div class="card-specs">
+            {% if p.habitaciones %}<span class="spec-item">🛏 {{ p.habitaciones }}</span>{% endif %}
+            {% if p.banos %}<span class="spec-item">🚿 {{ p.banos }}</span>{% endif %}
+            {% if p.m2_construidos %}<span class="spec-item">📐 {{ p.m2_construidos }}m²</span>{% endif %}
+            {% if wa_num %}
+            <span style="margin-left:auto;">
+              <span class="wa-pill" onclick="event.preventDefault();event.stopPropagation();window.open('https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}','_blank')">
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                WA
+              </span>
+            </span>
+            {% endif %}
+          </div>
+        </div>
+      </a>
+
+      <!-- Heart button — outside the <a> to avoid nesting -->
+      <button onclick="toggleFav(event, {{ p.id }}, this)"
+              data-fav="{{ 'true' if is_fav else 'false' }}"
+              class="heart-btn {% if is_fav %}active{% endif %}"
+              style="position:absolute;top:12px;right:12px;z-index:3;">
+        <svg width="16" height="16" viewBox="0 0 24 24"
+             fill="{{ '#ef4444' if is_fav else 'none' }}"
+             stroke="{{ '#ef4444' if is_fav else 'rgba(255,255,255,.9)' }}"
+             stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- ── Empty state ── -->
+  <div style="text-align:center;padding:80px 20px;">
+    <div style="font-size:64px;margin-bottom:20px;opacity:.7;">🏠</div>
+    <h3 class="font-sora" style="font-size:1.2rem;font-weight:800;color:#1B2A4A;margin:0 0 10px;">
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max %}
+        Sin resultados con esos filtros
+      {% else %}
+        Próximamente tendremos propiedades
+      {% endif %}
+    </h3>
+    <p style="color:#9ca3af;font-size:.9rem;margin:0 0 24px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6;">
+      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max %}
+        Intenta ampliar los criterios o
+        <a href="/" style="color:#C9A84C;font-weight:700;text-decoration:none;">ver todas las propiedades</a>
+      {% else %}
+        Estamos captando las mejores propiedades de la región. Vuelve pronto.
+      {% endif %}
+    </p>
+    {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
+    <a href="/" style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:11px 24px;background:#1B2A4A;color:#C9A84C;border-radius:10px;text-decoration:none;">
+      Ver todas
+    </a>
+    {% endif %}
+  </div>
+  {% endif %}
+
+</main>
+
+
+<!-- ══════════════════════════════════════════════
+     CTA SECTION
+══════════════════════════════════════════════ -->
+<section id="contacto" style="background:linear-gradient(135deg,#1B2A4A 0%,#0f1a2e 100%);padding:56px 20px;position:relative;overflow:hidden;">
+  <div class="search-pattern" style="position:absolute;inset:0;opacity:.6;"></div>
+  <div style="position:relative;max-width:680px;margin:0 auto;text-align:center;">
+    <div class="section-kicker" style="margin-bottom:10px;">¿No encontraste lo que buscas?</div>
+    <h2 class="font-sora" style="color:#fff;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin:0 0 12px;letter-spacing:-.5px;">
+      Nuestros corredores te ayudan a encontrar
+      <span style="color:#C9A84C;">la propiedad perfecta</span>
+    </h2>
+    <p style="color:rgba(255,255,255,.5);font-size:.9rem;margin:0 0 28px;line-height:1.6;">
+      Especialistas en el mercado inmobiliario peruano. Contacta directamente o únete al equipo.
+    </p>
+    <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
+      <a href="https://wa.me/51999999999" target="_blank"
+         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#22C55E;color:#fff;border-radius:10px;text-decoration:none;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+        Contactar por WhatsApp
+      </a>
+      <a href="/corredor/registro"
+         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#C9A84C;color:#1B2A4A;border-radius:10px;text-decoration:none;">
+        Quiero ser Corredor →
+      </a>
+    </div>
+  </div>
+</section>
+
+
+<!-- ══════════════════════════════════════════════
+     FOOTER
+══════════════════════════════════════════════ -->
+<footer style="background:#0f1a2e;padding:28px 20px;">
+  <div style="max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
+    <div style="display:flex;align-items:center;gap:10px;">
+      <div style="width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
+        <img src="/static/img/logo.jpeg" alt="" style="width:28px;height:28px;object-fit:contain;" onerror="this.style.display='none'">
+      </div>
+      <div>
+        <div class="font-sora" style="color:#fff;font-weight:800;font-size:.78rem;letter-spacing:3px;">INMERSIVA</div>
+        <div style="color:#C9A84C;font-size:7px;letter-spacing:2px;font-weight:600;">GRUPO INMOBILIARIO</div>
+      </div>
+    </div>
+    <div style="color:#4b5563;font-size:.75rem;text-align:center;">
+      © 2026 Inmersiva Grupo Inmobiliario · <span style="color:#C9A84C;">inmobiliariainmersiva.com</span>
+    </div>
+    <div style="display:flex;align-items:center;gap:16px;">
+      <a href="/login?tab=corredor" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Corredores</a>
+      <a href="/registro" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Registro</a>
+      <a href="/login?tab=admin" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Admin</a>
+    </div>
+  </div>
+</footer>
+
+
+<!-- ══════════════════════════════════════════════
+     SCRIPTS
+══════════════════════════════════════════════ -->
 <script>
+// Dropdown
 function toggleMenu() {
-  const d = document.getElementById('user-dropdown');
-  d.classList.toggle('hidden');
+  document.getElementById('user-dropdown').classList.toggle('hidden');
 }
 document.addEventListener('click', function(e) {
   const wrap = document.getElementById('user-menu-wrap');
@@ -236,474 +745,49 @@ document.addEventListener('click', function(e) {
 document.getElementById('modal-corredor').style.display = 'flex';
 {% endif %}
 
+// Advanced filters toggle
 function toggleFiltros() {
   const panel = document.getElementById('filtros-avanzados');
   const icon = document.getElementById('filtros-icon');
-  panel.classList.toggle('hidden');
-  if (!panel.classList.contains('hidden')) {
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>';
-  } else {
-    icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>';
-  }
+  const open = panel.style.display === 'block';
+  panel.style.display = open ? 'none' : 'block';
+  icon.innerHTML = open
+    ? '<path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>'
+    : '<path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>';
 }
 
+// Favorites toggle (AJAX)
 function toggleFav(e, propId, btn) {
   e.preventDefault();
   e.stopPropagation();
   const isFav = btn.dataset.fav === 'true';
   const svg = btn.querySelector('svg');
+  // Optimistic update
   if (isFav) {
     svg.setAttribute('fill', 'none');
-    svg.setAttribute('stroke', '#999');
+    svg.setAttribute('stroke', 'rgba(255,255,255,.9)');
     btn.dataset.fav = 'false';
+    btn.classList.remove('active');
   } else {
     svg.setAttribute('fill', '#ef4444');
     svg.setAttribute('stroke', '#ef4444');
     btn.dataset.fav = 'true';
+    btn.classList.add('active');
+    btn.style.transform = 'scale(1.3)';
+    setTimeout(() => btn.style.transform = '', 250);
   }
   fetch('/api/favorito/' + propId, { method: 'POST' })
     .then(r => {
       if (r.status === 401) {
-        if (isFav) { svg.setAttribute('fill','#ef4444'); svg.setAttribute('stroke','#ef4444'); btn.dataset.fav='true'; }
-        else { svg.setAttribute('fill','none'); svg.setAttribute('stroke','#999'); btn.dataset.fav='false'; }
+        // Revert and redirect to login
+        if (isFav) { svg.setAttribute('fill','#ef4444'); svg.setAttribute('stroke','#ef4444'); btn.dataset.fav='true'; btn.classList.add('active'); }
+        else { svg.setAttribute('fill','none'); svg.setAttribute('stroke','rgba(255,255,255,.9)'); btn.dataset.fav='false'; btn.classList.remove('active'); }
         window.location.href = '/login';
       }
     })
     .catch(() => {});
 }
 </script>
-
-
-<!-- ══════════════ HERO ══════════════ -->
-<section class="relative hero-bg overflow-hidden" style="min-height: 520px;">
-  <div class="absolute inset-0 hero-dots pointer-events-none"></div>
-  <div class="absolute left-0 top-0 w-1 h-full gold-bar"></div>
-
-  <div class="relative max-w-4xl mx-auto px-6 pt-16 pb-24 text-center">
-
-    <!-- Badge -->
-    <div class="inline-flex items-center gap-2 text-xs font-semibold px-4 py-1.5 rounded-full mb-6 tracking-widest uppercase"
-         style="background:rgba(201,168,76,0.15); color:#C9A84C; border:1px solid rgba(201,168,76,0.35);">
-      ✦ Portal Inmobiliario Oficial
-    </div>
-
-    <h1 class="text-white font-black text-4xl md:text-6xl leading-tight mb-3 tracking-tight">
-      Encuentra tu<br>
-      <span style="color:#C9A84C;">próximo hogar</span>
-    </h1>
-    <p class="text-gray-300 text-lg mb-10 font-light">
-      Las mejores propiedades en venta y alquiler en todo el Perú
-    </p>
-
-    <!-- Search card -->
-    <div class="bg-white rounded-2xl shadow-2xl overflow-hidden max-w-3xl mx-auto">
-
-      <!-- Tabs Alquilar / Comprar -->
-      <div class="flex border-b border-gray-100" style="background:#1B2A4A;">
-        <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-           class="search-tab flex-1 py-3.5 text-sm font-semibold text-center transition-all
-                  {% if filtros.operacion == 'Renta' or not filtros.operacion %}active{% endif %}">
-          Alquilar
-        </a>
-        <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-           class="search-tab flex-1 py-3.5 text-sm font-semibold text-center transition-all
-                  {% if filtros.operacion == 'Venta' %}active{% endif %}">
-          Comprar
-        </a>
-      </div>
-
-      <!-- Search inputs -->
-      <form method="GET" action="/" id="search-form" class="p-3 flex flex-col gap-2">
-        <div class="flex flex-col sm:flex-row gap-2 items-stretch">
-          <select name="tipo"
-                  class="search-input px-4 py-3 text-gray-700 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:border-gold transition-colors">
-            <option value="">Tipo de propiedad</option>
-            {% for t in ["Casa","Departamento","Terreno","Penthouse","Local","Oficina"] %}
-            <option value="{{ t }}" {% if filtros.tipo == t %}selected{% endif %}>{{ t }}</option>
-            {% endfor %}
-          </select>
-          <input type="hidden" name="operacion" value="{{ filtros.operacion }}">
-          <input
-            type="text" name="ciudad" value="{{ filtros.ciudad }}"
-            placeholder="Ciudad, zona o distrito..."
-            class="search-input flex-1 px-4 py-3 text-gray-800 text-sm rounded-xl border border-gray-200 bg-gray-50 focus:border-gold transition-colors"
-          >
-          <button type="submit"
-                  class="px-7 py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90 flex-shrink-0 flex items-center gap-2"
-                  style="background-color:#C9A84C; color:#1B2A4A;">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
-            </svg>
-            Buscar
-          </button>
-        </div>
-
-        <!-- Advanced filters toggle -->
-        <div>
-          <button type="button" onclick="toggleFiltros()"
-                  class="text-xs font-semibold flex items-center gap-1 px-3 py-1.5 rounded-lg transition-colors"
-                  id="filtros-btn"
-                  style="color:#1B2A4A; background:rgba(27,42,74,0.08);">
-            <svg class="w-3.5 h-3.5" id="filtros-icon" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
-            </svg>
-            Más filtros
-            {% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}
-            <span class="ml-1 px-1.5 py-0.5 rounded-full text-white text-xs font-bold" style="background:#C9A84C;color:#1B2A4A;">
-              {{ [filtros.precio_min, filtros.precio_max, filtros.habitaciones, filtros.m2_min]|select|list|length }}
-            </span>
-            {% endif %}
-          </button>
-
-          <!-- Advanced panel -->
-          <div id="filtros-avanzados"
-               class="{% if not (filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min) %}hidden{% endif %} mt-2 p-3 rounded-xl bg-gray-50 border border-gray-200">
-            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
-              <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Precio mín.</label>
-                <input type="number" name="precio_min" value="{{ filtros.precio_min }}"
-                       placeholder="S/ 0"
-                       class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-yellow-400">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Precio máx.</label>
-                <input type="number" name="precio_max" value="{{ filtros.precio_max }}"
-                       placeholder="Sin límite"
-                       class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-yellow-400">
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Habitaciones mín.</label>
-                <select name="habitaciones" class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-yellow-400">
-                  <option value="">Cualquiera</option>
-                  {% for n in [1,2,3,4,5] %}
-                  <option value="{{ n }}" {% if filtros.habitaciones|string == n|string %}selected{% endif %}>{{ n }}+</option>
-                  {% endfor %}
-                </select>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold text-gray-600 mb-1">Área mín. (m²)</label>
-                <input type="number" name="m2_min" value="{{ filtros.m2_min }}"
-                       placeholder="m²"
-                       class="w-full px-3 py-2 text-sm rounded-lg border border-gray-200 bg-white focus:outline-none focus:border-yellow-400">
-              </div>
-            </div>
-          </div>
-        </div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Wave divider -->
-  <div class="absolute bottom-0 left-0 right-0 leading-none">
-    <svg viewBox="0 0 1440 60" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none"
-         style="display:block; width:100%; height:60px;">
-      <path d="M0 60 L0 30 Q360 5 720 28 Q1080 50 1440 22 L1440 60 Z" fill="#F9FAFB"/>
-    </svg>
-  </div>
-</section>
-
-
-<!-- ══════════════ QUICK CATEGORIES ══════════════ -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-1 pb-4">
-  <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-
-    <a href="/?tipo=Departamento" class="cat-card bg-white rounded-xl p-4 shadow-sm flex items-center gap-3 no-underline">
-      <span class="text-2xl">🏢</span>
-      <div>
-        <div class="font-bold text-gray-900 text-sm">Departamentos</div>
-        <div class="text-xs text-gray-500">Alquiler y venta</div>
-      </div>
-    </a>
-
-    <a href="/?tipo=Casa" class="cat-card bg-white rounded-xl p-4 shadow-sm flex items-center gap-3 no-underline">
-      <span class="text-2xl">🏠</span>
-      <div>
-        <div class="font-bold text-gray-900 text-sm">Casas</div>
-        <div class="text-xs text-gray-500">Alquiler y venta</div>
-      </div>
-    </a>
-
-    <a href="/?tipo=Terreno" class="cat-card bg-white rounded-xl p-4 shadow-sm flex items-center gap-3 no-underline">
-      <span class="text-2xl">🌳</span>
-      <div>
-        <div class="font-bold text-gray-900 text-sm">Terrenos</div>
-        <div class="text-xs text-gray-500">Inversión</div>
-      </div>
-    </a>
-
-    <a href="/?tipo=Oficina" class="cat-card bg-white rounded-xl p-4 shadow-sm flex items-center gap-3 no-underline">
-      <span class="text-2xl">💼</span>
-      <div>
-        <div class="font-bold text-gray-900 text-sm">Oficinas</div>
-        <div class="text-xs text-gray-500">Comercial</div>
-      </div>
-    </a>
-
-  </div>
-</section>
-
-
-<!-- ══════════════ PROPIEDADES ══════════════ -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8" id="propiedades">
-
-  <!-- Header + quick filters -->
-  <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
-    <div>
-      <h2 class="text-xl font-bold text-gray-900">
-        {% if filtros.operacion == 'Renta' %}Propiedades en Alquiler
-        {% elif filtros.operacion == 'Venta' %}Propiedades en Venta
-        {% else %}Todas las Propiedades
-        {% endif %}
-        {% if propiedades %}
-        <span class="text-sm font-normal text-gray-500 ml-1">({{ propiedades|length }} disponibles)</span>
-        {% endif %}
-      </h2>
-
-      {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}
-      <div class="flex flex-wrap gap-2 mt-2 items-center">
-        {% if filtros.tipo %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">{{ filtros.tipo }}</span>
-        {% endif %}
-        {% if filtros.operacion %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">{{ filtros.operacion }}</span>
-        {% endif %}
-        {% if filtros.ciudad %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">📍 {{ filtros.ciudad }}</span>
-        {% endif %}
-        {% if filtros.precio_min %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">Desde S/ {{ filtros.precio_min }}</span>
-        {% endif %}
-        {% if filtros.precio_max %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">Hasta S/ {{ filtros.precio_max }}</span>
-        {% endif %}
-        {% if filtros.habitaciones %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">🛏 {{ filtros.habitaciones }}+</span>
-        {% endif %}
-        {% if filtros.m2_min %}
-        <span class="text-xs font-semibold px-3 py-1 rounded-full" style="background:#1B2A4A20; color:#1B2A4A;">📐 {{ filtros.m2_min }}m²+</span>
-        {% endif %}
-        <a href="/" class="text-xs font-semibold hover:underline" style="color:#C9A84C;">✕ Limpiar</a>
-      </div>
-      {% endif %}
-    </div>
-
-    <!-- Filter pills -->
-    <div class="flex flex-wrap gap-2">
-      <a href="/"
-         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
-                {% if not filtros.operacion and not filtros.tipo %}filter-active{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
-        Todas
-      </a>
-      <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
-                {% if filtros.operacion == 'Venta' %}filter-gold border-yellow-400{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
-        Venta
-      </a>
-      <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
-                {% if filtros.operacion == 'Renta' %}filter-active{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
-        Alquiler
-      </a>
-      <a href="/?tour=1{% if filtros.operacion %}&operacion={{ filtros.operacion }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
-         class="px-4 py-2 text-sm font-semibold rounded-full border transition-all
-                {% if filtros.get('tour') %}filter-active{% else %}bg-white text-gray-600 border-gray-200 hover:bg-gray-50{% endif %}">
-        🔮 Tour 360°
-      </a>
-    </div>
-  </div>
-
-  <!-- Grid -->
-  {% if propiedades %}
-  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-    {% for p in propiedades %}
-    {% set c_wa = corredores_dict.get(p.corredor_id, {}) %}
-    {% set wa_num = c_wa.get('whatsapp') or c_wa.get('telefono') %}
-    {% set is_fav = p.id in favoritos %}
-    <div class="card-prop group bg-white rounded-2xl overflow-hidden shadow-md" style="position:relative;">
-      <a href="/propiedad/{{ p.id }}" class="block no-underline">
-
-        <!-- Image -->
-        <div class="relative overflow-hidden" style="height:220px; background-color:#1B2A4A;">
-          {% if p.foto_portada %}
-          <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}"
-               class="card-img w-full h-full object-cover"
-               onerror="this.style.display='none'">
-          {% endif %}
-          <div class="absolute inset-0 flex items-center justify-center {% if p.foto_portada %}opacity-0{% endif %}">
-            <span style="font-size:48px; opacity:0.3;">🏠</span>
-          </div>
-
-          <!-- Badges -->
-          <div class="absolute top-3 left-3 flex gap-2 flex-wrap">
-            <span class="text-xs font-bold px-3 py-1 rounded-full
-                         {% if p.operacion == 'Venta' %}text-navy{% else %}text-white{% endif %}"
-                  style="{% if p.operacion == 'Venta' %}background:#C9A84C;{% else %}background:#1B2A4A; border:1px solid #C9A84C;{% endif %}">
-              En {{ p.operacion }}
-            </span>
-            {% if p.tour_360_url %}
-            <span class="text-white text-xs font-semibold px-3 py-1 rounded-full"
-                  style="background:rgba(0,0,0,0.65);">🔮 360°</span>
-            {% endif %}
-            {% if p.destacado %}
-            <span class="text-xs font-bold px-3 py-1 rounded-full text-navy" style="background:#C9A84C;">★ Destacada</span>
-            {% endif %}
-          </div>
-
-          <!-- Bottom gradient -->
-          <div class="absolute bottom-0 left-0 right-0 h-16"
-               style="background:linear-gradient(to top, rgba(0,0,0,0.4), transparent);"></div>
-        </div>
-
-        <!-- Content -->
-        <div class="p-5">
-          <div class="text-xl font-black mb-1" style="color:#C9A84C;">{{ p.precio_fmt }}</div>
-          <div class="font-semibold text-gray-900 text-sm mb-1 truncate">{{ p.titulo }}</div>
-          <div class="text-gray-500 text-xs mb-4 flex items-center gap-1">
-            <span>📍</span><span class="truncate">{{ p.ciudad }}, {{ p.estado }}</span>
-          </div>
-
-          <!-- Specs -->
-          <div class="flex items-center gap-3 text-gray-500 text-xs border-t border-gray-100 pt-3">
-            {% if p.habitaciones %}<span class="flex items-center gap-1">🛏 {{ p.habitaciones }}</span>{% endif %}
-            {% if p.banos %}<span class="flex items-center gap-1">🚿 {{ p.banos }}</span>{% endif %}
-            {% if p.m2_construidos %}<span class="flex items-center gap-1">📐 {{ p.m2_construidos }}m²</span>{% endif %}
-            {% if p.estacionamientos %}<span class="flex items-center gap-1">🚗 {{ p.estacionamientos }}</span>{% endif %}
-            <span class="ml-auto font-bold transition-transform group-hover:translate-x-1" style="color:#C9A84C;">Ver →</span>
-          </div>
-        </div>
-      </a>
-
-      <!-- Action buttons (outside the main link) -->
-      <div class="absolute top-3 right-3 flex flex-col gap-2">
-        <!-- Favorite heart -->
-        <button onclick="toggleFav(event, {{ p.id }}, this)"
-                data-fav="{{ 'true' if is_fav else 'false' }}"
-                class="w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
-                style="background:rgba(255,255,255,0.92);">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="{{ '#ef4444' if is_fav else 'none' }}" stroke="{{ '#ef4444' if is_fav else '#999' }}" stroke-width="2">
-            <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-          </svg>
-        </button>
-
-        <!-- WhatsApp button -->
-        {% if wa_num %}
-        <a href="https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}"
-           target="_blank"
-           onclick="event.stopPropagation()"
-           class="w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
-           style="background:#22C55E;">
-          <svg width="17" height="17" viewBox="0 0 24 24" fill="white">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-        </a>
-        {% endif %}
-      </div>
-    </div>
-    {% endfor %}
-  </div>
-
-  {% else %}
-  <!-- Empty state -->
-  <div class="text-center py-20">
-    <div style="font-size:64px; margin-bottom:16px;">🏠</div>
-    <h3 class="text-xl font-bold text-gray-700 mb-2">
-      {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
-        No encontramos propiedades con esos filtros
-      {% else %}
-        Próximamente tendremos propiedades
-      {% endif %}
-    </h3>
-    <p class="text-gray-500 text-sm mb-6">
-      {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
-        Prueba con otros criterios de búsqueda
-      {% else %}
-        Estamos captando las mejores propiedades de la región
-      {% endif %}
-    </p>
-    {% if filtros.tipo or filtros.operacion or filtros.ciudad %}
-    <a href="/" class="inline-block font-semibold px-6 py-3 rounded-xl text-sm text-white" style="background-color:#1B2A4A;">
-      Ver todas las propiedades
-    </a>
-    {% endif %}
-  </div>
-  {% endif %}
-</section>
-
-
-<!-- ══════════════ TOUR 360° PROMO ══════════════ -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-10">
-  <div class="rounded-2xl overflow-hidden relative flex flex-col md:flex-row items-center justify-between gap-6 p-8 md:p-10"
-       style="background: linear-gradient(135deg, #1B2A4A 0%, #243660 100%);">
-    <div class="absolute inset-0 hero-dots pointer-events-none opacity-50"></div>
-    <div class="relative">
-      <div class="text-xs font-bold tracking-widest uppercase mb-2" style="color:#C9A84C;">Próximamente</div>
-      <h3 class="text-white text-2xl font-black mb-2">Recorridos Virtuales 360°</h3>
-      <p class="text-gray-400 text-sm max-w-md">
-        Visita propiedades desde la comodidad de tu casa. Experimenta cada rincón con nuestra tecnología de tour inmersivo.
-      </p>
-    </div>
-    <div class="relative flex-shrink-0">
-      <div class="w-20 h-20 rounded-full flex items-center justify-center text-5xl"
-           style="background:rgba(201,168,76,0.15); border: 2px solid rgba(201,168,76,0.4);">
-        🔮
-      </div>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════ CTA / CONTACTO ══════════════ -->
-<section class="relative overflow-hidden" id="contacto" style="background-color:#1B2A4A;">
-  <div class="absolute inset-0 hero-dots pointer-events-none"></div>
-  <div class="absolute left-0 top-0 w-1 h-full gold-bar"></div>
-  <div class="relative max-w-7xl mx-auto px-6 py-16 text-center">
-    <h2 class="text-white text-3xl font-bold mb-3">¿Buscas algo en especial?</h2>
-    <p class="text-gray-400 mb-8 text-base font-light max-w-xl mx-auto">
-      Nuestros corredores expertos te ayudan a encontrar la propiedad perfecta para ti
-    </p>
-    <div class="flex flex-col sm:flex-row gap-4 justify-center">
-      <a href="https://wa.me/51999999999" target="_blank"
-         class="inline-flex items-center justify-center gap-2 font-bold px-6 py-3.5 rounded-xl text-sm transition-all hover:opacity-90 text-white"
-         style="background:#22C55E;">
-        📱 Contactar por WhatsApp
-      </a>
-      <a href="/corredor/registro"
-         class="inline-flex items-center justify-center gap-2 font-bold px-6 py-3.5 rounded-xl text-sm transition-all hover:opacity-90"
-         style="background:#C9A84C; color:#1B2A4A;">
-        Quiero ser Corredor →
-      </a>
-    </div>
-  </div>
-</section>
-
-
-<!-- ══════════════ FOOTER ══════════════ -->
-<footer style="background:#111827;" class="text-gray-400 py-10">
-  <div class="max-w-7xl mx-auto px-4 flex flex-col md:flex-row items-center justify-between gap-6">
-    <div class="flex items-center gap-3">
-      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center overflow-hidden flex-shrink-0">
-        <img src="/static/img/logo.jpeg" alt="" class="w-7 h-7 object-contain" onerror="this.style.display='none'">
-      </div>
-      <div>
-        <div class="text-white font-bold text-sm tracking-wider">INMERSIVA</div>
-        <div class="tracking-widest" style="font-size:9px; color:#C9A84C;">GRUPO INMOBILIARIO</div>
-      </div>
-    </div>
-
-    <div class="text-center text-xs">
-      © 2026 Inmersiva Grupo Inmobiliario ·
-      <span style="color:#C9A84C;">inmobiliariainmersiva.com</span>
-    </div>
-
-    <div class="flex items-center gap-4 text-xs">
-      <a href="/login?tab=corredor" class="hover:text-white transition-colors">Corredores</a>
-      <span>·</span>
-      <a href="/login?tab=admin" class="hover:text-white transition-colors">Administración</a>
-      <span>·</span>
-      <a href="/registro" class="hover:text-white transition-colors">Registro</a>
-    </div>
-  </div>
-</footer>
 
 </body>
 </html>
