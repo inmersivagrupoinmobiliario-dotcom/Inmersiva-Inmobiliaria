@@ -4,6 +4,17 @@ import json as _json
 from database import Base
 
 
+class SolicitudCorredor(Base):
+    __tablename__ = "solicitudes_corredor"
+    id = Column(Integer, primary_key=True)
+    nombre = Column(String(100), nullable=False)
+    email = Column(String(100), unique=True, nullable=False)
+    telefono = Column(String(30), default="")
+    mensaje = Column(Text, default="")
+    estado = Column(String(20), default="Pendiente")  # Pendiente / Aprobado / Rechazado
+    created_at = Column(DateTime, default=datetime.utcnow)
+
+
 class Contacto(Base):
     __tablename__ = "contactos"
     id = Column(Integer, primary_key=True)
@@ -11,8 +22,8 @@ class Contacto(Base):
     nombre = Column(String(100), nullable=False)
     email = Column(String(100), default="")
     telefono = Column(String(30), default="")
-    origen = Column(String(50), default="Web")        # Web, WhatsApp, Referido, Portal, Otro
-    estado = Column(String(30), default="Nuevo")      # Nuevo, Contactado, Negociacion, Ganado, Perdido
+    origen = Column(String(50), default="Web")
+    estado = Column(String(30), default="Nuevo")
     interes = Column(String(300), default="")
     notas = Column(Text, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -28,7 +39,7 @@ class Cita(Base):
     descripcion = Column(Text, default="")
     fecha = Column(DateTime, nullable=False)
     lugar = Column(String(200), default="")
-    estado = Column(String(20), default="Pendiente")  # Pendiente, Completada, Cancelada
+    estado = Column(String(20), default="Pendiente")
     created_at = Column(DateTime, default=datetime.utcnow)
 
 
@@ -37,7 +48,7 @@ class DocumentoCorredor(Base):
     id = Column(Integer, primary_key=True)
     corredor_id = Column(Integer, ForeignKey("corredores.id"), nullable=False)
     nombre = Column(String(200), nullable=False)
-    tipo = Column(String(50), default="Otro")         # Contrato, Tasación, Plano, Fotos, Otro
+    tipo = Column(String(50), default="Otro")
     archivo = Column(String(300), default="")
     notas = Column(Text, default="")
     created_at = Column(DateTime, default=datetime.utcnow)
@@ -47,11 +58,26 @@ class PostRRSS(Base):
     __tablename__ = "posts_rrss"
     id = Column(Integer, primary_key=True)
     corredor_id = Column(Integer, ForeignKey("corredores.id"), nullable=False)
-    red = Column(String(30), nullable=False)          # Instagram, Facebook, WhatsApp, TikTok
+    # Campos originales
+    red = Column(String(30), nullable=False)
     contenido = Column(Text, default="")
     url = Column(String(500), default="")
     fecha_publicacion = Column(DateTime, default=datetime.utcnow)
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Campos nuevos para flujo de aprobación
+    listing_id = Column(String(36), nullable=True)
+    titulo = Column(String(200), nullable=True)
+    imagen_url = Column(String(500), nullable=True)
+    estado = Column(String(20), default="Pendiente")   # Pendiente/Aprobado/Rechazado/Publicado
+    comentario_admin = Column(Text, nullable=True)
+    redes = Column(String(200), nullable=True)          # CSV: instagram,facebook,whatsapp,tiktok
+    upload_post_id = Column(String(100), nullable=True)
+    publicado_at = Column(DateTime, nullable=True)
+    caption = Column(Text, nullable=True)
+
+    @property
+    def redes_list(self):
+        return [r.strip() for r in (self.redes or "").split(",") if r.strip()]
 
 
 class Corredor(Base):
@@ -64,6 +90,11 @@ class Corredor(Base):
     hashed_password = Column(String(200), nullable=False)
     activo = Column(Boolean, default=True)
     created_at = Column(DateTime, default=datetime.utcnow)
+    # Campos nuevos de perfil
+    foto_perfil = Column(String(300), nullable=True)
+    bio = Column(Text, nullable=True)
+    instagram = Column(String(100), nullable=True)
+    whatsapp = Column(String(30), nullable=True)
 
 
 class UsuarioPublico(Base):
