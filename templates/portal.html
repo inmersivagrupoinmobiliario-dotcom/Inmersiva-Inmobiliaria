@@ -6,16 +6,14 @@
   <title>{% if filtros.ciudad %}Propiedades en {{ filtros.ciudad }}{% elif filtros.tipo %}{{ filtros.tipo }} en {{ filtros.operacion or 'Venta y Alquiler' }}{% else %}Inmersiva — Recorre hoy, vive mañana{% endif %}</title>
   <link rel="icon" href="/static/img/favicon.png" type="image/png">
   <meta name="description" content="Encuentra las mejores propiedades en venta y alquiler en Perú. Inmersiva Grupo Inmobiliario.">
-  <!-- Open Graph — para compartir en WhatsApp, Facebook, LinkedIn -->
   <meta property="og:title" content="{% if filtros.ciudad %}Propiedades en {{ filtros.ciudad }} — Inmersiva{% else %}Inmersiva Grupo Inmobiliario — Propiedades en Perú{% endif %}">
   <meta property="og:description" content="Encuentra las mejores propiedades en venta y alquiler en Perú. Inmersiva Grupo Inmobiliario.">
   <meta property="og:type" content="website">
   <meta property="og:image" content="/static/img/og-portal.jpg">
   <meta property="og:locale" content="es_PE">
   <meta name="twitter:card" content="summary_large_image">
-  <link rel="canonical" href="{{ request.url.scheme }}://{{ request.url.netloc }}{% if filtros | selectattr is defined %}/{% endif %}">
+  <link rel="canonical" href="{{ request.url.scheme }}://{{ request.url.netloc }}/">
 
-  <!-- Sora (display) + Barlow (body) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;600;700;800&family=Barlow:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
@@ -25,7 +23,7 @@
       theme: {
         extend: {
           colors: {
-            navy: { DEFAULT: '#1B2A4A', dark: '#0f1a2e', light: '#243660' },
+            navy: { DEFAULT: '#1B2A4A', dark: '#0d1e38', light: '#243660' },
             gold:  { DEFAULT: '#C9A84C', light: '#E8C96A', dark: '#a88a3a' },
           }
         }
@@ -35,229 +33,168 @@
 
   <style>
     *, *::before, *::after { box-sizing: border-box; }
-    body { font-family: 'Barlow', system-ui, sans-serif; background: #f5f6f8; }
+    body { font-family: 'Barlow', system-ui, sans-serif; background: #eef0f5; color: #1a202c; }
     h1, h2, h3, .font-sora { font-family: 'Sora', system-ui, sans-serif; }
 
-    /* ── NAVBAR ── */
-    .nav-link { color: rgba(255,255,255,.55); font-size: .83rem; font-weight: 500; text-decoration: none; transition: color .15s; }
+    /* NAVBAR */
+    .nav-link { color: rgba(255,255,255,.72); font-size: .83rem; font-weight: 500; text-decoration: none; transition: color .15s; }
     .nav-link:hover, .nav-link.active { color: #fff; }
     .nav-link.active { font-weight: 700; }
 
-    /* ── SEARCH STRIP ── */
-    .search-strip { background: linear-gradient(135deg, #1B2A4A 0%, #0f1a2e 100%); }
-    .search-pattern { background-image: radial-gradient(circle, rgba(201,168,76,.07) 1px, transparent 1px); background-size: 28px 28px; }
+    /* SEARCH STRIP */
+    .search-strip { background: linear-gradient(160deg, #1B2A4A 0%, #0d1e38 100%); }
+    .search-pattern { background-image: radial-gradient(circle, rgba(201,168,76,.06) 1px, transparent 1px); background-size: 28px 28px; }
     .search-inp {
       background: rgba(255,255,255,.09);
-      border: 1.5px solid rgba(255,255,255,.18);
+      border: 1.5px solid rgba(255,255,255,.22);
       color: #fff;
       border-radius: 10px;
       padding: 10px 14px;
       font-family: 'Barlow', sans-serif;
       font-size: .88rem;
       outline: none;
-      transition: border-color .2s;
+      transition: border-color .2s, background .2s;
       width: 100%;
     }
-    .search-inp::placeholder { color: rgba(255,255,255,.38); }
-    .search-inp:focus { border-color: #C9A84C; }
+    .search-inp::placeholder { color: rgba(255,255,255,.42); }
+    .search-inp:focus { border-color: #C9A84C; background: rgba(255,255,255,.13); }
     .search-inp option { background: #1B2A4A; color: #fff; }
 
-    /* ── FILTER STRIP ── */
+    /* FILTER STRIP */
     .filter-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; }
     .filter-strip::-webkit-scrollbar { display: none; }
     .fpill {
-      flex-shrink: 0;
-      padding: 6px 16px;
-      border-radius: 20px;
-      font-family: 'Barlow', sans-serif;
-      font-size: .78rem;
-      font-weight: 600;
-      cursor: pointer;
-      border: 1.5px solid #e2e4e8;
-      background: #fff;
-      color: #555;
-      text-decoration: none;
-      transition: all .18s;
-      white-space: nowrap;
+      flex-shrink: 0; padding: 6px 16px; border-radius: 20px;
+      font-family: 'Barlow', sans-serif; font-size: .78rem; font-weight: 600;
+      cursor: pointer; border: 1.5px solid #d0d4de; background: #fff;
+      color: #4a5568; text-decoration: none; transition: all .18s; white-space: nowrap;
     }
-    .fpill:hover { border-color: #1B2A4A; color: #1B2A4A; }
+    .fpill:hover { border-color: #1B2A4A; color: #1B2A4A; background: #f4f6fb; }
     .fpill.active-navy { background: #1B2A4A; border-color: #1B2A4A; color: #fff; }
-    .fpill.active-gold { background: #C9A84C; border-color: #C9A84C; color: #1B2A4A; }
+    .fpill.active-gold { background: #C9A84C; border-color: #C9A84C; color: #1B2A4A; font-weight: 700; }
 
-    /* ── PROPERTY CARDS (portrait 3:4) ── */
+    /* PROPERTY CARDS */
     .prop-card {
-      position: relative;
-      border-radius: 16px;
-      overflow: hidden;
-      background: #1B2A4A;
-      aspect-ratio: 3 / 4;
-      display: block;
-      text-decoration: none;
-      cursor: pointer;
-      transition: transform .28s cubic-bezier(.25,.46,.45,.94), box-shadow .28s ease;
-      box-shadow: 0 4px 16px rgba(0,0,0,.10);
+      position: relative; border-radius: 16px; overflow: hidden;
+      background: #1B2A4A; aspect-ratio: 3/4; display: block;
+      text-decoration: none; cursor: pointer;
+      transition: transform .3s cubic-bezier(.25,.46,.45,.94), box-shadow .3s ease;
+      box-shadow: 0 4px 20px rgba(0,0,0,.13);
     }
-    .prop-card:hover {
-      transform: translateY(-7px);
-      box-shadow: 0 24px 56px rgba(0,0,0,.16);
-    }
-    .prop-card-img {
-      width: 100%; height: 100%;
-      object-fit: cover;
-      transition: transform .6s ease;
-      display: block;
-    }
-    .prop-card:hover .prop-card-img { transform: scale(1.05); }
+    .prop-card:hover { transform: translateY(-8px); box-shadow: 0 28px 64px rgba(0,0,0,.2); }
+    .prop-card-img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s ease; display: block; }
+    .prop-card:hover .prop-card-img { transform: scale(1.06); }
 
-    /* Gradient overlay — stronger at bottom */
     .card-overlay {
       position: absolute; inset: 0;
-      background: linear-gradient(
-        to bottom,
-        rgba(0,0,0,0)     0%,
-        rgba(0,0,0,0)     30%,
-        rgba(10,20,38,.55) 60%,
-        rgba(10,20,38,.92) 100%
-      );
+      background: linear-gradient(to bottom, rgba(0,0,0,0) 0%, rgba(0,0,0,0) 25%, rgba(8,16,30,.52) 58%, rgba(8,16,30,.94) 100%);
     }
-    /* Subtle top gradient for badges readability */
     .card-top-shadow {
       position: absolute; top: 0; left: 0; right: 0; height: 80px;
-      background: linear-gradient(to bottom, rgba(0,0,0,.35), transparent);
+      background: linear-gradient(to bottom, rgba(0,0,0,.38), transparent);
     }
-
-    /* Card top row: badges + heart */
     .card-top {
       position: absolute; top: 12px; left: 12px; right: 12px;
       display: flex; align-items: flex-start; justify-content: space-between; gap: 8px; z-index: 2;
     }
-    /* Card bottom: price, title, specs */
-    .card-bottom {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 16px 14px 14px; z-index: 2;
-    }
+    .card-bottom { position: absolute; bottom: 0; left: 0; right: 0; padding: 18px 14px 14px; z-index: 2; }
     .card-price {
-      font-family: 'Sora', sans-serif;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: #C9A84C;
-      line-height: 1;
-      margin-bottom: 4px;
+      font-family: 'Sora', sans-serif; font-size: 1.18rem; font-weight: 800;
+      color: #C9A84C; line-height: 1; margin-bottom: 5px; text-shadow: 0 1px 4px rgba(0,0,0,.4);
     }
     .card-title {
-      font-family: 'Barlow', sans-serif;
-      font-size: .83rem;
-      font-weight: 600;
-      color: #fff;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      margin-bottom: 4px;
+      font-family: 'Barlow', sans-serif; font-size: .84rem; font-weight: 600; color: #fff;
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px;
     }
     .card-location {
-      font-size: .72rem;
-      color: rgba(255,255,255,.65);
-      margin-bottom: 8px;
+      font-size: .72rem; color: rgba(255,255,255,.8); margin-bottom: 9px;
       display: flex; align-items: center; gap: 4px;
     }
     .card-specs {
       display: flex; align-items: center; gap: 10px;
-      font-size: .72rem; color: rgba(255,255,255,.8); font-weight: 500;
+      font-size: .72rem; color: rgba(255,255,255,.85); font-weight: 500;
     }
     .spec-item { display: flex; align-items: center; gap: 3px; }
 
-    /* Op badge */
     .op-badge {
-      font-family: 'Barlow', sans-serif;
-      font-size: .65rem; font-weight: 700;
-      padding: 3px 9px; border-radius: 20px;
-      text-transform: uppercase; letter-spacing: .5px;
+      font-family: 'Barlow', sans-serif; font-size: .65rem; font-weight: 700;
+      padding: 3px 9px; border-radius: 20px; text-transform: uppercase; letter-spacing: .5px;
     }
     .op-badge.venta { background: #C9A84C; color: #1B2A4A; }
-    .op-badge.renta { background: rgba(255,255,255,.15); color: #fff; border: 1px solid rgba(201,168,76,.5); }
+    .op-badge.renta { background: rgba(255,255,255,.16); color: #fff; border: 1px solid rgba(201,168,76,.45); }
 
-    /* Heart */
     .heart-btn {
-      width: 34px; height: 34px; border-radius: 50%;
-      background: rgba(255,255,255,.18);
-      backdrop-filter: blur(6px);
-      border: none; cursor: pointer;
+      width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.18);
+      backdrop-filter: blur(6px); border: none; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
-      transition: transform .2s, background .2s;
-      flex-shrink: 0;
+      transition: transform .2s, background .2s; flex-shrink: 0;
     }
-    .heart-btn:hover { transform: scale(1.15); background: rgba(255,255,255,.28); }
+    .heart-btn:hover { transform: scale(1.15); background: rgba(255,255,255,.30); }
 
-    /* WhatsApp pill */
     .wa-pill {
       display: inline-flex; align-items: center; gap: 4px;
-      background: #22C55E; color: #fff;
-      border-radius: 20px; padding: 3px 9px;
+      background: #16a34a; color: #fff; border-radius: 20px; padding: 3px 9px;
       font-size: .65rem; font-weight: 700; text-decoration: none;
-      transition: opacity .2s; letter-spacing: .3px; text-transform: uppercase;
+      transition: opacity .2s; letter-spacing: .3px; text-transform: uppercase; cursor: pointer;
     }
     .wa-pill:hover { opacity: .88; }
 
-    /* Destacado shimmer */
     .badge-dest {
-      font-size: .63rem; font-weight: 700;
-      padding: 3px 8px; border-radius: 20px;
-      background: #C9A84C; color: #1B2A4A;
-      text-transform: uppercase; letter-spacing: .5px;
+      font-size: .63rem; font-weight: 700; padding: 3px 8px; border-radius: 20px;
+      background: #C9A84C; color: #1B2A4A; text-transform: uppercase; letter-spacing: .5px;
     }
 
     /* Advanced filter panel */
-    .adv-panel {
-      background: #fff; border-radius: 12px;
-      border: 1.5px solid #e8eaee;
-      padding: 14px 16px;
-      margin-top: 10px;
-    }
     .adv-inp {
-      width: 100%; padding: 8px 12px;
-      border: 1.5px solid #e2e4e8; border-radius: 8px;
-      font-family: 'Barlow', sans-serif; font-size: .83rem;
-      outline: none; background: #f8f9fb;
-      transition: border-color .15s;
+      width: 100%; padding: 8px 12px; border: 1.5px solid #e2e4e8; border-radius: 8px;
+      font-family: 'Barlow', sans-serif; font-size: .83rem; color: #1a202c;
+      outline: none; background: #f8f9fb; transition: border-color .15s;
     }
-    .adv-inp:focus { border-color: #C9A84C; }
+    .adv-inp:focus { border-color: #C9A84C; background: #fff; }
 
-    /* Corredor modal */
+    /* Modal */
     #modal-corredor {
-      position: fixed; inset: 0;
-      background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
-      z-index: 999; align-items: center; justify-content: center;
-      display: none;
+      position: fixed; inset: 0; background: rgba(0,0,0,.55); backdrop-filter: blur(4px);
+      z-index: 999; align-items: center; justify-content: center; display: none;
     }
 
     /* Category quick links */
     .cat-link {
-      display: flex; align-items: center; gap: 10px;
-      background: #fff; border-radius: 12px; padding: 12px 16px;
-      text-decoration: none; border: 1.5px solid #eff0f2;
-      transition: all .18s; box-shadow: 0 1px 4px rgba(0,0,0,.04);
+      display: flex; align-items: center; gap: 10px; background: #fff;
+      border-radius: 12px; padding: 12px 14px; text-decoration: none;
+      border: 1.5px solid #e6e9f0; transition: all .2s; box-shadow: 0 1px 4px rgba(0,0,0,.05);
     }
-    .cat-link:hover { border-color: #C9A84C; box-shadow: 0 4px 16px rgba(0,0,0,.08); transform: translateY(-2px); }
+    .cat-link:hover { border-color: #C9A84C; box-shadow: 0 6px 20px rgba(0,0,0,.1); transform: translateY(-2px); }
+    .cat-icon {
+      width: 36px; height: 36px; border-radius: 10px; background: rgba(27,42,74,.07);
+      display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+      transition: background .2s;
+    }
+    .cat-link:hover .cat-icon { background: rgba(201,168,76,.14); }
 
-    /* Section title */
+    /* Section kicker */
     .section-kicker {
-      font-family: 'Barlow', sans-serif;
-      font-size: .7rem; font-weight: 700; letter-spacing: 2.5px;
-      text-transform: uppercase; color: #C9A84C;
+      font-family: 'Barlow', sans-serif; font-size: .7rem; font-weight: 700;
+      letter-spacing: 2.5px; text-transform: uppercase; color: #C9A84C;
+    }
+
+    /* Filter badge */
+    .filter-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      background: rgba(27,42,74,.08); border: 1px solid rgba(27,42,74,.15);
+      color: #1B2A4A; font-size: .72rem; font-weight: 700;
+      padding: 3px 10px 3px 8px; border-radius: 20px;
     }
   </style>
 </head>
 <body>
 <a href="#main-content" style="position:absolute;left:-9999px;top:4px;padding:8px 16px;background:#C9A84C;color:#1B2A4A;font-weight:700;font-size:.85rem;border-radius:6px;z-index:9999;text-decoration:none;" onfocus="this.style.left='4px'" onblur="this.style.left='-9999px'">Saltar al contenido principal</a>
 
-<!-- ══════════════════════════════════════════════
-     NAVBAR
-══════════════════════════════════════════════ -->
-<nav style="background:#1B2A4A; position:sticky; top:0; z-index:50; box-shadow:0 2px 20px rgba(0,0,0,.25);">
-  <div style="max-width:1320px; margin:0 auto; padding:0 20px; height:58px; display:flex; align-items:center; justify-content:space-between; gap:16px;">
+<!-- NAVBAR -->
+<nav style="background:#1B2A4A;position:sticky;top:0;z-index:50;box-shadow:0 2px 24px rgba(0,0,0,.28);">
+  <div style="max-width:1320px;margin:0 auto;padding:0 20px;height:60px;display:flex;align-items:center;justify-content:space-between;gap:16px;">
 
-    <!-- Logo -->
-    <a href="/" style="display:flex; align-items:center; gap:10px; text-decoration:none; flex-shrink:0;">
+    <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;flex-shrink:0;">
       <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.2);">
         <img src="/static/img/logo.jpeg" alt="Inmersiva" style="width:32px;height:32px;object-fit:contain;" onerror="this.style.display='none'">
       </div>
@@ -267,7 +204,6 @@
       </div>
     </a>
 
-    <!-- Nav links -->
     <div class="hidden md:flex items-center gap-6">
       <a href="/" class="nav-link active">Inicio</a>
       <a href="/?operacion=Venta" class="nav-link">Comprar</a>
@@ -275,7 +211,6 @@
       <a href="/#contacto" class="nav-link">Contacto</a>
     </div>
 
-    <!-- Auth area -->
     <div style="display:flex;align-items:center;gap:10px;flex-shrink:0;">
 
       {% if usuario and (not user or user.get('role') == 'usuario') %}
@@ -285,11 +220,9 @@
           <button onclick="toggleMenu()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:none;border-radius:24px;padding:5px 12px 5px 5px;cursor:pointer;transition:background .15s;" onmouseenter="this.style.background='rgba(255,255,255,.14)'" onmouseleave="this.style.background='rgba(255,255,255,.08)'">
             <div style="width:30px;height:30px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;color:#1B2A4A;">{{ ini }}</div>
             <span class="hidden md:block" style="color:#fff;font-size:.82rem;font-weight:600;max-width:100px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">{{ nd }}</span>
-            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
           </button>
-
-          <!-- Dropdown -->
-          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:240px;background:#fff;border-radius:16px;box-shadow:0 16px 48px rgba(0,0,0,.18);overflow:hidden;border:1.5px solid #eff0f2;">
+          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:240px;background:#fff;border-radius:16px;box-shadow:0 20px 56px rgba(0,0,0,.2);overflow:hidden;border:1px solid #e6e9f0;">
             <div style="background:linear-gradient(135deg,#1B2A4A,#243660);padding:14px 16px;">
               <div style="display:flex;align-items:center;gap:10px;">
                 <div style="width:36px;height:36px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;color:#1B2A4A;">{{ ini }}</div>
@@ -300,21 +233,25 @@
               </div>
             </div>
             <div style="padding:6px 0;">
-              <a href="/mis-favoritos" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#333;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">
-                <span style="font-size:1rem;">🏠</span> Casas guardadas
+              <a href="/mis-favoritos" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#2d3748;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f7f8fa'" onmouseleave="this.style.background='transparent'">
+                <svg width="15" height="15" fill="none" stroke="#1B2A4A" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+                Casas guardadas
               </a>
-              <a href="/mi-perfil" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#333;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">
-                <span style="font-size:1rem;">👤</span> Mis datos
+              <a href="/mi-perfil" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#2d3748;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#f7f8fa'" onmouseleave="this.style.background='transparent'">
+                <svg width="15" height="15" fill="none" stroke="#1B2A4A" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                Mis datos
               </a>
               {% if usuario_es_corredor %}
               <div style="height:1px;background:#f0f0f0;margin:4px 12px;"></div>
-              <button onclick="document.getElementById('modal-corredor').style.display='flex'" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:#C9A84C;background:none;border:none;cursor:pointer;text-align:left;" onmouseenter="this.style.background='#fffbf0'" onmouseleave="this.style.background='transparent'">
-                <span style="font-size:1rem;">🏢</span> Acceder como Corredor
+              <button onclick="document.getElementById('modal-corredor').style.display='flex'" style="width:100%;display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;font-weight:600;color:#C9A84C;background:none;border:none;cursor:pointer;text-align:left;" onmouseenter="this.style.background='#fffcf0'" onmouseleave="this.style.background='transparent'">
+                <svg width="15" height="15" fill="none" stroke="#C9A84C" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Acceder como Corredor
               </button>
               {% endif %}
               <div style="height:1px;background:#f0f0f0;margin:4px 12px;"></div>
               <a href="/usuario/logout" style="display:flex;align-items:center;gap:10px;padding:10px 16px;font-size:.83rem;color:#dc2626;text-decoration:none;transition:background .12s;" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='transparent'">
-                <span style="font-size:1rem;">🚪</span> Cerrar sesión
+                <svg width="15" height="15" fill="none" stroke="#dc2626" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Cerrar sesión
               </a>
             </div>
           </div>
@@ -327,21 +264,30 @@
           <button onclick="toggleMenu()" style="display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.08);border:none;border-radius:24px;padding:5px 12px 5px 5px;cursor:pointer;" onmouseenter="this.style.background='rgba(255,255,255,.14)'" onmouseleave="this.style.background='rgba(255,255,255,.08)'">
             <div style="width:30px;height:30px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;color:#1B2A4A;">{{ iad }}</div>
             <span class="hidden md:block" style="color:#fff;font-size:.82rem;font-weight:600;">{{ nad }}</span>
-            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
+            <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 9l-7 7-7-7"/></svg>
           </button>
-          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:200px;background:#fff;border-radius:14px;box-shadow:0 16px 48px rgba(0,0,0,.15);overflow:hidden;border:1.5px solid #eff0f2;">
+          <div id="user-dropdown" class="hidden" style="position:absolute;right:0;top:calc(100% + 8px);width:200px;background:#fff;border-radius:14px;box-shadow:0 20px 56px rgba(0,0,0,.18);overflow:hidden;border:1px solid #e6e9f0;">
             <div style="background:linear-gradient(135deg,#1B2A4A,#243660);padding:12px 14px;">
               <div style="color:#fff;font-weight:700;font-size:.85rem;">{{ nad }}</div>
               <div style="color:#C9A84C;font-size:.7rem;margin-top:2px;">{% if user.get('role') == 'empresa' %}Administrador{% else %}Corredor{% endif %}</div>
             </div>
             <div style="padding:6px 0;">
               {% if user.get('role') == 'empresa' %}
-              <a href="/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#333;text-decoration:none;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">⚙️ Panel Admin</a>
+              <a href="/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#2d3748;text-decoration:none;" onmouseenter="this.style.background='#f7f8fa'" onmouseleave="this.style.background='transparent'">
+                <svg width="14" height="14" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+                Panel Admin
+              </a>
               {% else %}
-              <a href="/corredor/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#333;text-decoration:none;" onmouseenter="this.style.background='#f8f9fb'" onmouseleave="this.style.background='transparent'">🏢 Mi Dashboard</a>
+              <a href="/corredor/dashboard" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#2d3748;text-decoration:none;" onmouseenter="this.style.background='#f7f8fa'" onmouseleave="this.style.background='transparent'">
+                <svg width="14" height="14" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+                Mi Dashboard
+              </a>
               {% endif %}
               <div style="height:1px;background:#f0f0f0;margin:4px 10px;"></div>
-              <a href="/logout" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#dc2626;text-decoration:none;" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='transparent'">🚪 Cerrar sesión</a>
+              <a href="/logout" style="display:flex;align-items:center;gap:8px;padding:10px 14px;font-size:.83rem;color:#dc2626;text-decoration:none;" onmouseenter="this.style.background='#fef2f2'" onmouseleave="this.style.background='transparent'">
+                <svg width="14" height="14" fill="none" stroke="#dc2626" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+                Cerrar sesión
+              </a>
             </div>
           </div>
         </div>
@@ -355,20 +301,24 @@
 </nav>
 
 
-<!-- ══════════════════════════════════════════════
-     MODAL — Acceder como Corredor
-══════════════════════════════════════════════ -->
+<!-- MODAL — Acceder como Corredor -->
 <div id="modal-corredor" onclick="if(event.target===this)this.style.display='none'">
   <div style="background:#fff;border-radius:20px;padding:36px;width:100%;max-width:360px;box-shadow:0 32px 80px rgba(0,0,0,.3);">
     <div style="text-align:center;margin-bottom:24px;">
-      <div style="width:56px;height:56px;background:rgba(27,42,74,.07);border-radius:14px;display:flex;align-items:center;justify-content:center;font-size:1.6rem;margin:0 auto 14px;">🏢</div>
+      <div style="width:56px;height:56px;background:rgba(27,42,74,.07);border-radius:14px;display:flex;align-items:center;justify-content:center;margin:0 auto 14px;">
+        <svg width="26" height="26" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
       <h3 class="font-sora" style="font-size:1rem;font-weight:800;color:#1B2A4A;margin:0 0 6px;">Acceder como Corredor</h3>
       <p style="font-size:.8rem;color:#6b7280;margin:0;">Ingresa tu contraseña del CRM.</p>
     </div>
     {% if portal_error == 'corredor_pass' %}
-    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;color:#991b1b;font-size:.82rem;margin-bottom:14px;">⚠️ Contraseña incorrecta.</div>
+    <div style="background:#fef2f2;border:1.5px solid #fca5a5;border-radius:8px;padding:10px 14px;color:#991b1b;font-size:.82rem;margin-bottom:14px;display:flex;align-items:center;gap:8px;">
+      <svg width="14" height="14" fill="none" stroke="#991b1b" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Contraseña incorrecta.
+    </div>
     {% endif %}
     <form method="post" action="/usuario/acceder-como-corredor">
+      <input type="hidden" name="csrf_token" value="{{ request.state.csrf_token }}">
       <label style="display:block;font-size:.7rem;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:#374151;margin-bottom:7px;">Contraseña</label>
       <input type="password" name="password" required autofocus
              style="width:100%;padding:12px 14px;border:2px solid #e5e7eb;border-radius:10px;font-family:'Barlow',sans-serif;font-size:.9rem;outline:none;margin-bottom:14px;transition:border-color .15s;"
@@ -382,34 +332,30 @@
 </div>
 
 
-<!-- ══════════════════════════════════════════════
-     SEARCH STRIP
-══════════════════════════════════════════════ -->
+<!-- HERO / SEARCH STRIP -->
 <section class="search-strip search-pattern">
-  <div style="max-width:1320px;margin:0 auto;padding:24px 20px 20px;">
+  <div style="max-width:1320px;margin:0 auto;padding:36px 20px 26px;">
 
-    <!-- Slogan -->
-    <div style="text-align:center;margin-bottom:18px;">
-      <p class="font-sora" style="color:rgba(255,255,255,.45);font-size:.65rem;letter-spacing:4px;text-transform:uppercase;margin:0 0 6px;">Inmersiva Grupo Inmobiliario</p>
-      <h1 class="font-sora" style="color:#fff;font-size:clamp(1.2rem,3vw,1.7rem);font-weight:800;margin:0;letter-spacing:-.5px;">
+    <div style="text-align:center;margin-bottom:24px;">
+      <p class="font-sora" style="color:rgba(201,168,76,.9);font-size:.65rem;letter-spacing:4px;text-transform:uppercase;margin:0 0 8px;">Inmersiva Grupo Inmobiliario</p>
+      <h1 class="font-sora" style="color:#fff;font-size:clamp(1.4rem,3.5vw,2.1rem);font-weight:800;margin:0;letter-spacing:-.5px;line-height:1.15;">
         Recorre hoy, <span style="color:#C9A84C;">vive mañana</span>
       </h1>
+      <p style="color:rgba(255,255,255,.65);font-size:.88rem;margin:10px 0 0;font-family:'Barlow',sans-serif;">Las mejores propiedades del mercado peruano</p>
     </div>
 
-    <!-- Search form -->
     <form method="GET" action="/" id="search-form">
       <div style="display:flex;flex-wrap:wrap;gap:8px;align-items:stretch;">
 
-        <!-- Op toggle tabs -->
-        <div style="display:flex;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.15);flex-shrink:0;">
+        <div style="display:flex;border-radius:10px;overflow:hidden;border:1.5px solid rgba(255,255,255,.2);flex-shrink:0;">
           <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
              style="padding:10px 16px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .15s;
-                    {% if filtros.operacion == 'Renta' or not filtros.operacion %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.55);{% endif %}">
+                    {% if filtros.operacion == 'Renta' or not filtros.operacion %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.68);{% endif %}">
             Alquilar
           </a>
           <a href="/?operacion=Venta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
              style="padding:10px 16px;font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:700;text-decoration:none;transition:all .15s;
-                    {% if filtros.operacion == 'Venta' %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.55);{% endif %}">
+                    {% if filtros.operacion == 'Venta' %}background:#C9A84C;color:#1B2A4A;{% else %}background:transparent;color:rgba(255,255,255,.68);{% endif %}">
             Comprar
           </a>
         </div>
@@ -431,15 +377,14 @@
 
         <button type="submit"
                 style="padding:10px 20px;background:#C9A84C;color:#1B2A4A;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;border:none;border-radius:10px;cursor:pointer;letter-spacing:.3px;flex-shrink:0;display:flex;align-items:center;gap:6px;white-space:nowrap;">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.35-4.35"/></svg>
           Buscar
         </button>
       </div>
 
-      <!-- Advanced filters toggle -->
       <div style="margin-top:10px;">
-        <button type="button" onclick="toggleFiltros()" id="filtros-btn"
-                style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.18);border-radius:8px;color:rgba(255,255,255,.75);font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s;">
+        <button type="button" onclick="toggleFiltros()"
+                style="display:inline-flex;align-items:center;gap:6px;padding:5px 12px;background:rgba(255,255,255,.09);border:1px solid rgba(255,255,255,.22);border-radius:8px;color:rgba(255,255,255,.82);font-family:'Barlow',sans-serif;font-size:.76rem;font-weight:600;cursor:pointer;transition:all .15s;">
           <svg id="filtros-icon" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
           Más filtros
           {% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}
@@ -449,19 +394,18 @@
           {% endif %}
         </button>
 
-        <!-- Advanced panel -->
-        <div id="filtros-avanzados" style="display:{% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}block{% else %}none{% endif %};margin-top:10px;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.12);border-radius:12px;padding:14px 16px;">
+        <div id="filtros-avanzados" style="display:{% if filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min %}block{% else %}none{% endif %};margin-top:10px;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.18);border-radius:12px;padding:14px 16px;">
           <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;">
             <div>
-              <label for="f-precio-min" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio mín.</label>
+              <label for="f-precio-min" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio mín.</label>
               <input id="f-precio-min" type="number" name="precio_min" value="{{ filtros.precio_min }}" placeholder="S/ 0" class="adv-inp" inputmode="numeric" aria-label="Precio mínimo en soles">
             </div>
             <div>
-              <label for="f-precio-max" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio máx.</label>
+              <label for="f-precio-max" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Precio máx.</label>
               <input id="f-precio-max" type="number" name="precio_max" value="{{ filtros.precio_max }}" placeholder="Sin límite" class="adv-inp" inputmode="numeric" aria-label="Precio máximo en soles">
             </div>
             <div>
-              <label for="f-habitaciones" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Habitaciones</label>
+              <label for="f-habitaciones" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Habitaciones</label>
               <select id="f-habitaciones" name="habitaciones" class="adv-inp" aria-label="Número mínimo de habitaciones">
                 <option value="">Cualquiera</option>
                 {% for n in [1,2,3,4,5] %}
@@ -470,7 +414,7 @@
               </select>
             </div>
             <div>
-              <label for="f-m2" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.5);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Área mín. (m²)</label>
+              <label for="f-m2" style="display:block;font-size:.68rem;font-weight:700;color:rgba(255,255,255,.75);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:5px;">Área mín. (m²)</label>
               <input id="f-m2" type="number" name="m2_min" value="{{ filtros.m2_min }}" placeholder="m²" class="adv-inp" inputmode="numeric" aria-label="Área mínima en metros cuadrados">
             </div>
           </div>
@@ -481,58 +425,68 @@
 </section>
 
 
-<!-- ══════════════════════════════════════════════
-     MAIN CONTENT
-══════════════════════════════════════════════ -->
-<main id="main-content" style="max-width:1320px;margin:0 auto;padding:24px 20px 60px;">
+<!-- MAIN CONTENT -->
+<main id="main-content" style="max-width:1320px;margin:0 auto;padding:24px 20px 64px;">
 
-  <!-- ── Quick categories ── -->
-  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:24px;">
+  <!-- Quick categories -->
+  <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;margin-bottom:28px;">
     <a href="/?tipo=Departamento" class="cat-link">
-      <span style="font-size:1.3rem;">🏢</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 3v18"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Departamentos</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Alquiler y venta</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Alquiler y venta</div>
       </div>
     </a>
     <a href="/?tipo=Casa" class="cat-link">
-      <span style="font-size:1.3rem;">🏠</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Casas</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Alquiler y venta</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Alquiler y venta</div>
       </div>
     </a>
     <a href="/?tipo=Terreno" class="cat-link">
-      <span style="font-size:1.3rem;">🌳</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 20h20M5 20V10l7-6 7 6v10"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Terrenos</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Inversión</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Inversión</div>
       </div>
     </a>
     <a href="/?tipo=Penthouse" class="cat-link">
-      <span style="font-size:1.3rem;">✨</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Penthouses</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Premium</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Premium</div>
       </div>
     </a>
     <a href="/?tipo=Oficina" class="cat-link">
-      <span style="font-size:1.3rem;">💼</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Oficinas</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Comercial</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Comercial</div>
       </div>
     </a>
     <a href="/?tour=1" class="cat-link">
-      <span style="font-size:1.3rem;">🔮</span>
+      <div class="cat-icon">
+        <svg width="18" height="18" fill="none" stroke="#1B2A4A" stroke-width="1.7" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/><line x1="12" y1="2" x2="12" y2="5"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="2" y1="12" x2="5" y2="12"/><line x1="19" y1="12" x2="22" y2="12"/></svg>
+      </div>
       <div>
         <div style="font-family:'Sora',sans-serif;font-weight:700;font-size:.8rem;color:#1B2A4A;">Tour 360°</div>
-        <div style="font-size:.7rem;color:#999;margin-top:1px;">Inmersivo</div>
+        <div style="font-size:.7rem;color:#6b7280;margin-top:1px;">Inmersivo</div>
       </div>
     </a>
   </div>
 
-  <!-- ── Header + filter strip ── -->
+  <!-- Header + filter strip -->
   <div style="display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px;margin-bottom:16px;">
     <div>
       <div class="section-kicker">
@@ -545,25 +499,41 @@
         {% elif filtros.operacion == 'Venta' %}En Venta
         {% else %}Todas las propiedades{% endif %}
         {% if propiedades %}
-        <span style="font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:400;color:#999;margin-left:6px;">({{ propiedades|length }})</span>
+        <span style="font-family:'Barlow',sans-serif;font-size:.82rem;font-weight:400;color:#6b7280;margin-left:6px;">({{ propiedades|length }})</span>
         {% endif %}
       </h2>
 
-      <!-- Active filter badges -->
       {% if filtros.tipo or filtros.precio_min or filtros.precio_max or filtros.habitaciones or filtros.m2_min or filtros.ciudad %}
       <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;align-items:center;">
-        {% if filtros.tipo %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">{{ filtros.tipo }}</span>{% endif %}
-        {% if filtros.ciudad %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">📍 {{ filtros.ciudad }}</span>{% endif %}
-        {% if filtros.precio_min %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">Desde S/ {{ filtros.precio_min }}</span>{% endif %}
-        {% if filtros.precio_max %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">Hasta S/ {{ filtros.precio_max }}</span>{% endif %}
-        {% if filtros.habitaciones %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">🛏 {{ filtros.habitaciones }}+</span>{% endif %}
-        {% if filtros.m2_min %}<span style="background:#1B2A4A15;color:#1B2A4A;font-size:.72rem;font-weight:700;padding:3px 10px;border-radius:20px;">📐 {{ filtros.m2_min }}m²+</span>{% endif %}
-        <a href="/" style="font-size:.72rem;font-weight:700;color:#C9A84C;text-decoration:none;">✕ Limpiar</a>
+        {% if filtros.tipo %}<span class="filter-badge">{{ filtros.tipo }}</span>{% endif %}
+        {% if filtros.ciudad %}
+        <span class="filter-badge">
+          <svg width="9" height="9" fill="#1B2A4A" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+          {{ filtros.ciudad }}
+        </span>
+        {% endif %}
+        {% if filtros.precio_min %}<span class="filter-badge">Desde S/ {{ filtros.precio_min }}</span>{% endif %}
+        {% if filtros.precio_max %}<span class="filter-badge">Hasta S/ {{ filtros.precio_max }}</span>{% endif %}
+        {% if filtros.habitaciones %}
+        <span class="filter-badge">
+          <svg width="9" height="9" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 12V20H21V12"/><rect x="2" y="7" width="20" height="5" rx="2"/></svg>
+          {{ filtros.habitaciones }}+
+        </span>
+        {% endif %}
+        {% if filtros.m2_min %}
+        <span class="filter-badge">
+          <svg width="9" height="9" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+          {{ filtros.m2_min }}m²+
+        </span>
+        {% endif %}
+        <a href="/" style="font-size:.72rem;font-weight:700;color:#C9A84C;text-decoration:none;display:inline-flex;align-items:center;gap:3px;">
+          <svg width="10" height="10" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          Limpiar
+        </a>
       </div>
       {% endif %}
     </div>
 
-    <!-- Filter + sort pills -->
     <div style="display:flex;flex-wrap:wrap;align-items:center;gap:8px;">
       <div class="filter-strip">
         <a href="/" class="fpill {% if not filtros.operacion and not filtros.tipo %}active-navy{% endif %}">Todas</a>
@@ -572,12 +542,11 @@
         <a href="/?operacion=Renta{% if filtros.tipo %}&tipo={{ filtros.tipo }}{% endif %}{% if filtros.ciudad %}&ciudad={{ filtros.ciudad }}{% endif %}"
            class="fpill {% if filtros.operacion == 'Renta' %}active-navy{% endif %}">Alquiler</a>
         <a href="/?tour=1{% if filtros.operacion %}&operacion={{ filtros.operacion }}{% endif %}"
-           class="fpill {% if filtros.get('tour') %}active-navy{% endif %}">🔮 Tour 360°</a>
+           class="fpill {% if filtros.get('tour') %}active-navy{% endif %}">Tour 360°</a>
       </div>
-      <!-- Sort -->
       <div style="margin-left:auto;flex-shrink:0;">
         <select onchange="window.location.href=this.value"
-                style="font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:20px;border:1.5px solid #e2e4e8;background:#fff;color:#555;cursor:pointer;outline:none;">
+                style="font-family:'Barlow',sans-serif;font-size:.78rem;font-weight:600;padding:6px 12px;border-radius:20px;border:1.5px solid #d0d4de;background:#fff;color:#374151;cursor:pointer;outline:none;box-shadow:0 1px 3px rgba(0,0,0,.06);">
           {% set base = '?' + ('operacion=' + filtros.operacion + '&' if filtros.operacion else '') + ('tipo=' + filtros.tipo + '&' if filtros.tipo else '') + ('ciudad=' + filtros.ciudad + '&' if filtros.ciudad else '') %}
           <option value="{{ base }}orden=" {% if not filtros.orden %}selected{% endif %}>Destacados primero</option>
           <option value="{{ base }}orden=reciente" {% if filtros.orden == 'reciente' %}selected{% endif %}>Más recientes</option>
@@ -589,7 +558,7 @@
     </div>
   </div>
 
-  <!-- ── CARD GRID ── -->
+  <!-- CARD GRID -->
   {% if propiedades %}
   <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px;">
     {% for p in propiedades %}
@@ -598,41 +567,33 @@
     {% set is_fav = p.id in favoritos %}
 
     <div style="position:relative;">
-      <!-- Main card (clickable link) -->
       <a href="/propiedad/{{ p.id }}" class="prop-card" aria-label="{{ p.titulo }} — {{ p.tipo }} en {{ p.operacion }}, {{ p.ciudad }}">
-        <!-- Image -->
         {% if p.foto_portada %}
         <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }} — {{ p.tipo }} en {{ p.ciudad }}" class="prop-card-img"
              loading="lazy" onerror="this.style.display='none'">
         {% else %}
         <div style="width:100%;height:100%;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,#1B2A4A,#243660);">
-          <span style="font-size:4rem;opacity:.2;">🏠</span>
+          <svg width="48" height="48" fill="none" stroke="rgba(255,255,255,.18)" stroke-width="1.2" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
         {% endif %}
 
-        <!-- Overlays -->
         <div class="card-top-shadow"></div>
         <div class="card-overlay"></div>
 
-        <!-- Top: badge + tour/dest tags -->
         <div class="card-top">
           <div style="display:flex;flex-wrap:wrap;gap:4px;">
-            <span class="op-badge {% if p.operacion == 'Venta' %}venta{% else %}renta{% endif %}">
-              {{ p.operacion }}
-            </span>
+            <span class="op-badge {% if p.operacion == 'Venta' %}venta{% else %}renta{% endif %}">{{ p.operacion }}</span>
             {% if p.destacado %}<span class="badge-dest">★ Top</span>{% endif %}
             {% if p.tour_360_url %}<span class="op-badge" style="background:rgba(0,0,0,.5);color:#fff;">360°</span>{% endif %}
           </div>
-          <!-- Heart (placeholder spacing — real button is absolute sibling) -->
           <div style="width:34px;flex-shrink:0;"></div>
         </div>
 
-        <!-- Bottom: price + info -->
         <div class="card-bottom">
           <div class="card-price">{{ p.precio_fmt }}</div>
           <div class="card-title">{{ p.titulo }}</div>
           <div class="card-location">
-            <svg width="10" height="10" fill="#C9A84C" viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
+            <svg width="10" height="10" fill="#C9A84C" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>
             {{ p.ciudad }}{% if p.estado %}, {{ p.estado }}{% endif %}
           </div>
           <div class="card-specs">
@@ -642,7 +603,7 @@
             {% if wa_num %}
             <span style="margin-left:auto;">
               <span class="wa-pill" onclick="event.preventDefault();event.stopPropagation();window.open('https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}','_blank')">
-                <svg width="9" height="9" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                <svg width="9" height="9" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
                 WA
               </span>
             </span>
@@ -651,7 +612,6 @@
         </div>
       </a>
 
-      <!-- Heart button — outside the <a> to avoid nesting -->
       <button onclick="toggleFav(event, {{ p.id }}, this)"
               data-fav="{{ 'true' if is_fav else 'false' }}"
               class="heart-btn {% if is_fav %}active{% endif %}"
@@ -670,17 +630,19 @@
   </div>
 
   {% else %}
-  <!-- ── Empty state ── -->
+  <!-- Empty state -->
   <div style="text-align:center;padding:80px 20px;">
-    <div style="font-size:64px;margin-bottom:20px;opacity:.7;">🏠</div>
-    <h3 class="font-sora" style="font-size:1.2rem;font-weight:800;color:#1B2A4A;margin:0 0 10px;">
+    <div style="width:72px;height:72px;background:rgba(27,42,74,.06);border-radius:20px;display:flex;align-items:center;justify-content:center;margin:0 auto 20px;">
+      <svg width="32" height="32" fill="none" stroke="#1B2A4A" stroke-width="1.4" viewBox="0 0 24 24" aria-hidden="true" style="opacity:.3;"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+    </div>
+    <h3 class="font-sora" style="font-size:1.15rem;font-weight:800;color:#1B2A4A;margin:0 0 10px;">
       {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max or filtros.q %}
         Sin resultados con esos filtros
       {% else %}
         Próximamente tendremos propiedades
       {% endif %}
     </h3>
-    <p style="color:#9ca3af;font-size:.9rem;margin:0 0 24px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.6;">
+    <p style="color:#6b7280;font-size:.9rem;margin:0 0 24px;max-width:380px;margin-left:auto;margin-right:auto;line-height:1.65;">
       {% if filtros.tipo or filtros.operacion or filtros.ciudad or filtros.precio_min or filtros.precio_max or filtros.q %}
         Intenta ampliar los criterios o
         <a href="/" style="color:#C9A84C;font-weight:700;text-decoration:none;">ver todas las propiedades</a>
@@ -696,30 +658,30 @@
   </div>
   {% endif %}
 
-  <!-- ── Paginación ── -->
+  <!-- Paginación -->
   {% if total_pages > 1 %}
   {% set base_q = '?' + ('tipo=' + filtros.tipo + '&' if filtros.tipo else '') + ('operacion=' + filtros.operacion + '&' if filtros.operacion else '') + ('ciudad=' + filtros.ciudad + '&' if filtros.ciudad else '') + ('q=' + filtros.q + '&' if filtros.q else '') + ('orden=' + filtros.orden + '&' if filtros.orden else '') %}
-  <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:32px 20px 8px;flex-wrap:wrap;">
+  <div style="display:flex;align-items:center;justify-content:center;gap:6px;padding:36px 20px 8px;flex-wrap:wrap;">
     {% if page > 1 %}
     <a href="{{ base_q }}page={{ page - 1 }}"
-       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;transition:all .15s;"
-       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">← Anterior</a>
+       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #d0d4de;color:#1B2A4A;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.06);"
+       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#d0d4de'">← Anterior</a>
     {% endif %}
     {% for pg in range(1, total_pages + 1) %}
       {% if pg == page %}
       <span style="padding:8px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:800;font-size:.82rem;background:#1B2A4A;color:#C9A84C;">{{ pg }}</span>
       {% elif pg == 1 or pg == total_pages or (pg >= page - 2 and pg <= page + 2) %}
       <a href="{{ base_q }}page={{ pg }}"
-         style="padding:8px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;"
-         onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">{{ pg }}</a>
+         style="padding:8px 14px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #d0d4de;color:#374151;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.06);"
+         onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#d0d4de'">{{ pg }}</a>
       {% elif pg == page - 3 or pg == page + 3 %}
       <span style="color:#9ca3af;font-size:.82rem;">…</span>
       {% endif %}
     {% endfor %}
     {% if page < total_pages %}
     <a href="{{ base_q }}page={{ page + 1 }}"
-       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #e5e7eb;color:#1B2A4A;text-decoration:none;transition:all .15s;"
-       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#e5e7eb'">Siguiente →</a>
+       style="padding:8px 16px;border-radius:10px;font-family:'Sora',sans-serif;font-weight:700;font-size:.82rem;background:#fff;border:1.5px solid #d0d4de;color:#1B2A4A;text-decoration:none;box-shadow:0 1px 3px rgba(0,0,0,.06);"
+       onmouseover="this.style.borderColor='#C9A84C'" onmouseout="this.style.borderColor='#d0d4de'">Siguiente →</a>
     {% endif %}
   </div>
   <p style="text-align:center;color:#9ca3af;font-size:.78rem;padding-bottom:16px;">
@@ -730,28 +692,26 @@
 </main>
 
 
-<!-- ══════════════════════════════════════════════
-     CTA SECTION
-══════════════════════════════════════════════ -->
-<section id="contacto" style="background:linear-gradient(135deg,#1B2A4A 0%,#0f1a2e 100%);padding:56px 20px;position:relative;overflow:hidden;">
+<!-- CTA SECTION -->
+<section id="contacto" style="background:linear-gradient(160deg,#1B2A4A 0%,#0d1e38 100%);padding:60px 20px;position:relative;overflow:hidden;">
   <div class="search-pattern" style="position:absolute;inset:0;opacity:.6;"></div>
   <div style="position:relative;max-width:680px;margin:0 auto;text-align:center;">
-    <div class="section-kicker" style="margin-bottom:10px;">¿No encontraste lo que buscas?</div>
-    <h2 class="font-sora" style="color:#fff;font-size:clamp(1.3rem,3vw,1.8rem);font-weight:800;margin:0 0 12px;letter-spacing:-.5px;">
+    <div class="section-kicker" style="margin-bottom:12px;">¿No encontraste lo que buscas?</div>
+    <h2 class="font-sora" style="color:#fff;font-size:clamp(1.3rem,3vw,1.85rem);font-weight:800;margin:0 0 14px;letter-spacing:-.5px;line-height:1.2;">
       Nuestros corredores te ayudan a encontrar
       <span style="color:#C9A84C;">la propiedad perfecta</span>
     </h2>
-    <p style="color:rgba(255,255,255,.5);font-size:.9rem;margin:0 0 28px;line-height:1.6;">
+    <p style="color:rgba(255,255,255,.72);font-size:.9rem;margin:0 0 28px;line-height:1.65;max-width:520px;margin-left:auto;margin-right:auto;">
       Especialistas en el mercado inmobiliario peruano. Contacta directamente o únete al equipo.
     </p>
     <div style="display:flex;flex-wrap:wrap;gap:12px;justify-content:center;">
-      <a href="https://wa.me/51999999999" target="_blank"
-         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#22C55E;color:#fff;border-radius:10px;text-decoration:none;">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+      <a href="https://wa.me/51999999999" target="_blank" rel="noopener noreferrer"
+         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#16a34a;color:#fff;border-radius:10px;text-decoration:none;transition:opacity .15s;" onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
         Contactar por WhatsApp
       </a>
       <a href="/corredor/registro"
-         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#C9A84C;color:#1B2A4A;border-radius:10px;text-decoration:none;">
+         style="display:inline-flex;align-items:center;gap:8px;font-family:'Sora',sans-serif;font-weight:700;font-size:.85rem;padding:13px 24px;background:#C9A84C;color:#1B2A4A;border-radius:10px;text-decoration:none;transition:opacity .15s;" onmouseenter="this.style.opacity='.9'" onmouseleave="this.style.opacity='1'">
         Quiero ser Corredor →
       </a>
     </div>
@@ -759,10 +719,8 @@
 </section>
 
 
-<!-- ══════════════════════════════════════════════
-     FOOTER
-══════════════════════════════════════════════ -->
-<footer style="background:#0f1a2e;padding:28px 20px;">
+<!-- FOOTER -->
+<footer style="background:#0d1e38;padding:28px 20px;">
   <div style="max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:16px;">
     <div style="display:flex;align-items:center;gap:10px;">
       <div style="width:32px;height:32px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;flex-shrink:0;">
@@ -773,23 +731,19 @@
         <div style="color:#C9A84C;font-size:7px;letter-spacing:2px;font-weight:600;">GRUPO INMOBILIARIO</div>
       </div>
     </div>
-    <div style="color:#4b5563;font-size:.75rem;text-align:center;">
-      © 2026 Inmersiva Grupo Inmobiliario · <span style="color:#C9A84C;">inmobiliariainmersiva.com</span>
+    <div style="color:#4b6080;font-size:.75rem;text-align:center;">
+      © 2026 Inmersiva Grupo Inmobiliario · <a href="/" style="color:#C9A84C;text-decoration:none;">inmobiliariainmersiva.com</a>
     </div>
     <div style="display:flex;align-items:center;gap:16px;">
-      <a href="/login?tab=corredor" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Corredores</a>
-      <a href="/registro" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Registro</a>
-      <a href="/login?tab=admin" style="color:#4b5563;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#fff'" onmouseleave="this.style.color='#4b5563'">Admin</a>
+      <a href="/login?tab=corredor" style="color:#5a7090;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#bcd0e8'" onmouseleave="this.style.color='#5a7090'">Corredores</a>
+      <a href="/registro" style="color:#5a7090;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#bcd0e8'" onmouseleave="this.style.color='#5a7090'">Registro</a>
+      <a href="/login?tab=admin" style="color:#5a7090;font-size:.75rem;text-decoration:none;transition:color .15s;" onmouseenter="this.style.color='#bcd0e8'" onmouseleave="this.style.color='#5a7090'">Admin</a>
     </div>
   </div>
 </footer>
 
 
-<!-- ══════════════════════════════════════════════
-     SCRIPTS
-══════════════════════════════════════════════ -->
 <script>
-// Dropdown
 function toggleMenu() {
   document.getElementById('user-dropdown').classList.toggle('hidden');
 }
@@ -804,7 +758,6 @@ document.addEventListener('click', function(e) {
 document.getElementById('modal-corredor').style.display = 'flex';
 {% endif %}
 
-// Advanced filters toggle
 function toggleFiltros() {
   const panel = document.getElementById('filtros-avanzados');
   const icon = document.getElementById('filtros-icon');
@@ -815,13 +768,11 @@ function toggleFiltros() {
     : '<path stroke-linecap="round" stroke-linejoin="round" d="M20 12H4"/>';
 }
 
-// Favorites toggle (AJAX)
 function toggleFav(e, propId, btn) {
   e.preventDefault();
   e.stopPropagation();
   const isFav = btn.dataset.fav === 'true';
   const svg = btn.querySelector('svg');
-  // Optimistic update
   if (isFav) {
     svg.setAttribute('fill', 'none');
     svg.setAttribute('stroke', 'rgba(255,255,255,.9)');
@@ -838,7 +789,6 @@ function toggleFav(e, propId, btn) {
   fetch('/api/favorito/' + propId, { method: 'POST' })
     .then(r => {
       if (r.status === 401) {
-        // Revert and redirect to login
         if (isFav) { svg.setAttribute('fill','#ef4444'); svg.setAttribute('stroke','#ef4444'); btn.dataset.fav='true'; btn.classList.add('active'); }
         else { svg.setAttribute('fill','none'); svg.setAttribute('stroke','rgba(255,255,255,.9)'); btn.dataset.fav='false'; btn.classList.remove('active'); }
         window.location.href = '/login';
