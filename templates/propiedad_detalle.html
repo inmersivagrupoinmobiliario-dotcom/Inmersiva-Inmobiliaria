@@ -32,6 +32,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
   <style>
     body { font-family: 'Inter', system-ui, sans-serif; }
     .gold-bar { background: linear-gradient(180deg, #C9A84C 0%, #e0bc6e 50%, #C9A84C 100%); }
@@ -39,6 +40,14 @@
     .swiper-button-next, .swiper-button-prev { color: #C9A84C !important; }
     .swiper-pagination-bullet-active { background: #C9A84C !important; }
     .spec-item { display:flex; flex-direction:column; align-items:center; gap:4px; }
+    /* Lightbox */
+    #lightbox { background: rgba(0,0,0,0.96); }
+    #lightbox img { box-shadow: 0 0 60px rgba(0,0,0,0.8); }
+    .lb-btn { position:absolute; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.08); border:none; color:white; font-size:2rem; line-height:1; padding:12px 18px; cursor:pointer; border-radius:8px; transition:background .2s; z-index:10; }
+    .lb-btn:hover { background:rgba(255,255,255,0.18); }
+    /* Leaflet custom */
+    #leaflet-map { height:360px; border-radius:16px; overflow:hidden; }
+    .leaflet-popup-content-wrapper { border-radius:12px; font-family:'Inter',sans-serif; }
   </style>
 </head>
 <body class="bg-gray-50 text-gray-900">
@@ -113,7 +122,8 @@
         </div>
         {% elif p.foto_portada %}
         <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}"
-             class="w-full h-full object-cover"
+             class="w-full h-full object-cover cursor-pointer"
+             onclick="openLb(0)"
              onerror="this.style.display='none'">
         {% else %}
         <div class="w-full h-full flex items-center justify-center" style="background:#1B2A4A;">
@@ -206,6 +216,14 @@
         <p class="text-gray-700 leading-relaxed text-sm whitespace-pre-line">{{ p.descripcion }}</p>
       </div>
       {% endif %}
+
+      <!-- Map -->
+      <div class="bg-white rounded-2xl p-6 shadow-sm">
+        <h2 class="font-bold text-gray-900 text-sm uppercase tracking-widest mb-4 pb-3 border-b-2"
+            style="border-color:#C9A84C;">Ubicación Aproximada</h2>
+        <div id="leaflet-map"></div>
+        <p class="text-xs text-gray-400 mt-2 text-center">📍 {{ p.ciudad }}, {{ p.estado }}</p>
+      </div>
 
       <!-- Tour 360° -->
       {% if p.tour_360_url %}
@@ -345,15 +363,98 @@
   </div>
 </footer>
 
+<!-- Lightbox modal -->
+<div id="lightbox" class="fixed inset-0 z-[9999] hidden" style="display:none;">
+  <div class="absolute inset-0" style="background:rgba(0,0,0,0.96);" onclick="closeLightbox()"></div>
+  <button class="lb-btn" style="left:12px;" onclick="prevLb()">&#8249;</button>
+  <button class="lb-btn" style="right:12px;" onclick="nextLb()">&#8250;</button>
+  <button onclick="closeLightbox()" title="Cerrar"
+          style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.1);border:none;color:white;width:40px;height:40px;border-radius:50%;font-size:1.2rem;cursor:pointer;z-index:11;display:flex;align-items:center;justify-content:center;">✕</button>
+  <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;pointer-events:none;">
+    <img id="lb-img" src="" alt="" style="max-height:88vh;max-width:88vw;object-fit:contain;pointer-events:auto;box-shadow:0 0 80px rgba(0,0,0,0.8);">
+  </div>
+  <div id="lb-counter" style="position:absolute;bottom:20px;left:0;right:0;text-align:center;color:rgba(255,255,255,0.55);font-size:0.85rem;letter-spacing:.05em;"></div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
+  // ── Lightbox ──────────────────────────────────────────────
+  const lbPhotos = [];
+  {% if p.foto_portada %}lbPhotos.push("{{ p.foto_portada }}");{% endif %}
+  {% for foto in p.fotos_list %}{% if foto %}lbPhotos.push("{{ foto }}");{% endif %}{% endfor %}
+
+  let lbIdx = 0;
+  const lbEl   = document.getElementById('lightbox');
+  const lbImg  = document.getElementById('lb-img');
+  const lbCnt  = document.getElementById('lb-counter');
+
+  function openLb(i) {
+    if (!lbPhotos.length) return;
+    lbIdx = i;
+    lbEl.style.display = 'block';
+    document.body.style.overflow = 'hidden';
+    updateLb();
+  }
+  function closeLightbox() {
+    lbEl.style.display = 'none';
+    document.body.style.overflow = '';
+  }
+  function prevLb() { lbIdx = (lbIdx - 1 + lbPhotos.length) % lbPhotos.length; updateLb(); }
+  function nextLb() { lbIdx = (lbIdx + 1) % lbPhotos.length; updateLb(); }
+  function updateLb() {
+    lbImg.src = '/uploads/' + lbPhotos[lbIdx];
+    if (lbPhotos.length > 1) lbCnt.textContent = (lbIdx + 1) + ' / ' + lbPhotos.length;
+  }
+  document.addEventListener('keydown', e => {
+    if (lbEl.style.display === 'none') return;
+    if (e.key === 'Escape')     closeLightbox();
+    if (e.key === 'ArrowLeft')  prevLb();
+    if (e.key === 'ArrowRight') nextLb();
+  });
+
+  // ── Swiper ────────────────────────────────────────────────
   const swiperEl = document.querySelector('.swiper');
   if (swiperEl) {
-    new Swiper(swiperEl, {
+    const swiper = new Swiper(swiperEl, {
       loop: true,
       navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
       pagination: { el: '.swiper-pagination', clickable: true },
     });
+    swiperEl.style.cursor = 'zoom-in';
+    swiperEl.addEventListener('click', e => {
+      if (e.target.closest('.swiper-button-next, .swiper-button-prev, .swiper-pagination')) return;
+      openLb(swiper.realIndex);
+    });
+  }
+
+  // ── Leaflet Map ───────────────────────────────────────────
+  const mapDiv = document.getElementById('leaflet-map');
+  if (mapDiv) {
+    const q = encodeURIComponent("{{ p.ciudad }}, {{ p.estado }}, Perú");
+    fetch('https://nominatim.openstreetmap.org/search?q=' + q + '&format=json&limit=1', {
+      headers: { 'Accept-Language': 'es' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (!data.length) { mapDiv.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Mapa no disponible</p>'; return; }
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      const map = L.map('leaflet-map', { zoomControl: true, scrollWheelZoom: false }).setView([lat, lon], 14);
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '© <a href="https://openstreetmap.org">OpenStreetMap</a>',
+        maxZoom: 19
+      }).addTo(map);
+      const icon = L.divIcon({
+        html: '<div style="width:36px;height:36px;background:#1B2A4A;border-radius:50%;border:3px solid #C9A84C;display:flex;align-items:center;justify-content:center;font-size:16px;box-shadow:0 4px 12px rgba(0,0,0,0.35);">🏠</div>',
+        iconSize: [36, 36], iconAnchor: [18, 18], className: ''
+      });
+      L.marker([lat, lon], { icon })
+        .addTo(map)
+        .bindPopup('<strong style="color:#1B2A4A;">{{ p.titulo }}</strong><br><span style="color:#888;font-size:12px;">{{ p.ciudad }}, {{ p.estado }}</span>')
+        .openPopup();
+    })
+    .catch(() => { mapDiv.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Mapa no disponible</p>'; });
   }
 </script>
 </body>
