@@ -1174,9 +1174,62 @@ async def generar(
 
     listing.descripcion_generada = descripcion
     listing.copy_instagram = copy_ig
+    listing.nombre_borrador = f"Generado {listing.tipo} · {listing.ciudad} · {datetime.now().strftime('%d/%m %H:%M')}"
     save_listing(listing)
 
-    return templates.TemplateResponse(request, "results.html", {"listing": listing})
+    return RedirectResponse(f"/resultados/{listing.id}", status_code=302)
+
+
+@app.get("/resultados/{listing_id}", response_class=HTMLResponse)
+async def ver_resultados(request: Request, listing_id: str):
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return RedirectResponse("/", status_code=302)
+    ok = request.query_params.get("ok", "")
+    return templates.TemplateResponse(request, "results.html", {"listing": listing, "ok": ok})
+
+
+@app.post("/resultados/{listing_id}/editar")
+async def editar_resultados(
+    request: Request,
+    listing_id: str,
+    descripcion: str = Form(...),
+    copy_instagram: str = Form(...),
+):
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return RedirectResponse("/", status_code=302)
+    listing.descripcion_generada = descripcion
+    listing.copy_instagram = copy_instagram
+    save_listing(listing)
+    return RedirectResponse(f"/resultados/{listing_id}?ok=1", status_code=302)
+
+
+@app.post("/api/mejorar-texto")
+async def mejorar_texto(
+    request: Request,
+    listing_id: str = Form(...),
+    campo: str = Form(...),
+    instruccion: str = Form(default=""),
+):
+    try:
+        listing = load_listing(listing_id)
+    except Exception:
+        return JSONResponse({"error": "Ficha no encontrada"}, status_code=404)
+    from services.ai_service import generar_contenido
+    texto_actual = listing.descripcion_generada if campo == "descripcion" else listing.copy_instagram
+    prompt_extra = f"\n\nInstrucción adicional: {instruccion}" if instruccion.strip() else ""
+    try:
+        if campo == "descripcion":
+            desc, _ = generar_contenido(listing, hint=f"Reescribe y mejora esta descripción:{prompt_extra}\n\n{texto_actual}")
+            return JSONResponse({"texto": desc})
+        else:
+            _, copy_ig = generar_contenido(listing, hint=f"Reescribe y mejora este copy de Instagram:{prompt_extra}\n\n{texto_actual}")
+            return JSONResponse({"texto": copy_ig})
+    except Exception as e:
+        return JSONResponse({"error": str(e)}, status_code=500)
 
 
 # ── PDF ───────────────────────────────────────────────────────────────────────

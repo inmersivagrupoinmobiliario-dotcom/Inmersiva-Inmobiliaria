@@ -3,8 +3,45 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Resultados — Inmersiva Grupo Inmobiliario</title>
+  <title>Contenido Generado — Inmersiva</title>
   <link rel="stylesheet" href="/static/css/style.css">
+  <style>
+    .edit-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 16px;
+      border: 2px solid #e5e7eb;
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: .95rem;
+      line-height: 1.7;
+      color: #1a1a2e;
+      background: #fafafa;
+      resize: vertical;
+      transition: border-color .2s, background .2s;
+      min-height: 130px;
+    }
+    .edit-textarea:focus { border-color: #C9A84C; background: #fff; outline: none; }
+    .field-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; flex-wrap: wrap; gap: 8px; }
+    .field-label { font-size: .75rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: #1B2A4A; }
+    .btn-mejora { background: linear-gradient(135deg,#1B2A4A,#2d4070); color: #C9A84C; border: none; padding: 7px 14px; border-radius: 8px; font-size: .78rem; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; transition: opacity .2s; }
+    .btn-mejora:hover { opacity: .85; }
+    .btn-copy { background: #f1f5f9; color: #475569; border: 1.5px solid #e2e8f0; padding: 7px 14px; border-radius: 8px; font-size: .78rem; font-weight: 600; cursor: pointer; transition: all .2s; }
+    .btn-copy:hover { background: #e2e8f0; }
+    .ai-panel { display: none; margin-top: 12px; background: linear-gradient(135deg,#f0f4ff,#e8f0fe); border: 1.5px solid #c7d7fc; border-radius: 10px; padding: 14px; }
+    .ai-panel.open { display: block; }
+    .ai-input { width: 100%; box-sizing: border-box; padding: 10px 12px; border: 1.5px solid #c7d7fc; border-radius: 8px; font-family: inherit; font-size: .88rem; background: #fff; outline: none; }
+    .ai-input:focus { border-color: #1B2A4A; }
+    .btn-ai-run { background: linear-gradient(135deg,#C9A84C,#e8c96d); color: #1B2A4A; font-weight: 800; font-size: .82rem; padding: 9px 18px; border: none; border-radius: 8px; cursor: pointer; margin-top: 10px; }
+    .ai-spinner { display: none; font-size: .8rem; color: #1B2A4A; margin-top: 8px; }
+    .save-bar { position: sticky; bottom: 0; background: white; border-top: 2px solid #f1f5f9; padding: 16px 0; margin-top: 24px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+    .btn-save { background: linear-gradient(135deg,#C9A84C,#e8c96d); color: #1B2A4A; font-weight: 800; font-size: .95rem; padding: 12px 28px; border: none; border-radius: 10px; cursor: pointer; box-shadow: 0 4px 12px rgba(201,168,76,.3); transition: opacity .2s; }
+    .btn-save:hover { opacity: .9; }
+    .draft-badge { background: linear-gradient(135deg,#0d3d2a,#1a5c3a); border: 1.5px solid #2ecc71; border-radius: 10px; padding: 12px 18px; display: flex; align-items: center; gap: 12px; margin-bottom: 20px; }
+    .draft-badge-text { color: #2ecc71; font-size: .85rem; font-weight: 600; }
+    .draft-badge-sub { color: #a8e6c8; font-size: .75rem; }
+    .ok-toast { background: linear-gradient(135deg,#d4edda,#c3e6cb); border: 1.5px solid #28a745; border-radius: 10px; padding: 12px 18px; color: #155724; font-size: .88rem; font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 10px; }
+  </style>
 </head>
 <body>
 
@@ -20,7 +57,21 @@
 
 <div class="container">
 
-  <div id="alert-container"></div>
+  {% if ok %}
+  <div class="ok-toast">✅ Cambios guardados correctamente</div>
+  {% endif %}
+
+  <!-- Draft badge -->
+  <div class="draft-badge">
+    <span style="font-size:1.4rem">💾</span>
+    <div>
+      <div class="draft-badge-text">Guardado como borrador · {{ listing.nombre_borrador or listing.id }}</div>
+      <div class="draft-badge-sub">Disponible en tu dashboard → Mis Fichas</div>
+    </div>
+    <a href="/corredor/dashboard?seccion=fichas" style="margin-left:auto;background:rgba(46,204,113,.15);color:#2ecc71;font-size:.78rem;font-weight:700;padding:6px 14px;border-radius:8px;text-decoration:none;white-space:nowrap;border:1px solid rgba(46,204,113,.3);">
+      Ver mis fichas →
+    </a>
+  </div>
 
   <!-- Resumen de la propiedad -->
   <div class="card">
@@ -35,17 +86,56 @@
     </div>
   </div>
 
-  <!-- Descripción IA -->
-  <div class="card">
-    <div class="card-title">Descripción Profesional</div>
-    <div class="result-box" id="desc-box">{{ listing.descripcion_generada }}<button class="copy-btn" onclick="copyText('desc-box')">Copiar</button></div>
-  </div>
+  <!-- Formulario de edición unificado -->
+  <form method="post" action="/resultados/{{ listing.id }}/editar" id="form-editar">
 
-  <!-- Copy Instagram -->
-  <div class="card">
-    <div class="card-title">Copy para Instagram</div>
-    <div class="result-box" id="ig-box">{{ listing.copy_instagram }}<button class="copy-btn" onclick="copyText('ig-box')">Copiar</button></div>
-  </div>
+    <!-- Descripción IA -->
+    <div class="card">
+      <div class="field-header">
+        <span class="field-label">Descripción Profesional</span>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn-copy" onclick="copyField('desc')">📋 Copiar</button>
+          <button type="button" class="btn-mejora" onclick="togglePanel('panel-desc')">✨ Mejorar con IA</button>
+        </div>
+      </div>
+      <textarea class="edit-textarea" name="descripcion" id="field-desc" rows="8">{{ listing.descripcion_generada }}</textarea>
+
+      <div class="ai-panel" id="panel-desc">
+        <p style="font-size:.8rem;font-weight:700;color:#1B2A4A;margin:0 0 8px;">¿Cómo quieres mejorarla?</p>
+        <input class="ai-input" id="hint-desc" type="text" placeholder="Ej: más formal, enfócate en la inversión, agrega urgencia...">
+        <br>
+        <button type="button" class="btn-ai-run" onclick="mejorarConIA('desc', 'descripcion')">✨ Regenerar con IA</button>
+        <p class="ai-spinner" id="spin-desc">⏳ Generando...</p>
+      </div>
+    </div>
+
+    <!-- Copy Instagram -->
+    <div class="card">
+      <div class="field-header">
+        <span class="field-label">Copy para Instagram</span>
+        <div style="display:flex;gap:8px;">
+          <button type="button" class="btn-copy" onclick="copyField('ig')">📋 Copiar</button>
+          <button type="button" class="btn-mejora" onclick="togglePanel('panel-ig')">✨ Mejorar con IA</button>
+        </div>
+      </div>
+      <textarea class="edit-textarea" name="copy_instagram" id="field-ig" rows="8">{{ listing.copy_instagram }}</textarea>
+
+      <div class="ai-panel" id="panel-ig">
+        <p style="font-size:.8rem;font-weight:700;color:#1B2A4A;margin:0 0 8px;">¿Cómo quieres mejorar el copy?</p>
+        <input class="ai-input" id="hint-ig" type="text" placeholder="Ej: más emojis, enfócate en el lifestyle, agrega CTA directo...">
+        <br>
+        <button type="button" class="btn-ai-run" onclick="mejorarConIA('ig', 'instagram')">✨ Regenerar con IA</button>
+        <p class="ai-spinner" id="spin-ig">⏳ Generando...</p>
+      </div>
+    </div>
+
+    <!-- Save bar -->
+    <div class="save-bar">
+      <button type="submit" class="btn-save">💾 Guardar cambios</button>
+      <span style="font-size:.8rem;color:#94a3b8;">Los cambios se guardan en tu borrador</span>
+    </div>
+
+  </form>
 
   <!-- Acciones -->
   <div class="card">
@@ -57,7 +147,6 @@
       <button onclick="generarVideo('{{ listing.id }}')" class="btn btn-outline" id="btn-video">🎬 Generar Video Reel</button>
     </div>
 
-    <!-- Video progress -->
     <div id="video-progress" style="display:none;margin-top:1.5rem">
       <p style="font-size:.9rem;color:var(--navy);margin-bottom:.5rem" id="video-status">Iniciando render...</p>
       <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
@@ -66,33 +155,23 @@
       <a id="video-link" href="#" class="btn btn-gold" download>⬇️ Descargar Video</a>
     </div>
 
-    <!-- Solicitar publicación en RRSS -->
+    <!-- Solicitar publicación -->
     <div style="margin-top:28px;padding:24px;background:#f8f9fa;border-radius:12px;border:1.5px solid #e0e0e0">
       <h3 style="margin:0 0 6px;font-size:1rem;color:#1B2A4A;font-weight:700">📢 Solicitar publicación en redes sociales</h3>
-      <p style="color:#666;font-size:.85rem;margin:0 0 16px">El admin revisará y publicará en las redes seleccionadas via UploadPost.</p>
+      <p style="color:#666;font-size:.85rem;margin:0 0 16px">El admin revisará y publicará en las redes seleccionadas.</p>
       <form method="post" action="/corredor/solicitar-publicacion/{{ listing.id }}">
         <div style="display:flex;flex-wrap:wrap;gap:16px;margin-bottom:16px">
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
-            <input type="checkbox" name="redes" value="instagram" checked> Instagram
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
-            <input type="checkbox" name="redes" value="facebook" checked> Facebook
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
-            <input type="checkbox" name="redes" value="whatsapp" checked> WhatsApp
-          </label>
-          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem">
-            <input type="checkbox" name="redes" value="tiktok"> TikTok
-          </label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem"><input type="checkbox" name="redes" value="instagram" checked> Instagram</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem"><input type="checkbox" name="redes" value="facebook" checked> Facebook</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem"><input type="checkbox" name="redes" value="whatsapp" checked> WhatsApp</label>
+          <label style="display:flex;align-items:center;gap:6px;cursor:pointer;font-size:.9rem"><input type="checkbox" name="redes" value="tiktok"> TikTok</label>
         </div>
-        <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem">
-          🚀 Enviar al admin para publicar
-        </button>
+        <button type="submit" class="btn btn-primary" style="width:100%;padding:14px;font-size:1rem">🚀 Enviar al admin para publicar</button>
       </form>
     </div>
   </div>
 
-  <a href="/" class="btn btn-outline" style="margin-bottom:2rem">← Nueva Propiedad</a>
+  <a href="/nueva-ficha" class="btn btn-outline" style="margin-bottom:2rem">← Nueva Ficha</a>
 
 </div>
 
@@ -101,5 +180,46 @@
 </footer>
 
 <script src="/static/js/main.js"></script>
+<script>
+function togglePanel(id) {
+  const p = document.getElementById(id);
+  p.classList.toggle('open');
+}
+
+function copyField(key) {
+  const ta = document.getElementById('field-' + key);
+  navigator.clipboard.writeText(ta.value).then(() => {
+    const btn = ta.closest('.card').querySelector('.btn-copy');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copiado';
+    setTimeout(() => btn.textContent = orig, 1800);
+  });
+}
+
+async function mejorarConIA(key, campo) {
+  const hint = document.getElementById('hint-' + key).value;
+  const spin = document.getElementById('spin-' + key);
+  const field = document.getElementById('field-' + key);
+  spin.style.display = 'block';
+  try {
+    const fd = new FormData();
+    fd.append('listing_id', '{{ listing.id }}');
+    fd.append('campo', campo);
+    fd.append('instruccion', hint);
+    const res = await fetch('/api/mejorar-texto', { method: 'POST', body: fd });
+    const data = await res.json();
+    if (data.texto) {
+      field.value = data.texto;
+      document.getElementById('panel-' + key).classList.remove('open');
+    } else {
+      alert('Error: ' + (data.error || 'Inténtalo de nuevo'));
+    }
+  } catch (e) {
+    alert('Error de conexión');
+  } finally {
+    spin.style.display = 'none';
+  }
+}
+</script>
 </body>
 </html>

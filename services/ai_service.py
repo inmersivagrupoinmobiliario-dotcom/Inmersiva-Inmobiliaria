@@ -12,12 +12,10 @@ def _get_client() -> OpenAI:
     return _client
 
 
-def generar_contenido(listing: Listing) -> tuple[str, str]:
+def generar_contenido(listing: Listing, hint: str = "") -> tuple[str, str]:
     amenidades_str = ", ".join(listing.amenidades) if listing.amenidades else "sin amenidades especificadas"
 
-    prompt = f"""Eres experto en bienes raíces en México. Genera contenido profesional para esta propiedad de Inmersiva Grupo Inmobiliario.
-
-Propiedad:
+    contexto = f"""Propiedad:
 - Tipo: {listing.tipo} en {listing.operacion}
 - Ubicación: {listing.direccion}, {listing.ciudad}, {listing.estado}
 - Precio: {listing.precio_str}
@@ -25,7 +23,30 @@ Propiedad:
 - M² construidos: {listing.m2_construidos or 'N/A'} | M² terreno: {listing.m2_terreno or 'N/A'}
 - Estacionamientos: {listing.estacionamientos or 'N/A'}
 - Amenidades: {amenidades_str}
-- Notas del agente: {listing.descripcion_agente}
+- Notas del agente: {listing.descripcion_agente}"""
+
+    if hint:
+        # Improve-mode: hint tells the AI exactly what to rewrite
+        prompt = f"""Eres experto en bienes raíces en México, trabajas para Inmersiva Grupo Inmobiliario.
+
+{contexto}
+
+{hint}
+
+Responde SOLO con el texto mejorado, sin explicaciones, sin encabezados."""
+        response = _get_client().chat.completions.create(
+            model="gpt-4o",
+            messages=[{"role": "user", "content": prompt}],
+            temperature=0.7,
+            max_tokens=600,
+        )
+        texto = response.choices[0].message.content.strip()
+        # Return improved text in both slots — caller picks the right one
+        return texto, texto
+
+    prompt = f"""Eres experto en bienes raíces en México. Genera contenido profesional para esta propiedad de Inmersiva Grupo Inmobiliario.
+
+{contexto}
 
 Genera exactamente en este formato:
 

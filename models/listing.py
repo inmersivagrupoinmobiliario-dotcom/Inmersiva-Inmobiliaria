@@ -112,6 +112,7 @@ class Listing(BaseModel):
     # ── Generado por IA ───────────────────────────────────────────────────────
     descripcion_generada: str = ""
     copy_instagram: str = ""
+    nombre_borrador: str = ""
 
     @computed_field
     @property
