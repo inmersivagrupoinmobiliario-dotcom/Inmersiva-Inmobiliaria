@@ -1485,13 +1485,12 @@ async def aprobar_solicitud_corredor(request: Request, solicitud_id: int):
         if not sol:
             return RedirectResponse("/dashboard?error=Solicitud+no+encontrada", status_code=302)
 
-        # Generar email corporativo: primer_nombre.primer_apellido@inmersiva.com
+        # Generar email corporativo: primer_nombre.apellido@inmersiva.com
         partes = sol.nombre.strip().split()
         slug = normalizar(f"{partes[0]}.{partes[-1]}") if len(partes) > 1 else normalizar(partes[0])
         email_corp = f"{slug}@{company_domain}"
         username = slug
 
-        # Si ya existe ese email, añadir dígito incremental
         base_slug = slug
         counter = 1
         while db.query(CorredorModel).filter(
@@ -1501,24 +1500,34 @@ async def aprobar_solicitud_corredor(request: Request, solicitud_id: int):
             email_corp = f"{username}@{company_domain}"
             counter += 1
 
-        # Contraseña temporal segura: Inm + 4 dígitos + letra mayúscula
-        alphabet = string.ascii_letters + string.digits
         password = "Inm" + "".join(secrets.choice(string.digits) for _ in range(4)) + secrets.choice(string.ascii_uppercase)
 
+        # Guardar valores antes de cerrar la sesión
+        sol_nombre = sol.nombre
+        sol_email  = sol.email
+        sol_telefono = sol.telefono or ""
+        sol_dni    = sol.dni
+
         db.add(CorredorModel(
-            nombre=sol.nombre, email=email_corp, telefono=sol.telefono,
+            nombre=sol_nombre, email=email_corp, telefono=sol_telefono,
             username=username, hashed_password=hash_password(password),
-            dni=sol.dni, email_personal=sol.email,
+            dni=sol_dni, email_personal=sol_email,
         ))
         sol.estado = "Aprobado"
         db.commit()
+    except Exception as e:
+        db.rollback()
+        import traceback, urllib.parse
+        traceback.print_exc()
+        msg = urllib.parse.quote(str(e)[:200])
+        return RedirectResponse(f"/dashboard?error={msg}", status_code=302)
     finally:
         db.close()
 
-    setup_cloudflare_email_routing(email_corp, sol.email)
-    enviar_credenciales_corredor(sol.nombre, email_corp, sol.email, username, password)
+    setup_cloudflare_email_routing(email_corp, sol_email)
+    enviar_credenciales_corredor(sol_nombre, email_corp, sol_email, username, password)
     import urllib.parse
-    msg = urllib.parse.quote(f"Corredor aprobado: {email_corp} · contraseña enviada a {sol.email}")
+    msg = urllib.parse.quote(f"Corredor aprobado: {email_corp} · credenciales enviadas a {sol_email}")
     return RedirectResponse(f"/dashboard?ok={msg}", status_code=302)
 
 
