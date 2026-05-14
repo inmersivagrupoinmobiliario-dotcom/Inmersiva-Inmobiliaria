@@ -27,6 +27,45 @@ from models.db_models import (
     Contacto, Cita, DocumentoCorredor, PostRRSS,
 )
 
+def _run_migrations():
+    """Add new columns to existing tables without breaking existing data."""
+    from sqlalchemy import text
+    db = SessionLocal()
+    try:
+        is_pg = "postgresql" in str(engine.url)
+        migrations = [
+            # posts_rrss new columns
+            ("posts_rrss", "listing_id", "VARCHAR(36)"),
+            ("posts_rrss", "titulo", "VARCHAR(200)"),
+            ("posts_rrss", "imagen_url", "VARCHAR(500)"),
+            ("posts_rrss", "estado", "VARCHAR(20) DEFAULT 'Pendiente'"),
+            ("posts_rrss", "comentario_admin", "TEXT"),
+            ("posts_rrss", "redes", "VARCHAR(200)"),
+            ("posts_rrss", "upload_post_id", "VARCHAR(100)"),
+            ("posts_rrss", "publicado_at", "TIMESTAMP"),
+            ("posts_rrss", "caption", "TEXT"),
+            # corredores new columns
+            ("corredores", "foto_perfil", "VARCHAR(300)"),
+            ("corredores", "bio", "TEXT"),
+            ("corredores", "instagram", "VARCHAR(100)"),
+            ("corredores", "whatsapp", "VARCHAR(30)"),
+        ]
+        for table, col, col_type in migrations:
+            try:
+                if is_pg:
+                    db.execute(text(f"ALTER TABLE {table} ADD COLUMN IF NOT EXISTS {col} {col_type}"))
+                else:
+                    db.execute(text(f"ALTER TABLE {table} ADD COLUMN {col} {col_type}"))
+                db.commit()
+            except Exception:
+                db.rollback()  # column already exists on SQLite
+        print("[DB] Migraciones aplicadas OK")
+    except Exception as e:
+        print(f"[ERROR] Migraciones: {e}")
+    finally:
+        db.close()
+
+
 def _init_db():
     try:
         Base.metadata.create_all(bind=engine)
@@ -36,6 +75,10 @@ def _init_db():
         print(f"[ERROR] create_all falló: {e}")
         traceback.print_exc()
         return
+
+    # Add new columns to existing tables (non-breaking — IF NOT EXISTS)
+    _run_migrations()
+
     db = SessionLocal()
     try:
         if db.query(CorredorModel).count() == 0:
