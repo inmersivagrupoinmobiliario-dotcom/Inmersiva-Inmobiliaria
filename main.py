@@ -105,7 +105,7 @@ def _init_db():
 _init_db()
 
 EMPRESA_USER = os.getenv("EMPRESA_USER", "admin")
-EMPRESA_PASS = os.getenv("EMPRESA_PASS", "Inmersiva2025")
+EMPRESA_PASS = os.getenv("EMPRESA_PASS", "joan123")
 ADMIN_EMAIL  = os.getenv("ADMIN_EMAIL", "inmersivagrupoinmobiliario@gmail.com")
 
 app = FastAPI(title="Inmersiva Grupo Inmobiliario")
