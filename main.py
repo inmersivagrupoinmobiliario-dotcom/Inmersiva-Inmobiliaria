@@ -13,10 +13,16 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from starlette.middleware.base import BaseHTTPMiddleware
-from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
-from slowapi.errors import RateLimitExceeded
 from dotenv import load_dotenv
+
+try:
+    from slowapi import Limiter, _rate_limit_exceeded_handler
+    from slowapi.util import get_remote_address
+    from slowapi.errors import RateLimitExceeded
+    _SLOWAPI_AVAILABLE = True
+except ImportError:
+    _SLOWAPI_AVAILABLE = False
+    print("[⚠️  RATE LIMIT] slowapi no instalado — rate limiting desactivado. Ejecuta: pip install slowapi")
 
 from models.listing import Listing
 from services.ai_service import generar_contenido
@@ -149,9 +155,17 @@ async def _require_csrf(request: Request, _csrf_token: str = Form(default="")):
 # ── App + Middleware ───────────────────────────────────────────────────────────
 app = FastAPI(title="Inmersiva Grupo Inmobiliario")
 
-_limiter = Limiter(key_func=get_remote_address)
-app.state.limiter = _limiter
-app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+if _SLOWAPI_AVAILABLE:
+    _limiter = Limiter(key_func=get_remote_address)
+    app.state.limiter = _limiter
+    app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
+else:
+    # No-op decorator cuando slowapi no está disponible
+    import functools
+    class _NoopLimiter:
+        def limit(self, *a, **kw):
+            return lambda fn: fn
+    _limiter = _NoopLimiter()
 
 # Orden importa: SessionMiddleware (outer) → _CSRFMiddleware (inner, necesita sesión)
 app.add_middleware(_CSRFMiddleware)
