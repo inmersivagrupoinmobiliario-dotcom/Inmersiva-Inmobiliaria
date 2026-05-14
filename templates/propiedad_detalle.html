@@ -312,16 +312,23 @@
             <input type="hidden" name="_csrf_token" value="{{ request.state.csrf_token }}">
             <input type="text" name="nombre" required
                    placeholder="Tu nombre *"
+                   autocomplete="name"
+                   aria-label="Tu nombre completo"
                    {% if usuario %}value="{{ usuario.get('nombre', '') }}"{% endif %}
                    class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
                    style="font-family:inherit;">
             <input type="email" name="email_contacto" required
                    placeholder="Tu email *"
+                   autocomplete="email"
+                   aria-label="Tu correo electrónico"
                    {% if usuario %}value="{{ usuario.get('sub', '') }}"{% endif %}
                    class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
                    style="font-family:inherit;">
             <input type="tel" name="telefono_contacto"
                    placeholder="Teléfono (opcional)"
+                   autocomplete="tel"
+                   inputmode="tel"
+                   aria-label="Tu número de teléfono (opcional)"
                    class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
                    style="font-family:inherit;">
             <textarea name="mensaje" required rows="3"

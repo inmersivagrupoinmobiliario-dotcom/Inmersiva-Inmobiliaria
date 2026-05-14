@@ -377,9 +377,12 @@ async def detalle_propiedad(request: Request, propiedad_id: int):
         ).first()
         if not propiedad:
             return RedirectResponse("/", status_code=302)
-        # Increment view counter
-        propiedad.vistas = (propiedad.vistas or 0) + 1
-        db.commit()
+        # Increment view counter — deduplicated per session (no inflar con F5)
+        _vista_key = f"vista_{propiedad_id}"
+        if not request.session.get(_vista_key):
+            propiedad.vistas = (propiedad.vistas or 0) + 1
+            db.commit()
+            request.session[_vista_key] = True
         corredor_obj = db.query(CorredorModel).filter(
             CorredorModel.id == propiedad.corredor_id
         ).first() if propiedad.corredor_id else None
@@ -746,7 +749,7 @@ async def recuperar_contrasena_submit(
     finally:
         db.close()
 
-    base_url = os.getenv("BASE_URL", "https://inmobiliariainmersiva.com")
+    base_url = os.getenv("BASE_URL") or f"{request.url.scheme}://{request.url.netloc}"
     reset_url = f"{base_url}/recuperar-contrasena?token={token_str}"
     try:
         from services.email_service import enviar_reset_password
