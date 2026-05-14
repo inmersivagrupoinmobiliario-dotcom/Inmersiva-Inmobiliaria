@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mis Favoritos — Inmersiva</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            navy: { DEFAULT: '#1B2A4A', 800: '#243660' },
+            gold: { DEFAULT: '#C9A84C' },
+          },
+          fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'] }
+        }
+      }
+    }
+  </script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .card-prop { transition: transform 0.25s ease, box-shadow 0.25s ease; }
+    .card-prop:hover { transform: translateY(-5px); box-shadow: 0 20px 40px rgba(0,0,0,0.12); }
+    .card-img { transition: transform 0.5s ease; }
+    .card-prop:hover .card-img { transform: scale(1.04); }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-900">
+
+<!-- NAV -->
+<nav class="sticky top-0 z-50 shadow-lg" style="background-color:#1B2A4A;">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+    <a href="/" class="flex items-center gap-3 flex-shrink-0">
+      <div class="w-9 h-9 bg-white rounded-full flex items-center justify-center overflow-hidden shadow-md">
+        <img src="/static/img/logo.jpeg" alt="Inmersiva" class="w-8 h-8 object-contain" onerror="this.style.display='none'">
+      </div>
+      <div class="hidden sm:block">
+        <div class="text-white font-black text-sm tracking-widest leading-none">INMERSIVA</div>
+        <div class="font-semibold tracking-widest leading-none" style="font-size:8px; color:#C9A84C;">GRUPO INMOBILIARIO</div>
+      </div>
+    </a>
+    <a href="/" class="text-gray-400 hover:text-white text-sm transition-colors">← Volver al portal</a>
+    <div class="flex-1"></div>
+    {% if usuario %}
+    {% set nombre_display = usuario.get('nombre', usuario.get('sub', 'Usuario')) %}
+    <span class="text-white text-sm font-semibold">{{ nombre_display }}</span>
+    <a href="/usuario/logout" class="text-gray-400 hover:text-white text-sm transition-colors">Salir</a>
+    {% endif %}
+  </div>
+</nav>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-2xl font-black text-gray-900 mb-1">Mis propiedades guardadas</h1>
+    <p class="text-gray-500 text-sm">
+      {% if propiedades %}{{ propiedades|length }} propiedad{{ 'es' if propiedades|length != 1 else '' }} guardada{{ 's' if propiedades|length != 1 else '' }}{% else %}Aún no has guardado ninguna propiedad{% endif %}
+    </p>
+  </div>
+
+  {% if propiedades %}
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+    {% for p in propiedades %}
+    <div class="card-prop group bg-white rounded-2xl overflow-hidden shadow-md" style="position:relative;">
+      <a href="/propiedad/{{ p.id }}" class="block no-underline">
+        <div class="relative overflow-hidden" style="height:220px; background-color:#1B2A4A;">
+          {% if p.foto_portada %}
+          <img src="/uploads/{{ p.foto_portada }}" alt="{{ p.titulo }}"
+               class="card-img w-full h-full object-cover"
+               onerror="this.style.display='none'">
+          {% endif %}
+          <div class="absolute top-3 left-3 flex gap-2">
+            <span class="text-xs font-bold px-3 py-1 rounded-full
+                         {% if p.operacion == 'Venta' %}text-navy{% else %}text-white{% endif %}"
+                  style="{% if p.operacion == 'Venta' %}background:#C9A84C;{% else %}background:#1B2A4A; border:1px solid #C9A84C;{% endif %}">
+              En {{ p.operacion }}
+            </span>
+          </div>
+          <div class="absolute bottom-0 left-0 right-0 h-16"
+               style="background:linear-gradient(to top, rgba(0,0,0,0.4), transparent);"></div>
+        </div>
+
+        <div class="p-5">
+          <div class="text-xl font-black mb-1" style="color:#C9A84C;">{{ p.precio_fmt }}</div>
+          <div class="font-semibold text-gray-900 text-sm mb-1 truncate">{{ p.titulo }}</div>
+          <div class="text-gray-500 text-xs mb-4 flex items-center gap-1">
+            <span>📍</span><span class="truncate">{{ p.ciudad }}, {{ p.estado }}</span>
+          </div>
+          <div class="flex items-center gap-3 text-gray-500 text-xs border-t border-gray-100 pt-3">
+            {% if p.habitaciones %}<span>🛏 {{ p.habitaciones }}</span>{% endif %}
+            {% if p.banos %}<span>🚿 {{ p.banos }}</span>{% endif %}
+            {% if p.m2_construidos %}<span>📐 {{ p.m2_construidos }}m²</span>{% endif %}
+            <span class="ml-auto font-bold transition-transform group-hover:translate-x-1" style="color:#C9A84C;">Ver →</span>
+          </div>
+        </div>
+      </a>
+
+      <!-- Remove from favorites -->
+      <button onclick="quitarFav(event, {{ p.id }}, this)"
+              class="absolute top-3 right-3 w-9 h-9 rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
+              style="background:rgba(255,255,255,0.92);">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="#ef4444" stroke="#ef4444" stroke-width="2">
+          <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+        </svg>
+      </button>
+    </div>
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <!-- Empty state -->
+  <div class="text-center py-24">
+    <div style="font-size:72px; margin-bottom:20px;">🏠</div>
+    <h2 class="text-xl font-bold text-gray-700 mb-3">Aún no has guardado propiedades</h2>
+    <p class="text-gray-500 text-sm mb-8 max-w-md mx-auto">
+      Explora el portal y toca el corazón ❤️ en las propiedades que te interesen para guardarlas aquí.
+    </p>
+    <a href="/" class="inline-block font-bold px-8 py-3.5 rounded-xl text-sm transition-all hover:opacity-90"
+       style="background:#C9A84C; color:#1B2A4A;">
+      Explorar propiedades
+    </a>
+  </div>
+  {% endif %}
+
+</main>
+
+<!-- Footer -->
+<footer style="background:#111827;" class="text-gray-400 py-8 mt-10">
+  <div class="max-w-7xl mx-auto px-4 text-center text-xs">
+    © 2026 Inmersiva Grupo Inmobiliario · <a href="/" class="hover:text-white transition-colors" style="color:#C9A84C;">inmobiliariainmersiva.com</a>
+  </div>
+</footer>
+
+<script>
+function quitarFav(e, propId, btn) {
+  e.preventDefault();
+  e.stopPropagation();
+  fetch('/api/favorito/' + propId, { method: 'POST' })
+    .then(() => {
+      const card = btn.closest('.card-prop');
+      if (card) {
+        card.style.transition = 'opacity .3s, transform .3s';
+        card.style.opacity = '0';
+        card.style.transform = 'scale(0.95)';
+        setTimeout(() => card.remove(), 300);
+      }
+    })
+    .catch(() => {});
+}
+</script>
+</body>
+</html>

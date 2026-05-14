@@ -158,3 +158,99 @@ def enviar_credenciales_corredor(
     except Exception as e:
         print(f"[EMAIL] Error al enviar: {e}")
         return {"ok": False, "error": str(e)}
+
+
+def enviar_consulta_propiedad(
+    corredor_email: str,
+    corredor_nombre: str,
+    propiedad_titulo: str,
+    nombre_cliente: str,
+    email_cliente: str,
+    telefono_cliente: str,
+    mensaje: str,
+) -> dict:
+    """Sends property inquiry email from a potential buyer/renter to the assigned corredor."""
+    smtp_host = os.getenv("SMTP_HOST", "smtp.gmail.com")
+    smtp_port = int(os.getenv("SMTP_PORT", "587"))
+    smtp_user = os.getenv("SMTP_USER", "")
+    smtp_password = os.getenv("SMTP_PASSWORD", "")
+    smtp_from = os.getenv("SMTP_FROM", smtp_user)
+
+    if not smtp_user or not smtp_password:
+        print("[EMAIL] SMTP no configurado — omitiendo consulta de propiedad")
+        return {"ok": False, "error": "SMTP no configurado"}
+
+    html = f"""
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:24px;background:#f4f6f9;font-family:Arial,sans-serif;">
+<div style="max-width:560px;margin:0 auto;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,.08);">
+  <div style="padding:28px 36px;background:#1B2A4A;text-align:center;">
+    <h2 style="margin:0;color:#C9A84C;font-size:1.1rem;letter-spacing:1px;">NUEVA CONSULTA DE PROPIEDAD</h2>
+    <p style="color:#aaa;margin:6px 0 0;font-size:.85rem;">Inmersiva Grupo Inmobiliario</p>
+  </div>
+  <div style="padding:28px 36px;">
+    <p style="color:#333;margin:0 0 6px;">Hola <strong>{corredor_nombre}</strong>,</p>
+    <p style="color:#666;margin:0 0 20px;font-size:.9rem;">Tienes una nueva consulta sobre la siguiente propiedad:</p>
+
+    <div style="background:#f8f9fa;border-radius:10px;padding:14px 18px;margin-bottom:22px;font-size:.9rem;">
+      <strong style="color:#1B2A4A;">Propiedad:</strong> {propiedad_titulo}
+    </div>
+
+    <table style="width:100%;border-collapse:collapse;font-size:.9rem;">
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:10px 0;color:#888;width:120px;">Nombre</td>
+        <td style="padding:10px 0;font-weight:600;color:#1B2A4A;">{nombre_cliente}</td>
+      </tr>
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:10px 0;color:#888;">Email</td>
+        <td style="padding:10px 0;"><a href="mailto:{email_cliente}" style="color:#C9A84C;font-weight:600;">{email_cliente}</a></td>
+      </tr>
+      <tr style="border-bottom:1px solid #f0f0f0;">
+        <td style="padding:10px 0;color:#888;">Teléfono</td>
+        <td style="padding:10px 0;color:#333;">{telefono_cliente or '—'}</td>
+      </tr>
+    </table>
+
+    <div style="margin-top:20px;background:#fffbf0;border:1.5px solid #e8c96d;border-radius:10px;padding:16px 18px;">
+      <p style="margin:0 0 8px;color:#1B2A4A;font-weight:700;font-size:.82rem;text-transform:uppercase;letter-spacing:1px;">Mensaje</p>
+      <p style="margin:0;color:#333;font-size:.9rem;line-height:1.6;">{mensaje}</p>
+    </div>
+
+    <div style="text-align:center;margin-top:24px;">
+      <a href="mailto:{email_cliente}?subject=Re: Consulta — {propiedad_titulo}"
+         style="display:inline-block;background:#C9A84C;color:#1B2A4A;font-weight:800;padding:13px 32px;border-radius:8px;text-decoration:none;font-size:.9rem;">
+        Responder al cliente
+      </a>
+    </div>
+  </div>
+  <div style="background:#f8f9fa;padding:12px;text-align:center;">
+    <p style="color:#aaa;font-size:.72rem;margin:0;">© 2026 Inmersiva Grupo Inmobiliario</p>
+  </div>
+</div>
+</body></html>
+"""
+    try:
+        msg = MIMEMultipart("alternative")
+        msg["Subject"] = f"Nueva consulta — {propiedad_titulo}"
+        msg["From"] = f"Inmersiva Grupo Inmobiliario <{smtp_from}>"
+        msg["To"] = corredor_email
+        msg["Reply-To"] = email_cliente
+        msg.attach(MIMEText(html, "html"))
+
+        if smtp_port == 465:
+            with smtplib.SMTP_SSL(smtp_host, smtp_port) as server:
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, corredor_email, msg.as_string())
+        else:
+            with smtplib.SMTP(smtp_host, smtp_port) as server:
+                server.ehlo()
+                server.starttls()
+                server.login(smtp_user, smtp_password)
+                server.sendmail(smtp_from, corredor_email, msg.as_string())
+
+        print(f"[EMAIL] Consulta enviada a corredor {corredor_email}")
+        return {"ok": True}
+    except Exception as e:
+        print(f"[EMAIL] Error al enviar consulta: {e}")
+        return {"ok": False, "error": str(e)}

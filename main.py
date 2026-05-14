@@ -207,6 +207,10 @@ async def portal(
     operacion: Opt[str] = None,
     ciudad: Opt[str] = None,
     tour: Opt[str] = None,
+    precio_min: Opt[int] = None,
+    precio_max: Opt[int] = None,
+    habitaciones: Opt[int] = None,
+    m2_min: Opt[int] = None,
 ):
     db = SessionLocal()
     try:
@@ -219,10 +223,24 @@ async def portal(
             q = q.filter(PropiedadPublica.ciudad.ilike(f"%{ciudad}%"))
         if tour:
             q = q.filter(PropiedadPublica.tour_360_url != "")
+        if precio_min is not None:
+            q = q.filter(PropiedadPublica.precio >= precio_min)
+        if precio_max is not None:
+            q = q.filter(PropiedadPublica.precio <= precio_max)
+        if habitaciones is not None:
+            q = q.filter(PropiedadPublica.habitaciones >= habitaciones)
+        if m2_min is not None:
+            q = q.filter(PropiedadPublica.m2_construidos >= m2_min)
         propiedades = q.order_by(
             PropiedadPublica.destacado.desc(),
             PropiedadPublica.created_at.desc()
         ).all()
+        # Build WhatsApp lookup for cards
+        corredor_ids = [p.corredor_id for p in propiedades if p.corredor_id]
+        corredores_dict: dict = {}
+        if corredor_ids:
+            cors = db.query(CorredorModel).filter(CorredorModel.id.in_(corredor_ids)).all()
+            corredores_dict = {c.id: {"whatsapp": c.whatsapp, "telefono": c.telefono} for c in cors}
     finally:
         db.close()
 
@@ -231,8 +249,8 @@ async def portal(
     usuario = get_usuario_session(request)
     user = empresa or corredor or usuario
 
-    # Check if public user is also a registered corredor (for dual-access option)
     usuario_es_corredor = False
+    favoritos: list = []
     if usuario and not corredor and not empresa:
         db2 = SessionLocal()
         try:
@@ -241,13 +259,30 @@ async def portal(
                 CorredorModel.activo == True,
             ).first()
             usuario_es_corredor = _cor is not None
+            u = db2.query(UsuarioPublico).filter(UsuarioPublico.email == usuario.get("sub", "")).first()
+            if u and u.favoritos:
+                try:
+                    favoritos = json.loads(u.favoritos)
+                except Exception:
+                    pass
         finally:
             db2.close()
 
     portal_error = request.query_params.get("error", "")
     return templates.TemplateResponse(request, "portal.html", {
         "propiedades": propiedades,
-        "filtros": {"tipo": tipo or "", "operacion": operacion or "", "ciudad": ciudad or "", "tour": tour or ""},
+        "filtros": {
+            "tipo": tipo or "",
+            "operacion": operacion or "",
+            "ciudad": ciudad or "",
+            "tour": tour or "",
+            "precio_min": precio_min or "",
+            "precio_max": precio_max or "",
+            "habitaciones": habitaciones or "",
+            "m2_min": m2_min or "",
+        },
+        "corredores_dict": corredores_dict,
+        "favoritos": favoritos,
         "user": user,
         "usuario": usuario,
         "usuario_es_corredor": usuario_es_corredor,
@@ -273,10 +308,112 @@ async def detalle_propiedad(request: Request, propiedad_id: int):
 
     empresa = get_empresa_session(request)
     corredor_session = get_corredor_session(request)
+    usuario = get_usuario_session(request)
     return templates.TemplateResponse(request, "propiedad_detalle.html", {
         "p": propiedad,
         "corredor": corredor_obj,
         "user": empresa or corredor_session,
+        "usuario": usuario,
+        "success": request.query_params.get("success", ""),
+        "error_msg": request.query_params.get("error", ""),
+    })
+
+
+@app.post("/propiedad/{propiedad_id}/contactar")
+async def contactar_propiedad(
+    request: Request,
+    propiedad_id: int,
+    nombre: str = Form(...),
+    email_contacto: str = Form(...),
+    telefono_contacto: str = Form(default=""),
+    mensaje: str = Form(...),
+):
+    from services.email_service import enviar_consulta_propiedad
+    db = SessionLocal()
+    try:
+        propiedad = db.query(PropiedadPublica).filter(
+            PropiedadPublica.id == propiedad_id,
+            PropiedadPublica.publicado == True,
+        ).first()
+        if not propiedad:
+            return RedirectResponse("/", status_code=302)
+        corredor_obj = db.query(CorredorModel).filter(
+            CorredorModel.id == propiedad.corredor_id
+        ).first() if propiedad.corredor_id else None
+        corredor_email = corredor_obj.email if corredor_obj else ADMIN_EMAIL
+        corredor_nombre = corredor_obj.nombre if corredor_obj else "Inmersiva"
+        propiedad_titulo = propiedad.titulo
+    finally:
+        db.close()
+
+    enviar_consulta_propiedad(
+        corredor_email=corredor_email,
+        corredor_nombre=corredor_nombre,
+        propiedad_titulo=propiedad_titulo,
+        nombre_cliente=nombre,
+        email_cliente=email_contacto,
+        telefono_cliente=telefono_contacto,
+        mensaje=mensaje,
+    )
+    return RedirectResponse(f"/propiedad/{propiedad_id}?success=1", status_code=302)
+
+
+@app.post("/api/favorito/{propiedad_id}")
+async def toggle_favorito(request: Request, propiedad_id: int):
+    usuario = get_usuario_session(request)
+    if not usuario:
+        return JSONResponse({"error": "no_login"}, status_code=401)
+    db = SessionLocal()
+    try:
+        u = db.query(UsuarioPublico).filter(UsuarioPublico.email == usuario.get("sub", "")).first()
+        if not u:
+            return JSONResponse({"error": "not_found"}, status_code=404)
+        favoritos: list = []
+        if u.favoritos:
+            try:
+                favoritos = json.loads(u.favoritos)
+            except Exception:
+                pass
+        if propiedad_id in favoritos:
+            favoritos.remove(propiedad_id)
+            added = False
+        else:
+            favoritos.append(propiedad_id)
+            added = True
+        u.favoritos = json.dumps(favoritos)
+        db.commit()
+        return JSONResponse({"added": added, "count": len(favoritos)})
+    finally:
+        db.close()
+
+
+@app.get("/mis-favoritos", response_class=HTMLResponse)
+async def mis_favoritos(request: Request):
+    usuario = get_usuario_session(request)
+    if not usuario:
+        return RedirectResponse("/login", status_code=302)
+    db = SessionLocal()
+    try:
+        u = db.query(UsuarioPublico).filter(UsuarioPublico.email == usuario.get("sub", "")).first()
+        favorito_ids: list = []
+        if u and u.favoritos:
+            try:
+                favorito_ids = json.loads(u.favoritos)
+            except Exception:
+                pass
+        propiedades = []
+        if favorito_ids:
+            propiedades = db.query(PropiedadPublica).filter(
+                PropiedadPublica.id.in_(favorito_ids),
+                PropiedadPublica.publicado == True,
+            ).all()
+    finally:
+        db.close()
+    user = get_empresa_session(request) or get_corredor_session(request) or usuario
+    return templates.TemplateResponse(request, "mis_favoritos.html", {
+        "propiedades": propiedades,
+        "usuario": usuario,
+        "user": user,
     })
 
 
@@ -1804,3 +1941,31 @@ async def actualizar_perfil(
     finally:
         db.close()
     return RedirectResponse("/corredor/dashboard?seccion=perfil&ok=Perfil+actualizado", status_code=302)
+
+
+@app.post("/corredor/cambiar-contrasena")
+async def cambiar_contrasena(
+    request: Request,
+    password_actual: str = Form(...),
+    password_nueva: str = Form(...),
+    password_nueva2: str = Form(...),
+):
+    corredor_tok = get_corredor_session(request)
+    if not corredor_tok:
+        return RedirectResponse("/login", status_code=302)
+    if password_nueva != password_nueva2:
+        return RedirectResponse("/corredor/dashboard?seccion=perfil&error_pass=Las+contrase%C3%B1as+no+coinciden", status_code=302)
+    if len(password_nueva) < 6:
+        return RedirectResponse("/corredor/dashboard?seccion=perfil&error_pass=M%C3%ADnimo+6+caracteres", status_code=302)
+    db = SessionLocal()
+    try:
+        c = db.query(CorredorModel).filter(CorredorModel.username == corredor_tok.get("sub")).first()
+        if not c:
+            return RedirectResponse("/corredor/dashboard?error_pass=Corredor+no+encontrado", status_code=302)
+        if not verify_password(password_actual, c.hashed_password):
+            return RedirectResponse("/corredor/dashboard?seccion=perfil&error_pass=Contrase%C3%B1a+actual+incorrecta", status_code=302)
+        c.hashed_password = hash_password(password_nueva)
+        db.commit()
+    finally:
+        db.close()
+    return RedirectResponse("/corredor/dashboard?seccion=perfil&ok=Contrase%C3%B1a+actualizada+correctamente", status_code=302)

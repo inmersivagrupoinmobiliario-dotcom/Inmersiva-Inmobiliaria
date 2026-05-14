@@ -3,7 +3,18 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>{{ p.titulo }} — Inmersiva</title>
+  <title>{{ p.titulo }} — Inmersiva Grupo Inmobiliario</title>
+  <meta name="description" content="{{ (p.descripcion or (p.tipo + ' en ' + p.operacion + ' en ' + p.ciudad + ', ' + p.estado + '. Precio: ' + p.precio_fmt))[:160] }}">
+  <meta property="og:title" content="{{ p.titulo }} — Inmersiva">
+  <meta property="og:description" content="{{ (p.descripcion or '')[:200] }}">
+  <meta property="og:type" content="website">
+  {% if p.foto_portada %}
+  <meta property="og:image" content="/uploads/{{ p.foto_portada }}">
+  {% endif %}
+  <meta property="og:locale" content="es_PE">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="{{ p.titulo }} — Inmersiva">
+  <meta name="twitter:description" content="{{ (p.descripcion or '')[:200] }}">
   <script src="https://cdn.tailwindcss.com"></script>
   <script>
     tailwind.config = {
@@ -218,9 +229,12 @@
       <!-- Agent card -->
       <div class="bg-white rounded-2xl overflow-hidden shadow-sm sticky top-20">
         <div class="p-5 text-white text-center" style="background:#1B2A4A;">
-          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center font-black text-2xl"
+          <div class="w-16 h-16 rounded-full mx-auto mb-3 flex items-center justify-center font-black text-2xl overflow-hidden"
                style="background:#C9A84C; color:#1B2A4A;">
-            {% if corredor %}{{ corredor.nombre[0]|upper }}{% else %}I{% endif %}
+            {% if corredor and corredor.foto_perfil %}
+            <img src="/uploads/{{ corredor.foto_perfil }}" class="w-full h-full object-cover">
+            {% elif corredor %}{{ corredor.nombre[0]|upper }}
+            {% else %}I{% endif %}
           </div>
           <div class="font-bold text-sm">
             {% if corredor %}{{ corredor.nombre }}{% else %}Inmersiva Grupo Inmobiliario{% endif %}
@@ -228,37 +242,74 @@
           <div class="text-xs mt-0.5" style="color:#C9A84C;">Corredor Inmersiva</div>
         </div>
 
-        <div class="p-5 space-y-3">
-          {% if corredor and corredor.telefono %}
-          <a href="https://wa.me/51{{ corredor.telefono|replace(' ','')|replace('-','') }}"
+        <!-- Quick contact buttons -->
+        <div class="p-4 space-y-2">
+          {% set wa_num = (corredor.whatsapp if corredor and corredor.whatsapp else (corredor.telefono if corredor and corredor.telefono else '')) %}
+          {% if wa_num %}
+          <a href="https://wa.me/51{{ wa_num|replace(' ','')|replace('-','') }}?text=Hola%2C+vi+esta+propiedad+en+Inmersiva%3A+{{ p.titulo | urlencode }}"
              target="_blank"
              class="flex items-center justify-center gap-2 w-full font-bold text-sm py-3 rounded-xl transition-all hover:opacity-90 text-white"
              style="background:#22C55E;">
-            📱 WhatsApp
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+            WhatsApp
           </a>
+          {% if corredor and corredor.telefono %}
           <a href="tel:{{ corredor.telefono }}"
-             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border-2 transition-all hover:bg-gray-50"
+             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-2.5 rounded-xl border-2 transition-all hover:bg-gray-50"
              style="border-color:#1B2A4A; color:#1B2A4A;">
             📞 Llamar
           </a>
           {% endif %}
-          {% if corredor and corredor.email %}
-          <a href="mailto:{{ corredor.email }}?subject=Consulta: {{ p.titulo }}"
-             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border transition-all hover:bg-gray-50 text-gray-600 border-gray-200">
-            ✉️ Enviar email
-          </a>
-          {% else %}
-          <a href="mailto:inmersivagrupoinmobiliario@gmail.com?subject=Consulta: {{ p.titulo }}"
-             class="flex items-center justify-center gap-2 w-full font-semibold text-sm py-3 rounded-xl border transition-all hover:bg-gray-50 text-gray-600 border-gray-200">
-            ✉️ Contactar
-          </a>
           {% endif %}
         </div>
 
-        <div class="px-5 pb-5">
-          <div class="rounded-xl p-4 text-xs text-gray-600 leading-relaxed"
+        <!-- Contact form -->
+        <div class="px-4 pb-4">
+          {% if success %}
+          <div class="rounded-xl p-3 mb-3 text-sm font-semibold text-center"
+               style="background:#d4edda; color:#155724;">
+            ✅ Mensaje enviado correctamente
+          </div>
+          {% endif %}
+          {% if error_msg %}
+          <div class="rounded-xl p-3 mb-3 text-sm"
+               style="background:#f8d7da; color:#721c24;">
+            ⚠️ {{ error_msg }}
+          </div>
+          {% endif %}
+
+          <div class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Enviar consulta</div>
+          <form method="POST" action="/propiedad/{{ p.id }}/contactar" class="space-y-2">
+            <input type="text" name="nombre" required
+                   placeholder="Tu nombre *"
+                   {% if usuario %}value="{{ usuario.get('nombre', '') }}"{% endif %}
+                   class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
+                   style="font-family:inherit;">
+            <input type="email" name="email_contacto" required
+                   placeholder="Tu email *"
+                   {% if usuario %}value="{{ usuario.get('sub', '') }}"{% endif %}
+                   class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
+                   style="font-family:inherit;">
+            <input type="tel" name="telefono_contacto"
+                   placeholder="Teléfono (opcional)"
+                   class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors"
+                   style="font-family:inherit;">
+            <textarea name="mensaje" required rows="3"
+                      placeholder="Me interesa esta propiedad..."
+                      class="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:border-yellow-400 transition-colors resize-none"
+                      style="font-family:inherit;"></textarea>
+            <button type="submit"
+                    class="w-full py-3 font-bold text-sm rounded-xl transition-all hover:opacity-90"
+                    style="background:#1B2A4A; color:#C9A84C;">
+              Enviar mensaje
+            </button>
+          </form>
+        </div>
+
+        <div class="px-4 pb-4">
+          <div class="rounded-xl p-3 text-xs text-gray-600 leading-relaxed"
                style="background:#F9FAFB; border:1px solid #e5e7eb;">
-            <strong class="text-gray-900">Referencia:</strong> #{{ p.id }}<br>
+            <strong class="text-gray-900">Ref:</strong> #{{ p.id }} ·
             <strong class="text-gray-900">Publicada:</strong>
             {{ p.created_at.strftime('%d/%m/%Y') if p.created_at else 'N/A' }}
           </div>
