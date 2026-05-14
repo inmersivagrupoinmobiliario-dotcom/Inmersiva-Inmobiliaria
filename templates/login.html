@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Ingresar — Inmersiva Grupo Inmobiliario</title>
+  <link rel="icon" type="image/png" href="/static/img/logo_nuevo.png">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
@@ -51,21 +52,16 @@
     }
     .brand {
       text-align: center;
-      padding: 32px 32px 24px;
+      padding: 28px 32px 20px;
       border-bottom: 1px solid #f1f5f9;
     }
-    .brand-logo {
-      width: 72px; height: 72px;
-      border-radius: 50%;
-      background: #1B2A4A;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 16px;
-      border: 3px solid #C9A84C;
-      overflow: hidden;
+    .brand-logo-rect {
+      display: block;
+      margin: 0 auto;
+      width: 200px;
+      height: 80px;
+      object-fit: contain;
     }
-    .brand-logo img { width: 58px; height: 58px; object-fit: contain; }
-    .brand-name { color: #1B2A4A; font-size: 1.3rem; font-weight: 900; letter-spacing: 3px; text-transform: uppercase; }
-    .brand-sub  { color: #C9A84C; font-size: .65rem; font-weight: 700; letter-spacing: 2.5px; text-transform: uppercase; margin-top: 2px; }
     .form-body { padding: 28px 32px 32px; }
     .error-box {
       background: #fef2f2; border: 1.5px solid #fca5a5; border-radius: 10px;
@@ -124,11 +120,7 @@
   <div style="width:100%;max-width:420px;">
     <div class="card">
       <div class="brand">
-        <div class="brand-logo">
-          <img src="/static/img/logo.jpeg" alt="Inmersiva" onerror="this.style.display='none'">
-        </div>
-        <div class="brand-name">Inmersiva</div>
-        <div class="brand-sub">Grupo Inmobiliario</div>
+        <img src="/static/img/logo_nuevo.png" alt="Inmersiva Grupo Inmobiliario" class="brand-logo-rect">
       </div>
 
       <div class="form-body">
