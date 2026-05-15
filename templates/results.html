@@ -45,7 +45,7 @@
     .nav-logo img { width: 34px; height: 34px; object-fit: contain; }
     .nav-brand-text .name { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; font-size: .82rem; letter-spacing: 3px; line-height: 1; }
     .nav-brand-text .sub  { color: var(--gold); font-size: 7px; font-weight: 600; letter-spacing: 2.5px; line-height: 1; margin-top: 2px; }
-    .nav-center { font-family: 'Sora', sans-serif; color: #fff; font-weight: 700; font-size: .9rem; letter-spacing: 1.5px; text-transform: uppercase; }
+    .nav-center { font-family: 'Sora', sans-serif; color: #fff; font-weight: 700; font-size: .9rem; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; }
     .nav-center span { color: var(--gold); display: block; font-size: .62rem; letter-spacing: 2px; margin-top: 1px; }
     .nav-right { display: flex; gap: 10px; align-items: center; }
     .nav-btn { display: flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 9px; font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 700; text-decoration: none; transition: all .18s; cursor: pointer; border: none; }
@@ -54,8 +54,23 @@
     .nav-btn-gold { background: var(--gold); color: var(--navy); }
     .nav-btn-gold:hover { opacity: .88; }
 
-    /* ── PAGE WRAP ── */
-    .page { max-width: 900px; margin: 0 auto; padding: 28px 24px 60px; }
+    /* ── SPLIT LAYOUT ── */
+    .split-layout {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+      max-width: 1500px;
+      margin: 0 auto;
+      padding: 24px 20px 60px;
+    }
+    .split-left { flex: 1; min-width: 0; }
+    .split-right {
+      width: 440px;
+      flex-shrink: 0;
+      position: sticky;
+      top: 80px;
+      max-height: calc(100vh - 96px);
+    }
 
     /* ── DRAFT BANNER ── */
     .draft-banner {
@@ -67,7 +82,7 @@
       display: flex;
       align-items: center;
       gap: 14px;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
     }
     .draft-icon { width: 36px; height: 36px; background: rgba(46,204,113,.15); border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .draft-text .title { color: #2ecc71; font-weight: 700; font-size: .88rem; }
@@ -83,32 +98,32 @@
       background: var(--navy);
       border-radius: var(--radius);
       overflow: hidden;
-      margin-bottom: 20px;
+      margin-bottom: 16px;
       border: 1.5px solid rgba(255,255,255,.06);
     }
     .prop-card-header {
       background: linear-gradient(135deg, var(--navy) 0%, #243660 100%);
-      padding: 20px 24px 18px;
+      padding: 18px 22px 16px;
       border-bottom: 3px solid var(--gold);
     }
     .prop-tipo-badge { display: inline-flex; align-items: center; gap: 6px; background: var(--gold-light); border: 1px solid var(--gold-border); border-radius: 6px; padding: 4px 12px; margin-bottom: 10px; }
     .prop-tipo-badge span { font-family: 'Sora', sans-serif; color: var(--gold); font-size: .7rem; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
-    .prop-title { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; font-size: 1.15rem; margin-bottom: 4px; }
+    .prop-title { font-family: 'Sora', sans-serif; color: #fff; font-weight: 800; font-size: 1.1rem; margin-bottom: 4px; }
     .prop-addr { color: rgba(255,255,255,.55); font-size: .85rem; }
-    .prop-card-body { padding: 18px 24px; display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
-    .prop-price { font-family: 'Sora', sans-serif; color: var(--gold); font-size: 2rem; font-weight: 800; line-height: 1; }
+    .prop-card-body { padding: 16px 22px; display: flex; flex-wrap: wrap; gap: 20px; align-items: flex-start; }
+    .prop-price { font-family: 'Sora', sans-serif; color: var(--gold); font-size: 1.9rem; font-weight: 800; line-height: 1; }
     .prop-price-min { color: rgba(255,255,255,.4); font-size: .78rem; margin-top: 4px; }
     .prop-stats { display: flex; flex-wrap: wrap; gap: 16px; margin-left: auto; }
     .prop-stat { text-align: center; }
-    .prop-stat-val { font-family: 'Sora', sans-serif; color: var(--gold); font-size: 1.3rem; font-weight: 800; line-height: 1; }
+    .prop-stat-val { font-family: 'Sora', sans-serif; color: var(--gold); font-size: 1.2rem; font-weight: 800; line-height: 1; }
     .prop-stat-lbl { color: rgba(255,255,255,.45); font-size: .68rem; text-transform: uppercase; letter-spacing: .8px; margin-top: 3px; }
 
     /* ── CONTENT CARD ── */
-    .content-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--border); margin-bottom: 16px; overflow: hidden; }
-    .content-card-header { padding: 16px 22px 14px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
-    .content-card-label { font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--navy); }
+    .content-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--border); margin-bottom: 14px; overflow: hidden; }
+    .content-card-header { padding: 14px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
+    .content-card-label { font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--navy); display: flex; align-items: center; gap: 6px; }
     .content-card-actions { display: flex; gap: 8px; }
-    .content-card-body { padding: 0 22px 20px; }
+    .content-card-body { padding: 0 20px 18px; }
 
     /* ── BUTTONS ── */
     .btn { display: inline-flex; align-items: center; gap: 7px; padding: 8px 16px; border-radius: 9px; font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 700; cursor: pointer; transition: all .18s; border: none; text-decoration: none; white-space: nowrap; }
@@ -122,32 +137,30 @@
     .btn-navy:hover { opacity: .88; }
     .btn-outline { background: transparent; color: var(--navy); border: 1.5px solid var(--border); }
     .btn-outline:hover { background: var(--bg); border-color: var(--navy); }
-    .btn-green { background: #10b981; color: #fff; }
-    .btn-green:hover { opacity: .88; }
     .btn-lg { padding: 12px 24px; font-size: .88rem; border-radius: 11px; }
 
     /* ── TEXTAREA ── */
     .edit-textarea {
       width: 100%;
-      padding: 16px;
+      padding: 14px;
       border: 1.5px solid var(--border);
       border-radius: 10px;
       font-family: 'Inter', sans-serif;
-      font-size: .9rem;
+      font-size: .88rem;
       line-height: 1.72;
       color: var(--text);
       background: #fafbfc;
       resize: vertical;
       transition: border-color .18s, background .18s;
-      min-height: 140px;
-      margin-top: 14px;
+      min-height: 130px;
+      margin-top: 12px;
     }
     .edit-textarea:focus { border-color: var(--gold); background: #fff; outline: none; }
 
     /* ── AI PANEL ── */
     .ai-panel {
       display: none;
-      margin: 12px 0 0;
+      margin: 10px 0 0;
       background: linear-gradient(135deg, #f0f4ff, #eef2fe);
       border: 1.5px solid #c7d7fc;
       border-radius: 10px;
@@ -170,36 +183,36 @@
     .ai-actions { display: flex; align-items: center; gap: 10px; margin-top: 10px; }
     .ai-spinner { font-size: .78rem; color: var(--navy); display: none; }
 
-    /* ── DOWNLOADS CARD ── */
-    .downloads-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 20px 22px; }
+    /* ── DOWNLOADS GRID ── */
+    .downloads-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; padding: 16px 20px; }
     .dl-item {
       background: var(--bg);
       border: 1.5px solid var(--border);
       border-radius: 11px;
-      padding: 16px;
+      padding: 14px;
       display: flex;
       flex-direction: column;
       align-items: flex-start;
-      gap: 10px;
+      gap: 8px;
       transition: border-color .18s, box-shadow .18s;
       text-decoration: none;
       cursor: pointer;
     }
     .dl-item:hover { border-color: var(--gold); box-shadow: 0 4px 16px rgba(201,168,76,.15); }
-    .dl-icon { width: 40px; height: 40px; border-radius: 10px; display: flex; align-items: center; justify-content: center; }
+    .dl-icon { width: 38px; height: 38px; border-radius: 9px; display: flex; align-items: center; justify-content: center; }
     .dl-icon-pdf  { background: #fef2f2; color: #dc2626; }
     .dl-icon-img  { background: #eff6ff; color: #2563eb; }
     .dl-icon-vid  { background: #f0fdf4; color: #16a34a; }
     .dl-icon-vert { background: #faf5ff; color: #7c3aed; }
-    .dl-label { font-family: 'Sora', sans-serif; font-size: .8rem; font-weight: 700; color: var(--navy); }
-    .dl-sub { font-size: .72rem; color: var(--muted); }
+    .dl-label { font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 700; color: var(--navy); }
+    .dl-sub { font-size: .7rem; color: var(--muted); }
 
     /* ── PUBLISH SECTION ── */
-    .publish-section { padding: 20px 22px; border-top: 1px solid var(--border); }
+    .publish-section { padding: 16px 20px; border-top: 1px solid var(--border); }
     .publish-title { font-family: 'Sora', sans-serif; font-size: .88rem; font-weight: 800; color: var(--navy); margin-bottom: 4px; }
-    .publish-sub { font-size: .8rem; color: var(--muted); margin-bottom: 16px; }
-    .network-grid { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
-    .network-label { display: flex; align-items: center; gap: 8px; padding: 8px 16px; border: 1.5px solid var(--border); border-radius: 100px; cursor: pointer; font-size: .82rem; font-weight: 600; color: var(--muted); transition: all .18s; user-select: none; }
+    .publish-sub { font-size: .8rem; color: var(--muted); margin-bottom: 14px; }
+    .network-grid { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .network-label { display: flex; align-items: center; gap: 8px; padding: 8px 14px; border: 1.5px solid var(--border); border-radius: 100px; cursor: pointer; font-size: .82rem; font-weight: 600; color: var(--muted); transition: all .18s; user-select: none; }
     .network-label input { display: none; }
     .network-label:has(input:checked) { background: var(--navy); border-color: var(--navy); color: #fff; }
     .network-label:hover { border-color: var(--navy); color: var(--navy); }
@@ -217,21 +230,137 @@
       background: rgba(255,255,255,.95);
       backdrop-filter: blur(8px);
       border-top: 1px solid var(--border);
-      padding: 14px 24px;
+      padding: 12px 20px;
       display: flex;
       gap: 14px;
       align-items: center;
-      margin-top: 20px;
+      margin-top: 16px;
       border-radius: 0 0 var(--radius) var(--radius);
     }
     .save-note { font-size: .78rem; color: var(--muted); }
 
+    /* ── PREVIEW PANEL ── */
+    .preview-panel {
+      background: var(--card);
+      border-radius: var(--radius);
+      box-shadow: 0 4px 24px rgba(0,0,0,.10);
+      border: 1.5px solid var(--border);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      height: calc(100vh - 100px);
+    }
+    .preview-header {
+      padding: 14px 18px 0;
+      background: var(--navy);
+      flex-shrink: 0;
+    }
+    .preview-header-title {
+      font-family: 'Sora', sans-serif;
+      color: #fff;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .preview-tabs {
+      display: flex;
+      gap: 2px;
+    }
+    .preview-tab {
+      flex: 1;
+      padding: 9px 6px;
+      font-family: 'Sora', sans-serif;
+      font-size: .72rem;
+      font-weight: 700;
+      text-align: center;
+      border: none;
+      background: rgba(255,255,255,.07);
+      color: rgba(255,255,255,.5);
+      cursor: pointer;
+      transition: all .15s;
+      letter-spacing: .5px;
+      text-transform: uppercase;
+      border-radius: 8px 8px 0 0;
+    }
+    .preview-tab:hover { background: rgba(255,255,255,.12); color: rgba(255,255,255,.8); }
+    .preview-tab.active {
+      background: var(--bg);
+      color: var(--navy);
+    }
+    .preview-body {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+    }
+    .preview-frame {
+      display: none;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      inset: 0;
+      overflow: auto;
+    }
+    .preview-frame.active { display: block; }
+    .pdf-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .img-preview-wrap {
+      width: 100%;
+      height: 100%;
+      overflow: auto;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 12px;
+      background: #1a1a2e;
+    }
+    .img-preview {
+      max-width: 100%;
+      border-radius: 8px;
+      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      display: block;
+    }
+    .preview-refresh {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 10;
+      background: rgba(0,0,0,.5);
+      border: none;
+      border-radius: 8px;
+      padding: 7px 11px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 600;
+      transition: background .15s;
+    }
+    .preview-refresh:hover { background: rgba(0,0,0,.75); }
+
     /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .split-layout { flex-direction: column-reverse; }
+      .split-right { width: 100%; position: static; max-height: none; }
+      .preview-panel { height: 520px; }
+    }
     @media (max-width: 640px) {
-      .page { padding: 16px 14px 80px; }
+      .split-layout { padding: 12px 12px 60px; gap: 14px; }
       .prop-card-body { flex-direction: column; gap: 14px; }
       .prop-stats { margin-left: 0; }
       .downloads-grid { grid-template-columns: 1fr 1fr; }
+      .preview-panel { height: 420px; }
     }
   </style>
 </head>
@@ -264,241 +393,311 @@
   </div>
 </nav>
 
-<div class="page">
+<!-- SPLIT LAYOUT -->
+<div class="split-layout">
 
-  {% if ok %}
-  <div class="ok-toast">
-    <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-    Cambios guardados correctamente
-  </div>
-  {% endif %}
+  <!-- LEFT: editing content -->
+  <div class="split-left">
 
-  <!-- DRAFT BANNER -->
-  <div class="draft-banner">
-    <div class="draft-icon">
-      <svg width="18" height="18" fill="none" stroke="#2ecc71" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+    {% if ok %}
+    <div class="ok-toast">
+      <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+      Cambios guardados correctamente
     </div>
-    <div class="draft-text">
-      <div class="title">Guardado como borrador · {{ listing.nombre_borrador or listing.id }}</div>
-      <div class="sub">Disponible en tu dashboard → Mis Fichas</div>
-    </div>
-    <a href="/corredor/dashboard?seccion=fichas" class="draft-link">Ver mis fichas →</a>
-  </div>
+    {% endif %}
 
-  <!-- PROPERTY CARD -->
-  <div class="prop-card">
-    <div class="prop-card-header">
-      <div class="prop-tipo-badge">
-        <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-        <span>{{ listing.tipo }} · {{ listing.operacion }}</span>
+    <!-- DRAFT BANNER -->
+    <div class="draft-banner">
+      <div class="draft-icon">
+        <svg width="18" height="18" fill="none" stroke="#2ecc71" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
       </div>
-      <div class="prop-title">{{ listing.tipo }} en {{ listing.operacion }} · {{ listing.ciudad }}, {{ listing.estado }}</div>
-      <div class="prop-addr">{{ listing.direccion }}</div>
-    </div>
-    <div class="prop-card-body">
-      <div>
-        <div class="prop-price">{{ listing.precio_str }}</div>
-        {% if listing.precio_minimo_str %}
-        <div class="prop-price-min">Mínimo aceptable: {{ listing.precio_minimo_str }}</div>
-        {% endif %}
+      <div class="draft-text">
+        <div class="title">Guardado como borrador · {{ listing.nombre_borrador or listing.id }}</div>
+        <div class="sub">Disponible en tu dashboard → Mis Fichas</div>
       </div>
-      <div class="prop-stats">
-        {% if listing.recamaras %}
-        <div class="prop-stat">
-          <div class="prop-stat-val">{{ listing.recamaras }}</div>
-          <div class="prop-stat-lbl">Dorm.</div>
+      <a href="/corredor/dashboard?seccion=fichas" class="draft-link">Ver mis fichas →</a>
+    </div>
+
+    <!-- PROPERTY CARD -->
+    <div class="prop-card">
+      <div class="prop-card-header">
+        <div class="prop-tipo-badge">
+          <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <span>{{ listing.tipo }} · {{ listing.operacion }}</span>
         </div>
-        {% endif %}
-        {% if listing.banos %}
-        <div class="prop-stat">
-          <div class="prop-stat-val">{{ listing.banos }}</div>
-          <div class="prop-stat-lbl">Baños</div>
+        <div class="prop-title">{{ listing.tipo }} en {{ listing.operacion }} · {{ listing.ciudad }}, {{ listing.estado }}</div>
+        <div class="prop-addr">{{ listing.direccion }}</div>
+      </div>
+      <div class="prop-card-body">
+        <div>
+          <div class="prop-price">{{ listing.precio_str }}</div>
+          {% if listing.precio_minimo_str %}
+          <div class="prop-price-min">Mínimo aceptable: {{ listing.precio_minimo_str }}</div>
+          {% endif %}
         </div>
-        {% endif %}
-        {% if listing.m2_construidos %}
-        <div class="prop-stat">
-          <div class="prop-stat-val">{{ listing.m2_construidos }}</div>
-          <div class="prop-stat-lbl">m² const.</div>
+        <div class="prop-stats">
+          {% if listing.recamaras %}
+          <div class="prop-stat"><div class="prop-stat-val">{{ listing.recamaras }}</div><div class="prop-stat-lbl">Dorm.</div></div>
+          {% endif %}
+          {% if listing.banos %}
+          <div class="prop-stat"><div class="prop-stat-val">{{ listing.banos }}</div><div class="prop-stat-lbl">Baños</div></div>
+          {% endif %}
+          {% if listing.m2_construidos %}
+          <div class="prop-stat"><div class="prop-stat-val">{{ listing.m2_construidos }}</div><div class="prop-stat-lbl">m² const.</div></div>
+          {% endif %}
+          {% if listing.m2_terreno %}
+          <div class="prop-stat"><div class="prop-stat-val">{{ listing.m2_terreno }}</div><div class="prop-stat-lbl">m² terr.</div></div>
+          {% endif %}
+          {% if listing.estacionamientos %}
+          <div class="prop-stat"><div class="prop-stat-val">{{ listing.estacionamientos }}</div><div class="prop-stat-lbl">Coch.</div></div>
+          {% endif %}
         </div>
-        {% endif %}
-        {% if listing.m2_terreno %}
-        <div class="prop-stat">
-          <div class="prop-stat-val">{{ listing.m2_terreno }}</div>
-          <div class="prop-stat-lbl">m² terr.</div>
-        </div>
-        {% endif %}
-        {% if listing.estacionamientos %}
-        <div class="prop-stat">
-          <div class="prop-stat-val">{{ listing.estacionamientos }}</div>
-          <div class="prop-stat-lbl">Coch.</div>
-        </div>
-        {% endif %}
       </div>
     </div>
-  </div>
 
-  <!-- EDIT FORM -->
-  <form method="post" action="/resultados/{{ listing.id }}/editar" id="form-editar">
+    <!-- EDIT FORM -->
+    <form method="post" action="/resultados/{{ listing.id }}/editar" id="form-editar">
 
-    <!-- Descripción -->
-    <div class="content-card">
-      <div class="content-card-header">
-        <span class="content-card-label">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:6px;margin-bottom:1px"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
-          Descripción Profesional
-        </span>
-        <div class="content-card-actions">
-          <button type="button" class="btn btn-copy" onclick="copyField('desc')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copiar
-          </button>
-          <button type="button" class="btn btn-ia" onclick="togglePanel('panel-desc')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Mejorar con IA
-          </button>
-        </div>
-      </div>
-      <div class="content-card-body">
-        <textarea class="edit-textarea" name="descripcion" id="field-desc" rows="9">{{ listing.descripcion_generada }}</textarea>
-        <div class="ai-panel" id="panel-desc">
-          <div class="ai-panel-label">¿Cómo quieres mejorarla?</div>
-          <input class="ai-input" id="hint-desc" type="text" placeholder="Ej: más formal, enfócate en la inversión, agrega urgencia...">
-          <div class="ai-actions">
-            <button type="button" class="btn btn-gold" onclick="mejorarConIA('desc','descripcion')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Regenerar con IA
+      <!-- Descripción -->
+      <div class="content-card">
+        <div class="content-card-header">
+          <span class="content-card-label">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+            Descripción Profesional
+          </span>
+          <div class="content-card-actions">
+            <button type="button" class="btn btn-copy" onclick="copyField('desc')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
             </button>
-            <span class="ai-spinner" id="spin-desc">Generando…</span>
+            <button type="button" class="btn btn-ia" onclick="togglePanel('panel-desc')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Mejorar con IA
+            </button>
+          </div>
+        </div>
+        <div class="content-card-body">
+          <textarea class="edit-textarea" name="descripcion" id="field-desc" rows="8">{{ listing.descripcion_generada }}</textarea>
+          <div class="ai-panel" id="panel-desc">
+            <div class="ai-panel-label">¿Cómo quieres mejorarla?</div>
+            <input class="ai-input" id="hint-desc" type="text" placeholder="Ej: más formal, enfócate en la inversión, agrega urgencia...">
+            <div class="ai-actions">
+              <button type="button" class="btn btn-gold" onclick="mejorarConIA('desc','descripcion')">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Regenerar con IA
+              </button>
+              <span class="ai-spinner" id="spin-desc">Generando…</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Copy Instagram -->
-    <div class="content-card">
-      <div class="content-card-header">
-        <span class="content-card-label">
-          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:6px;margin-bottom:1px"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
-          Copy para Instagram
-        </span>
-        <div class="content-card-actions">
-          <button type="button" class="btn btn-copy" onclick="copyField('ig')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-            Copiar
-          </button>
-          <button type="button" class="btn btn-ia" onclick="togglePanel('panel-ig')">
-            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-            Mejorar con IA
-          </button>
-        </div>
-      </div>
-      <div class="content-card-body">
-        <textarea class="edit-textarea" name="copy_instagram" id="field-ig" rows="9">{{ listing.copy_instagram }}</textarea>
-        <div class="ai-panel" id="panel-ig">
-          <div class="ai-panel-label">¿Cómo quieres mejorar el copy?</div>
-          <input class="ai-input" id="hint-ig" type="text" placeholder="Ej: más emojis, enfócate en el lifestyle, agrega CTA directo...">
-          <div class="ai-actions">
-            <button type="button" class="btn btn-gold" onclick="mejorarConIA('ig','instagram')">
-              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-              Regenerar con IA
+      <!-- Copy Instagram -->
+      <div class="content-card">
+        <div class="content-card-header">
+          <span class="content-card-label">
+            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="2" y="2" width="20" height="20" rx="5"/><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/></svg>
+            Copy para Instagram
+          </span>
+          <div class="content-card-actions">
+            <button type="button" class="btn btn-copy" onclick="copyField('ig')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+              Copiar
             </button>
-            <span class="ai-spinner" id="spin-ig">Generando…</span>
+            <button type="button" class="btn btn-ia" onclick="togglePanel('panel-ig')">
+              <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+              Mejorar con IA
+            </button>
+          </div>
+        </div>
+        <div class="content-card-body">
+          <textarea class="edit-textarea" name="copy_instagram" id="field-ig" rows="8">{{ listing.copy_instagram }}</textarea>
+          <div class="ai-panel" id="panel-ig">
+            <div class="ai-panel-label">¿Cómo quieres mejorar el copy?</div>
+            <input class="ai-input" id="hint-ig" type="text" placeholder="Ej: más emojis, enfócate en el lifestyle, agrega CTA directo...">
+            <div class="ai-actions">
+              <button type="button" class="btn btn-gold" onclick="mejorarConIA('ig','instagram')">
+                <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+                Regenerar con IA
+              </button>
+              <span class="ai-spinner" id="spin-ig">Generando…</span>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Save bar -->
-    <div class="save-bar">
-      <button type="submit" class="btn btn-gold btn-lg">
-        <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-        Guardar cambios
-      </button>
-      <span class="save-note">Los cambios se guardan en tu borrador</span>
-    </div>
-  </form>
-
-  <!-- DOWNLOADS & PUBLISH -->
-  <div class="content-card" style="margin-top:20px;">
-    <div class="content-card-header">
-      <span class="content-card-label">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" style="display:inline;vertical-align:middle;margin-right:6px;margin-bottom:1px"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Descargas y Publicación
-      </span>
-    </div>
-    <div class="downloads-grid">
-      <a href="/pdf/{{ listing.id }}" class="dl-item" target="_blank">
-        <div class="dl-icon dl-icon-pdf">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-        </div>
-        <div class="dl-label">Ficha PDF</div>
-        <div class="dl-sub">Documento profesional Letter</div>
-      </a>
-      <a href="/imagen/{{ listing.id }}" class="dl-item" download>
-        <div class="dl-icon dl-icon-img">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
-        </div>
-        <div class="dl-label">Imagen Cuadrada</div>
-        <div class="dl-sub">1080 × 1080 px — Instagram</div>
-      </a>
-      <a href="/imagen-vertical/{{ listing.id }}" class="dl-item" download>
-        <div class="dl-icon dl-icon-vert">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-        </div>
-        <div class="dl-label">Stories / Reels</div>
-        <div class="dl-sub">1080 × 1920 px — vertical</div>
-      </a>
-      <div class="dl-item" onclick="generarVideo('{{ listing.id }}')" id="btn-video">
-        <div class="dl-icon dl-icon-vid">
-          <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
-        </div>
-        <div class="dl-label">Video Reel</div>
-        <div class="dl-sub">Generar video animado</div>
-      </div>
-    </div>
-
-    <!-- Video progress -->
-    <div class="video-progress" id="video-progress" style="padding: 0 22px 16px;">
-      <div class="video-status" id="video-status">Iniciando render...</div>
-      <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
-      <div id="video-download" style="display:none;margin-top:12px;">
-        <a id="video-link" href="#" class="btn btn-gold" download>
-          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-          Descargar Video
-        </a>
-      </div>
-    </div>
-
-    <!-- Publish section -->
-    <div class="publish-section">
-      <div class="publish-title">Solicitar publicación en redes sociales</div>
-      <div class="publish-sub">El admin revisará y publicará en las redes seleccionadas.</div>
-      <form method="post" action="/corredor/solicitar-publicacion/{{ listing.id }}">
-        <div class="network-grid">
-          {% for red, icon in [("instagram","M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"),("facebook","M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"),("whatsapp","M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"),("tiktok","M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5")] %}
-          <label class="network-label">
-            <input type="checkbox" name="redes" value="{{ red }}" {% if red in ['instagram','facebook','whatsapp'] %}checked{% endif %}>
-            <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              {% if red == 'instagram' %}<rect x="2" y="2" width="20" height="20" rx="5"/><path d="{{ icon }}"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
-              {% elif red == 'tiktok' %}<path d="{{ icon }}"/>
-              {% else %}<path d="{{ icon }}"/>{% endif %}
-            </svg>
-            {{ red | capitalize }}
-          </label>
-          {% endfor %}
-        </div>
-        <button type="submit" class="btn btn-navy btn-lg" style="width:100%;">
-          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
-          Enviar al admin para publicar
+      <!-- Save bar -->
+      <div class="save-bar">
+        <button type="submit" class="btn btn-gold btn-lg">
+          <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+          Guardar cambios
         </button>
-      </form>
-    </div>
-  </div>
+        <span class="save-note">Los cambios se guardan en tu borrador</span>
+      </div>
+    </form>
 
-</div>
+    <!-- DOWNLOADS & PUBLISH -->
+    <div class="content-card" style="margin-top:14px;">
+      <div class="content-card-header">
+        <span class="content-card-label">
+          <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Descargas y Publicación
+        </span>
+      </div>
+      <div class="downloads-grid">
+        <a href="/pdf/{{ listing.id }}" class="dl-item" target="_blank" onclick="switchPreview('pdf')">
+          <div class="dl-icon dl-icon-pdf">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          </div>
+          <div class="dl-label">Ficha PDF</div>
+          <div class="dl-sub">Documento A4</div>
+        </a>
+        <a href="/imagen/{{ listing.id }}" class="dl-item" download onclick="switchPreview('cuadrada'); return false;">
+          <div class="dl-icon dl-icon-img">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="dl-label">Imagen Cuadrada</div>
+          <div class="dl-sub">1080 × 1080 px</div>
+        </a>
+        <a href="/imagen-vertical/{{ listing.id }}" class="dl-item" download onclick="switchPreview('stories'); return false;">
+          <div class="dl-icon dl-icon-vert">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          </div>
+          <div class="dl-label">Stories / Reels</div>
+          <div class="dl-sub">1080 × 1920 px</div>
+        </a>
+        <div class="dl-item" onclick="generarVideo('{{ listing.id }}')" id="btn-video">
+          <div class="dl-icon dl-icon-vid">
+            <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg>
+          </div>
+          <div class="dl-label">Video Reel</div>
+          <div class="dl-sub">Generar video animado</div>
+        </div>
+      </div>
+
+      <!-- Video progress -->
+      <div class="video-progress" id="video-progress" style="padding: 0 20px 14px;">
+        <div class="video-status" id="video-status">Iniciando render...</div>
+        <div class="progress-track"><div class="progress-fill" id="progress-fill" style="width:5%"></div></div>
+        <div id="video-download" style="display:none;margin-top:12px;">
+          <a id="video-link" href="#" class="btn btn-gold" download>
+            <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Descargar Video
+          </a>
+        </div>
+      </div>
+
+      <!-- Publish section -->
+      <div class="publish-section">
+        <div class="publish-title">Solicitar publicación en redes sociales</div>
+        <div class="publish-sub">El admin revisará y publicará en las redes seleccionadas.</div>
+        <form method="post" action="/corredor/solicitar-publicacion/{{ listing.id }}">
+          <div class="network-grid">
+            {% for red, icon in [("instagram","M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"),("facebook","M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"),("whatsapp","M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"),("tiktok","M9 12a4 4 0 1 0 4 4V4a5 5 0 0 0 5 5")] %}
+            <label class="network-label">
+              <input type="checkbox" name="redes" value="{{ red }}" {% if red in ['instagram','facebook','whatsapp'] %}checked{% endif %}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                {% if red == 'instagram' %}<rect x="2" y="2" width="20" height="20" rx="5"/><path d="{{ icon }}"/><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"/>
+                {% elif red == 'tiktok' %}<path d="{{ icon }}"/>
+                {% else %}<path d="{{ icon }}"/>{% endif %}
+              </svg>
+              {{ red | capitalize }}
+            </label>
+            {% endfor %}
+          </div>
+          <button type="submit" class="btn btn-navy btn-lg" style="width:100%;">
+            <svg width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+            Enviar al admin para publicar
+          </button>
+        </form>
+      </div>
+    </div>
+
+  </div><!-- /split-left -->
+
+  <!-- RIGHT: preview panel -->
+  <div class="split-right">
+    <div class="preview-panel">
+      <div class="preview-header">
+        <div class="preview-header-title">
+          <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          Vista Previa
+        </div>
+        <div class="preview-tabs">
+          <button class="preview-tab active" onclick="switchPreview('pdf', this)" id="tab-pdf">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-right:4px;vertical-align:middle"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/></svg>
+            PDF
+          </button>
+          <button class="preview-tab" onclick="switchPreview('cuadrada', this)" id="tab-cuadrada">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-right:4px;vertical-align:middle"><rect x="3" y="3" width="18" height="18" rx="2"/></svg>
+            Cuadrada
+          </button>
+          <button class="preview-tab" onclick="switchPreview('stories', this)" id="tab-stories">
+            <svg width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" style="display:inline;margin-right:4px;vertical-align:middle"><rect x="5" y="2" width="14" height="20" rx="2"/></svg>
+            Stories
+          </button>
+        </div>
+      </div>
+      <div class="preview-body">
+
+        <!-- PDF -->
+        <div class="preview-frame active" id="prev-pdf">
+          <button class="preview-refresh" onclick="reloadPreview('pdf-iframe', '/pdf/{{ listing.id }}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Recargar
+          </button>
+          <iframe id="pdf-iframe" class="pdf-iframe" src="/pdf/{{ listing.id }}"></iframe>
+        </div>
+
+        <!-- Cuadrada -->
+        <div class="preview-frame" id="prev-cuadrada">
+          <button class="preview-refresh" onclick="reloadImg('img-cuadrada', '/imagen/{{ listing.id }}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Recargar
+          </button>
+          <div class="img-preview-wrap">
+            <img id="img-cuadrada" class="img-preview" src="/imagen/{{ listing.id }}" alt="Imagen cuadrada 1080x1080">
+          </div>
+        </div>
+
+        <!-- Stories -->
+        <div class="preview-frame" id="prev-stories">
+          <button class="preview-refresh" onclick="reloadImg('img-stories', '/imagen-vertical/{{ listing.id }}')">
+            <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+            Recargar
+          </button>
+          <div class="img-preview-wrap">
+            <img id="img-stories" class="img-preview" src="/imagen-vertical/{{ listing.id }}" alt="Stories 1080x1920">
+          </div>
+        </div>
+
+      </div><!-- /preview-body -->
+    </div><!-- /preview-panel -->
+  </div><!-- /split-right -->
+
+</div><!-- /split-layout -->
 
 <script src="/static/js/main.js"></script>
 <script>
+function switchPreview(tab, btn) {
+  document.querySelectorAll('.preview-tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.preview-frame').forEach(f => f.classList.remove('active'));
+  const activeTab = btn || document.getElementById('tab-' + tab);
+  if (activeTab) activeTab.classList.add('active');
+  const frame = document.getElementById('prev-' + tab);
+  if (frame) frame.classList.add('active');
+}
+
+function reloadPreview(iframeId, src) {
+  const iframe = document.getElementById(iframeId);
+  iframe.src = src + '?t=' + Date.now();
+}
+
+function reloadImg(imgId, src) {
+  const img = document.getElementById(imgId);
+  img.src = src + '?t=' + Date.now();
+}
+
 function togglePanel(id) {
   document.getElementById(id).classList.toggle('open');
 }
