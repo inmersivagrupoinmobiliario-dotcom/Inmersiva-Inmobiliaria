@@ -54,84 +54,8 @@
     .progress-pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 100px; padding: 5px 14px; font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.8); white-space: nowrap; }
     .progress-pill span { color: var(--gold); }
 
-    /* ── LAYOUT ── */
-    .layout { display: flex; min-height: calc(100vh - 64px); }
-
-    /* ── SIDEBAR NAV ── */
-    .sidebar-nav {
-      width: 230px;
-      flex-shrink: 0;
-      background: var(--navy-dark);
-      position: sticky;
-      top: 64px;
-      height: calc(100vh - 64px);
-      overflow-y: auto;
-      padding: 20px 12px;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .sidebar-nav::-webkit-scrollbar { width: 3px; }
-    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
-    .nav-section-label { font-size: .6rem; font-weight: 700; color: rgba(255,255,255,.3); letter-spacing: 1.5px; text-transform: uppercase; padding: 10px 8px 4px; }
-    .nav-item {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      padding: 8px 10px;
-      border-radius: 9px;
-      cursor: pointer;
-      transition: all var(--transition);
-      text-decoration: none;
-      color: rgba(255,255,255,.5);
-      font-size: .78rem;
-      font-weight: 600;
-    }
-    .nav-item:hover { background: rgba(201,168,76,.1); color: rgba(255,255,255,.85); }
-    .nav-item.active { background: rgba(201,168,76,.15); color: var(--gold); }
-    .nav-num {
-      width: 22px;
-      height: 22px;
-      border-radius: 50%;
-      background: rgba(255,255,255,.08);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: .65rem;
-      font-weight: 800;
-      flex-shrink: 0;
-      transition: all var(--transition);
-    }
-    .nav-item.active .nav-num { background: var(--gold); color: var(--navy); }
-    .nav-item.done .nav-num { background: #10b981; color: #fff; }
-    .nav-item.done { color: rgba(255,255,255,.6); }
-    .nav-submit {
-      margin-top: auto;
-      padding-top: 16px;
-      border-top: 1px solid rgba(255,255,255,.08);
-    }
-    .nav-submit-btn {
-      width: 100%;
-      padding: 11px;
-      background: var(--gold);
-      color: var(--navy);
-      font-family: 'Sora', sans-serif;
-      font-weight: 800;
-      font-size: .82rem;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      letter-spacing: .5px;
-      transition: opacity var(--transition);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-    }
-    .nav-submit-btn:hover { opacity: .88; }
-
     /* ── MAIN CONTENT ── */
-    .main-content { flex: 1; padding: 28px 32px; max-width: 900px; }
+    .main-content { max-width: 860px; margin: 0 auto; padding: 28px 32px; }
 
     /* ── LLAMADA BAR ── */
     .llamada-bar {
@@ -416,7 +340,6 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
-      .sidebar-nav { display: none; }
       .main-content { padding: 16px; max-width: 100%; }
       .fg-3, .fg-4, .fg-5 { grid-template-columns: 1fr 1fr; }
       .fg-3 .span3, .fg-4 .span3 { grid-column: span 2; }
@@ -447,38 +370,15 @@
     <div class="top-header-sub">Generador de contenido con IA</div>
   </div>
   <div class="top-header-right">
+    <button type="button" onclick="clearDraft()" style="display:flex;align-items:center;gap:6px;background:rgba(220,38,38,.15);border:1.5px solid rgba(220,38,38,.45);border-radius:8px;padding:6px 14px;color:#fca5a5;font-family:'Sora',sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;letter-spacing:.3px;transition:all .18s;" onmouseover="this.style.background='rgba(220,38,38,.3)'" onmouseout="this.style.background='rgba(220,38,38,.15)'">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      Borrar datos
+    </button>
     <div class="progress-pill">Sección <span id="currentSection">1</span> de 12</div>
   </div>
 </header>
 
-<!-- ═══ LAYOUT ══════════════════════════════════════════════════════════════ -->
-<div class="layout">
-
-  <!-- SIDEBAR -->
-  <nav class="sidebar-nav">
-    <div class="nav-section-label">Secciones</div>
-    <a class="nav-item active" href="#sec-1" id="nav-1"><span class="nav-num">1</span> Propietario</a>
-    <a class="nav-item" href="#sec-2" id="nav-2"><span class="nav-num">2</span> Inmueble</a>
-    <a class="nav-item" href="#sec-3" id="nav-3"><span class="nav-num">3</span> Amenidades</a>
-    <a class="nav-item" href="#sec-4" id="nav-4"><span class="nav-num">4</span> Documentación</a>
-    <a class="nav-item" href="#sec-5" id="nav-5"><span class="nav-num">5</span> Información comercial</a>
-    <a class="nav-item" href="#sec-6" id="nav-6"><span class="nav-num">6</span> Fotos</a>
-    <a class="nav-item" href="#sec-7" id="nav-7"><span class="nav-num">7</span> Video / Tour</a>
-    <a class="nav-item" href="#sec-8" id="nav-8"><span class="nav-num">8</span> Historial</a>
-    <a class="nav-item" href="#sec-9" id="nav-9"><span class="nav-num">9</span> Motivación</a>
-    <a class="nav-item" href="#sec-10" id="nav-10"><span class="nav-num">10</span> Ocupación</a>
-    <a class="nav-item" href="#sec-11" id="nav-11"><span class="nav-num">11</span> Siguiente paso</a>
-    <a class="nav-item" href="#sec-12" id="nav-12"><span class="nav-num">12</span> Observaciones</a>
-    <div class="nav-submit">
-      <button class="nav-submit-btn" onclick="document.getElementById('fichaForm').requestSubmit()">
-        <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        Generar con IA
-      </button>
-    </div>
-  </nav>
-
-  <!-- MAIN -->
-  <div class="main-content">
+<div class="main-content">
     <form id="fichaForm" action="/generar" method="post" enctype="multipart/form-data">
 
     {% if error %}
@@ -1237,7 +1137,6 @@
     <div class="form-footer">
       Inmersiva Grupo Inmobiliario · Sistema Generador de Contenido IA · inmobiliariainmersiva.com
     </div>
-  </div>
 </div>
 
 <script>
@@ -1276,22 +1175,89 @@
     toggle('arrendatario-block', radio.value === 'Alquilada');
   }
 
-  /* ── SIDEBAR ACTIVE STATE ────────────────────────────────────────────── */
+  /* ── SECTION COUNTER ─────────────────────────────────────────────────── */
   const sections = document.querySelectorAll('.section-card');
-  const navItems = document.querySelectorAll('.nav-item');
   const counter  = document.getElementById('currentSection');
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting) {
-        const id = e.target.id.replace('sec-', '');
-        navItems.forEach(n => n.classList.toggle('active', n.id === 'nav-' + id));
-        if (counter) counter.textContent = id;
+      if (e.isIntersecting && counter) {
+        counter.textContent = e.target.id.replace('sec-', '');
       }
     });
   }, { rootMargin: '-40% 0px -50% 0px' });
 
   sections.forEach(s => observer.observe(s));
+
+  /* ── LOCAL STORAGE DRAFT ─────────────────────────────────────────────── */
+  const DRAFT_KEY = 'inmersiva_ficha_draft';
+
+  function saveDraft() {
+    const form = document.getElementById('fichaForm');
+    const data = {};
+    form.querySelectorAll('input:not([type=file]), select, textarea').forEach(el => {
+      if (!el.name) return;
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        if (el.checked) {
+          if (data[el.name] === undefined) data[el.name] = [];
+          if (!Array.isArray(data[el.name])) data[el.name] = [data[el.name]];
+          data[el.name].push(el.value);
+        }
+      } else {
+        data[el.name] = el.value;
+      }
+    });
+    localStorage.setItem(DRAFT_KEY, JSON.stringify(data));
+  }
+
+  function restoreDraft() {
+    const raw = localStorage.getItem(DRAFT_KEY);
+    if (!raw) return;
+    let data;
+    try { data = JSON.parse(raw); } catch { return; }
+    const form = document.getElementById('fichaForm');
+    form.querySelectorAll('input:not([type=file]), select, textarea').forEach(el => {
+      if (!el.name || !(el.name in data)) return;
+      const val = data[el.name];
+      if (el.type === 'checkbox' || el.type === 'radio') {
+        el.checked = Array.isArray(val) ? val.includes(el.value) : val === el.value;
+      } else {
+        el.value = val || '';
+      }
+    });
+    // Re-run conditional logic after restoring
+    const q = s => document.querySelector(s);
+    const qAll = s => document.querySelectorAll(s);
+    qAll('[name=propietario_estado_civil]:checked').forEach(r => onEstadoCivil(r));
+    qAll('[name=propietario_otros_titulares]:checked').forEach(r => onOtrosTitulares(r));
+    qAll('[name=propietario_relacion]:checked').forEach(r => onRelacion(r));
+    qAll('[name=tenencia]:checked').forEach(r => onTenencia(r));
+    qAll('[name=hipoteca]:checked').forEach(r => toggle('hipoteca-block', r.value === 'Sí'));
+    qAll('[name=litigios]:checked').forEach(r => toggle('litigios-block', r.value === 'Sí'));
+    qAll('[name=cuotas_pendientes]:checked').forEach(r => toggle('cuotas-block', r.value === 'Sí'));
+    qAll('[name=otros_corredores]:checked').forEach(r => toggle('otros-corredores-block', r.value === 'Sí'));
+    qAll('[name=estado_ocupacion]:checked').forEach(r => onOcupacion(r));
+    qAll('[name=llaves_tercero]:checked').forEach(r => toggle('llaves-block', r.value === 'Sí'));
+  }
+
+  function clearDraft() {
+    localStorage.removeItem(DRAFT_KEY);
+    document.getElementById('fichaForm').reset();
+    document.querySelectorAll('.conditional').forEach(el => {
+      el.classList.add('hidden');
+      el.classList.remove('visible');
+    });
+    const rb = document.getElementById('registral-block');
+    if (rb) { rb.classList.remove('hidden'); rb.classList.add('visible'); }
+  }
+
+  // Auto-save on every change
+  const fichaForm = document.getElementById('fichaForm');
+  fichaForm.addEventListener('input', saveDraft);
+  fichaForm.addEventListener('change', saveDraft);
+
+  // Restore on load
+  restoreDraft();
 
   /* ── FILE PREVIEWS ───────────────────────────────────────────────────── */
   function previewPortada(input) {
@@ -1328,6 +1294,7 @@
 
   /* ── SUBMIT STATE ────────────────────────────────────────────────────── */
   document.getElementById('fichaForm').addEventListener('submit', function() {
+    localStorage.removeItem(DRAFT_KEY);
     const btn = document.getElementById('submitBtn');
     btn.disabled = true;
     btn.innerHTML = `
