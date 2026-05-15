@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Optional, List
 
 from fastapi import FastAPI, Form, File, UploadFile, Request, Depends, HTTPException
-from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import HTMLResponse, FileResponse, JSONResponse, RedirectResponse, Response
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
@@ -2325,3 +2325,85 @@ async def cambiar_contrasena(
     finally:
         db.close()
     return RedirectResponse("/corredor/dashboard?seccion=perfil&ok=Contrase%C3%B1a+actualizada+correctamente", status_code=302)
+
+
+# ── Páginas públicas ──────────────────────────────────────────────────────────
+
+@app.get("/acerca-de", response_class=HTMLResponse)
+async def acerca_de(request: Request):
+    user = get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request)
+    return templates.TemplateResponse(request, "acerca_de.html", {"user": user})
+
+
+@app.get("/contacto", response_class=HTMLResponse)
+async def contacto_page(request: Request):
+    user = get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request)
+    sent = request.query_params.get("enviado")
+    return templates.TemplateResponse(request, "contacto.html", {"user": user, "sent": sent})
+
+
+@app.post("/contacto")
+async def contacto_submit(
+    request: Request,
+    nombre: str = Form(...),
+    email: str = Form(...),
+    asunto: str = Form(default="Consulta general"),
+    mensaje: str = Form(...),
+):
+    from services.email_service import enviar_consulta_propiedad
+    admin_email = os.getenv("SMTP_FROM", os.getenv("SMTP_USER", ""))
+    if admin_email:
+        try:
+            enviar_consulta_propiedad(
+                corredor_email=admin_email,
+                corredor_nombre="Inmersiva",
+                propiedad_titulo=asunto,
+                nombre_cliente=nombre,
+                email_cliente=email,
+                telefono_cliente="",
+                mensaje=mensaje,
+            )
+        except Exception as e:
+            print(f"[CONTACTO] Error enviando mensaje: {e}")
+    return RedirectResponse("/contacto?enviado=1", status_code=302)
+
+
+# ── Sitemap ───────────────────────────────────────────────────────────────────
+
+@app.get("/sitemap.xml")
+async def sitemap(request: Request):
+    base = f"{request.url.scheme}://{request.url.netloc}"
+    db = SessionLocal()
+    try:
+        props = db.query(PropiedadPublica).filter(PropiedadPublica.publicado == True).all()
+    finally:
+        db.close()
+
+    urls = [
+        f"<url><loc>{base}/</loc><changefreq>daily</changefreq><priority>1.0</priority></url>",
+        f"<url><loc>{base}/acerca-de</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>",
+        f"<url><loc>{base}/contacto</loc><changefreq>monthly</changefreq><priority>0.6</priority></url>",
+    ]
+    for p in props:
+        urls.append(
+            f"<url><loc>{base}/propiedad/{p.id}</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>"
+        )
+    xml = '<?xml version="1.0" encoding="UTF-8"?>\n'
+    xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'
+    xml += "\n".join(urls)
+    xml += "\n</urlset>"
+    return Response(content=xml, media_type="application/xml")
+
+
+# ── Manejadores de error ──────────────────────────────────────────────────────
+
+@app.exception_handler(404)
+async def handler_404(request: Request, exc):
+    user = get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request)
+    return templates.TemplateResponse(request, "error_404.html", {"user": user}, status_code=404)
+
+
+@app.exception_handler(500)
+async def handler_500(request: Request, exc):
+    user = get_empresa_session(request) or get_corredor_session(request) or get_usuario_session(request)
+    return templates.TemplateResponse(request, "error_500.html", {"user": user}, status_code=500)

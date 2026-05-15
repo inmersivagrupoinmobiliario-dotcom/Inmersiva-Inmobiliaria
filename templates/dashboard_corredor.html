@@ -165,11 +165,42 @@
         </div>
       </div>
 
+      <!-- Mini analytics -->
+      {% if stats.mis_fichas > 0 %}
+      <div style="background:#fff;border:1.5px solid #e2e8f0;border-radius:14px;padding:18px 22px;margin-bottom:16px;">
+        <div style="font-size:.7rem;font-weight:800;color:#9ca3af;letter-spacing:.8px;text-transform:uppercase;margin-bottom:12px;">Actividad</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;text-align:center;margin-bottom:14px;">
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:#1B2A4A;">{{ stats.fichas_mes }}</div>
+            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;margin-top:2px;">este mes</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:#C9A84C;">{{ stats.contactos }}</div>
+            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;margin-top:2px;">leads</div>
+          </div>
+          <div>
+            <div style="font-size:1.5rem;font-weight:900;color:#10b981;">{{ stats.total_vistas }}</div>
+            <div style="font-size:.68rem;color:#94a3b8;font-weight:600;margin-top:2px;">visitas</div>
+          </div>
+        </div>
+        {% set pubs = stats.get('fichas_publicadas', 0) if stats is mapping else 0 %}
+        <div style="font-size:.68rem;color:#94a3b8;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.4px;">Fichas publicadas</div>
+        <div style="background:#f1f5f9;border-radius:100px;height:7px;overflow:hidden;">
+          {% set pct = [((stats.fichas_publicadas | default(0)) / stats.mis_fichas * 100) | int, 100] | min %}
+          <div style="width:{{ pct }}%;height:100%;background:linear-gradient(90deg,#1B2A4A,#C9A84C);border-radius:100px;"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px;">
+          <span style="font-size:.65rem;color:#94a3b8;">{{ stats.fichas_publicadas | default(0) }} publicadas</span>
+          <span style="font-size:.65rem;color:#94a3b8;">{{ stats.mis_fichas }} total</span>
+        </div>
+      </div>
+      {% endif %}
+
       <!-- Próximas citas -->
       {% set prox = citas | selectattr("estado","eq","Pendiente") | list %}
       {% if prox %}
       <div class="card-section p-5 mb-4">
-        <div class="font-bold text-gray-800 text-sm mb-3">📅 Próximas citas</div>
+        <div class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="#C9A84C" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Próximas citas</div>
         {% for cita in prox[:3] %}
         <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 text-sm">
           <div>
@@ -185,7 +216,7 @@
       <!-- Últimos contactos -->
       {% if contactos %}
       <div class="card-section p-5">
-        <div class="font-bold text-gray-800 text-sm mb-3">👥 Últimos contactos</div>
+        <div class="font-bold text-gray-800 text-sm mb-3 flex items-center gap-2"><svg width="14" height="14" fill="none" stroke="#1B2A4A" stroke-width="2" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Últimos contactos</div>
         {% for c in contactos[:5] %}
         <div class="flex items-center justify-between py-2 border-b border-gray-50 last:border-0 text-sm">
           <div>
@@ -206,6 +237,19 @@
         <a href="/nueva-ficha" class="btn-gold no-underline">+ Nueva ficha</a>
       </div>
 
+      <!-- Buscador -->
+      <div style="margin-bottom:12px;">
+        <div style="position:relative;max-width:320px;">
+          <svg width="15" height="15" fill="none" stroke="#94a3b8" stroke-width="2" viewBox="0 0 24 24"
+               style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;">
+            <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+          </svg>
+          <input type="text" id="ficha-search" placeholder="Buscar fichas..." oninput="filtrarFichas(this.value)"
+                 style="width:100%;padding:8px 12px 8px 34px;border:1.5px solid #e2e8f0;border-radius:9px;font-size:.82rem;outline:none;background:#fff;color:#1B2A4A;transition:border-color .2s;font-family:inherit;"
+                 onfocus="this.style.borderColor='#C9A84C'" onblur="this.style.borderColor='#e2e8f0'">
+        </div>
+      </div>
+
       <div class="card-section overflow-hidden">
         {% if fichas %}
         <table class="w-full text-sm">
@@ -223,7 +267,7 @@
             {% set sym = {"PEN":"S/","USD":"US$","MXN":"$"} %}
             {% for f in fichas %}
             {% set pub = props_map.get(f.id, {}) %}
-            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors">
+            <tr class="border-b border-gray-50 hover:bg-gray-50 transition-colors" data-ficha-item data-ficha-text="{{ f.tipo|lower }} {{ f.direccion|lower }} {{ f.ciudad|lower }} {{ f.operacion|lower }}">
               <td class="px-5 py-3 text-gray-400">{{ loop.index }}</td>
               <td class="px-5 py-3">
                 <div class="font-semibold text-gray-800">{{ f.tipo }}</div>
@@ -259,7 +303,7 @@
         </table>
         {% else %}
         <div class="text-center py-16 text-gray-400">
-          <div class="text-5xl mb-3">📋</div>
+          <div class="mb-3 flex justify-center"><svg width="48" height="48" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 0 2-2h2a2 2 0 0 0 2 2"/></svg></div>
           <div class="font-semibold">Aún no tienes fichas</div>
           <a href="/nueva-ficha" class="btn-gold mt-4 inline-block no-underline">+ Crear primera ficha</a>
         </div>
@@ -319,7 +363,7 @@
         </table>
         {% else %}
         <div class="text-center py-16 text-gray-400">
-          <div class="text-5xl mb-3">👥</div>
+          <div class="mb-3 flex justify-center"><svg width="48" height="48" fill="none" stroke="#d1d5db" stroke-width="1.5" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></div>
           <div class="font-semibold mb-1">Sin contactos aún</div>
           <div class="text-sm mb-4">Agrega leads para hacer seguimiento</div>
           <button onclick="openModal('modal-contacto')" class="btn-gold">+ Agregar primer contacto</button>
@@ -1046,6 +1090,19 @@ function previewAvatar2(input) {
   function openModal(id)  { document.getElementById(id).classList.add('open'); }
   function closeModal(id) { document.getElementById(id).classList.remove('open'); }
   function closeOnBg(e, id) { if (e.target === document.getElementById(id)) closeModal(id); }
+
+  function filtrarFichas(q) {
+    const term = q.toLowerCase().trim();
+    let visible = 0;
+    document.querySelectorAll('[data-ficha-item]').forEach(el => {
+      const text = el.dataset.fichaText || el.textContent.toLowerCase();
+      const show = !term || text.includes(term);
+      el.style.display = show ? '' : 'none';
+      if (show) visible++;
+    });
+    const noRes = document.getElementById('fichas-no-results');
+    if (noRes) noRes.style.display = (visible === 0 && term) ? '' : 'none';
+  }
 
   // Init from server-side seccion param
   const initSec = "{{ seccion }}";

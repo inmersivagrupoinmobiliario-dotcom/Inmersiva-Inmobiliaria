@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Error del servidor — Inmersiva</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;700;800&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Barlow', sans-serif; background: #f4f6fa; display: flex; flex-direction: column; min-height: 100vh; }
+    .font-sora { font-family: 'Sora', sans-serif; }
+  </style>
+</head>
+<body>
+
+<nav style="background:#1B2A4A;padding:0 20px;height:60px;display:flex;align-items:center;box-shadow:0 2px 24px rgba(0,0,0,.28);">
+  <a href="/" style="display:flex;align-items:center;gap:10px;text-decoration:none;">
+    <div style="width:36px;height:36px;background:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;overflow:hidden;">
+      <img src="/static/img/logo.jpeg" alt="Inmersiva" style="width:32px;height:32px;object-fit:contain;" onerror="this.style.display='none'">
+    </div>
+    <div>
+      <div class="font-sora" style="color:#fff;font-weight:800;font-size:.82rem;letter-spacing:3px;line-height:1;">INMERSIVA</div>
+      <div style="color:#C9A84C;font-size:7.5px;font-weight:600;letter-spacing:2.5px;line-height:1;margin-top:2px;">GRUPO INMOBILIARIO</div>
+    </div>
+  </a>
+</nav>
+
+<div style="flex:1;display:flex;align-items:center;justify-content:center;padding:40px 20px;">
+  <div style="text-align:center;max-width:480px;">
+
+    <div style="font-size:7rem;font-weight:900;color:#fee2e2;line-height:1;margin-bottom:8px;font-family:'Sora',sans-serif;">500</div>
+    <div style="width:48px;height:3px;background:#dc2626;margin:0 auto 24px;border-radius:2px;"></div>
+
+    <h1 class="font-sora" style="color:#1B2A4A;font-size:1.4rem;font-weight:800;margin-bottom:10px;">Error interno del servidor</h1>
+    <p style="color:#6b7280;line-height:1.6;margin-bottom:32px;">Algo salió mal de nuestro lado. Nuestro equipo técnico ya fue notificado. Por favor intenta de nuevo en unos minutos.</p>
+
+    <div style="display:flex;justify-content:center;gap:12px;flex-wrap:wrap;">
+      <a href="/" style="font-family:'Sora',sans-serif;font-weight:700;padding:11px 26px;background:#C9A84C;color:#1B2A4A;border-radius:10px;text-decoration:none;font-size:.88rem;">Volver al inicio</a>
+      <a href="/contacto" style="font-family:'Sora',sans-serif;font-weight:700;padding:11px 26px;background:#1B2A4A;color:#fff;border-radius:10px;text-decoration:none;font-size:.88rem;">Reportar problema</a>
+    </div>
+
+  </div>
+</div>
+
+<footer style="background:#0d1e38;padding:20px;text-align:center;">
+  <div style="color:#4b6080;font-size:.75rem;">© 2026 Inmersiva Grupo Inmobiliario · <a href="/" style="color:#C9A84C;text-decoration:none;">inmobiliariainmersiva.com</a></div>
+</footer>
+
+</body>
+</html>
