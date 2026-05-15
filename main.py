@@ -1671,7 +1671,7 @@ async def generar(
     tono_actitud: str = Form(default=""),
     descripcion_agente: str = Form(...),
     # ── Archivos ──────────────────────────────────────────────────────────────
-    foto_portada: UploadFile = File(...),
+    foto_portada: Optional[UploadFile] = File(default=None),
     fotos_extras: List[UploadFile] = File(default=[]),
     video_propiedad: Optional[UploadFile] = File(None),
     tour_360_url: str = Form(default=""),
@@ -1686,8 +1686,10 @@ async def generar(
     upload_dir = UPLOADS / listing_id
     upload_dir.mkdir(parents=True, exist_ok=True)
 
-    portada_name = f"portada_{foto_portada.filename}"
-    save_upload(foto_portada, upload_dir / portada_name)
+    portada_name = ""
+    if foto_portada and foto_portada.filename:
+        portada_name = f"portada_{foto_portada.filename}"
+        save_upload(foto_portada, upload_dir / portada_name)
 
     extras_names = []
     for extra in fotos_extras:
@@ -1741,7 +1743,7 @@ async def generar(
         acuerdo_concreto=acuerdo_concreto,
         interes_percibido=interes_percibido, decisor_unico=decisor_unico,
         tono_actitud=tono_actitud, descripcion_agente=descripcion_agente,
-        foto_portada=f"{listing_id}/{portada_name}",
+        foto_portada=f"{listing_id}/{portada_name}" if portada_name else "",
         fotos_extras=extras_names, video_propiedad=video_rel,
         tour_360_url=tour_360_url,
     )
