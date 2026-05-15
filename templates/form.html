@@ -1391,7 +1391,6 @@
   }
 
   function fillTestData() {
-    // Helper: set text/number/email/date/time input
     function setVal(name, val) {
       const el = document.querySelector(`[name="${name}"]`);
       if (el && (el.tagName === 'INPUT' || el.tagName === 'TEXTAREA' || el.tagName === 'SELECT')) {
@@ -1400,12 +1399,10 @@
         el.dispatchEvent(new Event('change', { bubbles: true }));
       }
     }
-    // Helper: select a radio button and trigger conditional logic
     function setRadio(name, val) {
       const r = document.querySelector(`[name="${name}"][value="${val}"]`);
       if (r) { r.checked = true; r.dispatchEvent(new Event('change', { bubbles: true })); }
     }
-    // Helper: check a checkbox
     function setCheck(name, val) {
       const c = document.querySelector(`[name="${name}"][value="${val}"]`);
       if (c) { c.checked = true; c.dispatchEvent(new Event('change', { bubbles: true })); }
@@ -1416,7 +1413,7 @@
     setVal('agente_telefono', '944 123 456');
     setVal('agente_email', 'joan@inmersiva.com');
     setVal('origen_contacto', 'Portal Inmobiliario');
-    setCheck('resultado_llamada', 'Captación exitosa');
+    setCheck('resultado_llamada', 'Visita agendada');
 
     /* ── Propietario ── */
     setVal('propietario_nombre', 'Carlos Alberto Ramírez Torres');
@@ -1424,14 +1421,14 @@
     setVal('propietario_telefono', '955 678 901');
     setVal('propietario_email', 'carlos.ramirez@gmail.com');
     setRadio('propietario_estado_civil', 'Casado/a');
-    setRadio('propietario_regimen', 'Sociedad de gananciales');
-    setRadio('propietario_relacion', 'Propietario directo');
+    setRadio('propietario_regimen', 'Gananciales');
+    setRadio('propietario_relacion', 'Propietario único');
     setRadio('propietario_otros_titulares', 'No');
 
     /* ── Inmueble ── */
     setVal('tipo', 'Casa');
     setVal('operacion', 'Venta');
-    setVal('estado_inmueble', 'Bueno');
+    setVal('estado_inmueble', 'Conservado');
     setVal('direccion', 'Jr. Los Libertadores 349');
     setVal('ciudad', 'Trujillo');
     setVal('estado', 'La Libertad');
@@ -1445,14 +1442,14 @@
     setVal('estacionamientos', '1');
     setVal('mantenimiento_mensual', '0');
     setRadio('cuotas_pendientes', 'No');
-    ['Agua','Luz','Gas natural','Internet'].forEach(s => setCheck('servicios', s));
+    ['Agua', 'Luz', 'Gas natural', 'Internet / cable'].forEach(s => setCheck('servicios', s));
 
     /* ── Amenidades ── */
-    ['Jardín','Terraza','Cochera','Cuarto de servicio'].forEach(a => setCheck('amenidades', a));
-    ['Cocina equipada','Closets empotrados'].forEach(e => setCheck('equipamiento', e));
+    ['Jardín', 'Terraza', 'Cuarto de servicio', 'Cisterna propia'].forEach(a => setCheck('amenidades', a));
+    ['Cocina empotrada', 'Closets'].forEach(e => setCheck('equipamiento', e));
 
     /* ── Documentación ── */
-    setRadio('tenencia', 'Escritura pública');
+    setRadio('tenencia', 'Propiedad inscrita en Registros Públicos');
     setVal('partida_registral', '11054672');
     setVal('oficina_registral', 'Trujillo');
     setRadio('declaratoria_fabrica', 'Sí');
@@ -1467,8 +1464,9 @@
     setVal('precio', '95000');
     setVal('precio_minimo', '88000');
     setVal('comision', '3%');
-    setRadio('comision_paga', 'Vendedor');
+    setRadio('comision_paga', 'Dueño');
     setRadio('exclusividad', 'Sí');
+    ['Contado', 'Crédito hipotecario'].forEach(f => setCheck('formas_pago', f));
 
     /* ── Historial ── */
     setVal('num_visitas', '4');
@@ -1478,28 +1476,27 @@
 
     /* ── Motivación ── */
     setVal('motivo_venta', 'El propietario se muda a Lima por trabajo. Necesita liquidez para comprar departamento allá.');
+    setRadio('plazo_venta', 'Corto (1–3 meses)');
     setRadio('urgencia', '4');
     setVal('dinero_comprometido', 'Tiene separada cuota inicial de depto en Lima. Necesita cerrar antes de julio.');
 
     /* ── Ocupación ── */
-    setRadio('estado_ocupacion', 'Desocupado');
+    setRadio('estado_ocupacion', 'Desocupada');
     setRadio('llaves_tercero', 'No');
     setVal('disponibilidad_visitas', 'Lunes a sábado de 9am a 6pm, previa cita al 944 123 456');
 
     /* ── Siguiente paso ── */
-    const hoy = new Date();
-    const mañana = new Date(hoy); mañana.setDate(hoy.getDate() + 1);
-    setVal('proximo_contacto_fecha', mañana.toISOString().split('T')[0]);
+    const manana = new Date(); manana.setDate(manana.getDate() + 1);
+    setVal('proximo_contacto_fecha', manana.toISOString().split('T')[0]);
     setVal('proximo_contacto_hora', '10:00');
     setRadio('proximo_contacto_canal', 'WhatsApp');
     setVal('acuerdo_concreto', 'Propietario enviará copia de escrituras el viernes. Visita de fotógrafo agendada para el lunes.');
     setRadio('interes_percibido', '5');
 
-    /* ── Observaciones (descripción) ── */
-    setVal('descripcion_agente', 'Casa de 2 pisos en Jr. Los Libertadores, Trujillo. 3 dormitorios, 2.5 baños, cochera para 1 auto y jardín frontal. Acabados en buen estado, cocina con muebles y cuarto de servicio independiente. Ubicación tranquila a 5 minutos del centro. Propietario motivado, negocia al contado.');
+    /* ── Descripción del agente ── */
+    setVal('descripcion_agente', 'Casa de 2 pisos en Jr. Los Libertadores, Trujillo. 3 dormitorios, 2.5 baños, cochera para 1 auto y jardín frontal. Acabados en buen estado, cocina empotrada con muebles y cuarto de servicio independiente. Ubicación tranquila a 5 minutos del centro. Propietario motivado, negocia al contado.');
 
     saveDraft();
-    alert('¡Datos de prueba cargados! Ahora puedes enviar el formulario.');
   }
 
   function clearDraft() {
