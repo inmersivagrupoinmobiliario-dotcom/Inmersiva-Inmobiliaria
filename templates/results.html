@@ -318,14 +318,16 @@
       overflow: auto;
       display: flex;
       justify-content: center;
-      align-items: flex-start;
-      padding: 12px;
-      background: #1a1a2e;
+      align-items: center;
+      padding: 16px;
+      background: #12121e;
     }
     .img-preview {
       max-width: 100%;
-      border-radius: 8px;
-      box-shadow: 0 8px 32px rgba(0,0,0,.4);
+      max-height: 100%;
+      object-fit: contain;
+      border-radius: 6px;
+      box-shadow: 0 8px 40px rgba(0,0,0,.6);
       display: block;
     }
     .preview-refresh {
@@ -544,26 +546,32 @@
         </span>
       </div>
       <div class="downloads-grid">
-        <a href="/pdf/{{ listing.id }}" class="dl-item" target="_blank" onclick="switchPreview('pdf')">
+        <!-- PDF: abre en nueva pestaña Y muestra en preview -->
+        <a href="/pdf/{{ listing.id }}" class="dl-item" target="_blank"
+           onclick="switchPreview('pdf', document.getElementById('tab-pdf'))">
           <div class="dl-icon dl-icon-pdf">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
           </div>
           <div class="dl-label">Ficha PDF</div>
-          <div class="dl-sub">Documento A4</div>
+          <div class="dl-sub">Descargar · A4</div>
         </a>
-        <a href="/imagen/{{ listing.id }}" class="dl-item" download onclick="switchPreview('cuadrada'); return false;">
+        <!-- Cuadrada: descarga real + muestra en preview -->
+        <a href="/imagen/{{ listing.id }}" class="dl-item" download="imagen-cuadrada.jpg"
+           onclick="switchPreview('cuadrada', document.getElementById('tab-cuadrada'))">
           <div class="dl-icon dl-icon-img">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
           </div>
           <div class="dl-label">Imagen Cuadrada</div>
-          <div class="dl-sub">1080 × 1080 px</div>
+          <div class="dl-sub">Descargar · 1080×1080</div>
         </a>
-        <a href="/imagen-vertical/{{ listing.id }}" class="dl-item" download onclick="switchPreview('stories'); return false;">
+        <!-- Stories: descarga real + muestra en preview -->
+        <a href="/imagen-vertical/{{ listing.id }}" class="dl-item" download="stories.jpg"
+           onclick="switchPreview('stories', document.getElementById('tab-stories'))">
           <div class="dl-icon dl-icon-vert">
             <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
           </div>
           <div class="dl-label">Stories / Reels</div>
-          <div class="dl-sub">1080 × 1920 px</div>
+          <div class="dl-sub">Descargar · 1080×1920</div>
         </a>
         <div class="dl-item" onclick="generarVideo('{{ listing.id }}')" id="btn-video">
           <div class="dl-icon dl-icon-vid">
