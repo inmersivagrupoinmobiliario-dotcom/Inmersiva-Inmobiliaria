@@ -54,8 +54,94 @@
     .progress-pill { background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.15); border-radius: 100px; padding: 5px 14px; font-size: .75rem; font-weight: 700; color: rgba(255,255,255,.8); white-space: nowrap; }
     .progress-pill span { color: var(--gold); }
 
+    /* ── LAYOUT ── */
+    .layout { display: flex; min-height: calc(100vh - 64px); }
+
+    /* ── SIDEBAR ── */
+    .sidebar-nav {
+      width: 220px;
+      flex-shrink: 0;
+      background: var(--navy-dark);
+      position: sticky;
+      top: 64px;
+      height: calc(100vh - 64px);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: width .22s ease;
+      z-index: 40;
+    }
+    .sidebar-nav.collapsed { width: 50px; }
+
+    .sidebar-toggle {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 42px;
+      width: 100%;
+      background: rgba(255,255,255,.04);
+      border: none;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+      cursor: pointer;
+      color: rgba(255,255,255,.45);
+      transition: background .15s, color .15s;
+      flex-shrink: 0;
+    }
+    .sidebar-toggle:hover { background: rgba(201,168,76,.12); color: var(--gold); }
+
+    .sidebar-body { flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px 5px; display: flex; flex-direction: column; gap: 1px; }
+    .sidebar-body::-webkit-scrollbar { width: 3px; }
+    .sidebar-body::-webkit-scrollbar-thumb { background: var(--gold-border); border-radius: 3px; }
+
+    .nav-section-label {
+      font-size: .58rem; font-weight: 700; color: rgba(255,255,255,.28);
+      letter-spacing: 1.5px; text-transform: uppercase;
+      padding: 8px 7px 3px; white-space: nowrap;
+      transition: opacity .15s;
+    }
+    .sidebar-nav.collapsed .nav-section-label { opacity: 0; }
+
+    .nav-item {
+      display: flex; align-items: center; gap: 9px;
+      padding: 7px 7px; border-radius: 8px; cursor: pointer;
+      text-decoration: none; color: rgba(255,255,255,.42);
+      font-size: .77rem; font-weight: 600;
+      transition: all var(--transition); overflow: hidden;
+    }
+    .nav-item:hover { background: rgba(201,168,76,.1); color: rgba(255,255,255,.85); }
+    .nav-item.active { background: rgba(201,168,76,.15); color: var(--gold); }
+
+    .nav-num {
+      width: 24px; height: 24px; border-radius: 50%;
+      background: rgba(255,255,255,.08);
+      display: flex; align-items: center; justify-content: center;
+      font-size: .64rem; font-weight: 800; flex-shrink: 0;
+      transition: background .15s, color .15s;
+    }
+    .nav-item.active .nav-num { background: var(--gold); color: var(--navy); }
+
+    .nav-label { white-space: nowrap; overflow: hidden; transition: opacity .15s, max-width .22s; max-width: 160px; }
+    .sidebar-nav.collapsed .nav-label { opacity: 0; max-width: 0; }
+
+    .nav-footer {
+      padding: 8px 5px 10px;
+      border-top: 1px solid rgba(255,255,255,.07);
+      flex-shrink: 0;
+    }
+    .nav-gen-btn {
+      width: 100%; padding: 9px 6px;
+      background: var(--gold); color: var(--navy);
+      font-family: 'Sora', sans-serif; font-weight: 800; font-size: .78rem;
+      border: none; border-radius: 8px; cursor: pointer;
+      display: flex; align-items: center; justify-content: center; gap: 6px;
+      transition: opacity .15s; overflow: hidden; white-space: nowrap;
+    }
+    .nav-gen-btn:hover { opacity: .88; }
+    .nav-gen-label { overflow: hidden; transition: opacity .15s, max-width .22s; max-width: 120px; }
+    .sidebar-nav.collapsed .nav-gen-label { opacity: 0; max-width: 0; }
+
     /* ── MAIN CONTENT ── */
-    .main-content { max-width: 860px; margin: 0 auto; padding: 28px 32px; }
+    .main-content { flex: 1; min-width: 0; padding: 28px 32px; }
 
     /* ── LLAMADA BAR ── */
     .llamada-bar {
@@ -340,6 +426,7 @@
 
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
+      .sidebar-nav { display: none; }
       .main-content { padding: 16px; max-width: 100%; }
       .fg-3, .fg-4, .fg-5 { grid-template-columns: 1fr 1fr; }
       .fg-3 .span3, .fg-4 .span3 { grid-column: span 2; }
@@ -377,6 +464,36 @@
     <div class="progress-pill">Sección <span id="currentSection">1</span> de 12</div>
   </div>
 </header>
+
+<div class="layout">
+
+<!-- SIDEBAR (collapsed by default) -->
+<nav class="sidebar-nav collapsed" id="sidebarNav">
+  <button class="sidebar-toggle" onclick="toggleSidebar()" title="Expandir / colapsar menú">
+    <svg id="toggleIcon" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+  </button>
+  <div class="sidebar-body">
+    <div class="nav-section-label">Secciones</div>
+    <a class="nav-item active" href="#sec-1" id="nav-1"><span class="nav-num">1</span><span class="nav-label">Propietario</span></a>
+    <a class="nav-item" href="#sec-2" id="nav-2"><span class="nav-num">2</span><span class="nav-label">Inmueble</span></a>
+    <a class="nav-item" href="#sec-3" id="nav-3"><span class="nav-num">3</span><span class="nav-label">Amenidades</span></a>
+    <a class="nav-item" href="#sec-4" id="nav-4"><span class="nav-num">4</span><span class="nav-label">Documentación</span></a>
+    <a class="nav-item" href="#sec-5" id="nav-5"><span class="nav-num">5</span><span class="nav-label">Inf. comercial</span></a>
+    <a class="nav-item" href="#sec-6" id="nav-6"><span class="nav-num">6</span><span class="nav-label">Fotos</span></a>
+    <a class="nav-item" href="#sec-7" id="nav-7"><span class="nav-num">7</span><span class="nav-label">Video / Tour</span></a>
+    <a class="nav-item" href="#sec-8" id="nav-8"><span class="nav-num">8</span><span class="nav-label">Historial</span></a>
+    <a class="nav-item" href="#sec-9" id="nav-9"><span class="nav-num">9</span><span class="nav-label">Motivación</span></a>
+    <a class="nav-item" href="#sec-10" id="nav-10"><span class="nav-num">10</span><span class="nav-label">Ocupación</span></a>
+    <a class="nav-item" href="#sec-11" id="nav-11"><span class="nav-num">11</span><span class="nav-label">Siguiente paso</span></a>
+    <a class="nav-item" href="#sec-12" id="nav-12"><span class="nav-num">12</span><span class="nav-label">Observaciones</span></a>
+  </div>
+  <div class="nav-footer">
+    <button class="nav-gen-btn" onclick="document.getElementById('fichaForm').requestSubmit()">
+      <svg width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+      <span class="nav-gen-label">Generar con IA</span>
+    </button>
+  </div>
+</nav>
 
 <div class="main-content">
     <form id="fichaForm" action="/generar" method="post" enctype="multipart/form-data">
@@ -1137,7 +1254,8 @@
     <div class="form-footer">
       Inmersiva Grupo Inmobiliario · Sistema Generador de Contenido IA · inmobiliariainmersiva.com
     </div>
-</div>
+  </div><!-- /main-content -->
+</div><!-- /layout -->
 
 <script>
   /* ── CONDITIONAL FIELDS ──────────────────────────────────────────────── */
@@ -1175,14 +1293,40 @@
     toggle('arrendatario-block', radio.value === 'Alquilada');
   }
 
-  /* ── SECTION COUNTER ─────────────────────────────────────────────────── */
+  /* ── SIDEBAR TOGGLE ─────────────────────────────────────────────────── */
+  const sidebar    = document.getElementById('sidebarNav');
+  const toggleIcon = document.getElementById('toggleIcon');
+  const SIDEBAR_KEY = 'inmersiva_sidebar_open';
+
+  function setSidebarIcon(open) {
+    toggleIcon.innerHTML = open
+      ? '<polyline points="15 18 9 12 15 6"/>'   // chevron left = close
+      : '<polyline points="9 18 15 12 9 6"/>';    // chevron right = open
+  }
+
+  function toggleSidebar() {
+    const nowOpen = sidebar.classList.toggle('collapsed') === false;
+    localStorage.setItem(SIDEBAR_KEY, nowOpen ? '1' : '0');
+    setSidebarIcon(nowOpen);
+  }
+
+  // Restore sidebar state
+  if (localStorage.getItem(SIDEBAR_KEY) === '1') {
+    sidebar.classList.remove('collapsed');
+    setSidebarIcon(true);
+  }
+
+  /* ── SIDEBAR ACTIVE + COUNTER ────────────────────────────────────────── */
   const sections = document.querySelectorAll('.section-card');
+  const navItems = document.querySelectorAll('.nav-item');
   const counter  = document.getElementById('currentSection');
 
   const observer = new IntersectionObserver((entries) => {
     entries.forEach(e => {
-      if (e.isIntersecting && counter) {
-        counter.textContent = e.target.id.replace('sec-', '');
+      if (e.isIntersecting) {
+        const id = e.target.id.replace('sec-', '');
+        navItems.forEach(n => n.classList.toggle('active', n.id === 'nav-' + id));
+        if (counter) counter.textContent = id;
       }
     });
   }, { rootMargin: '-40% 0px -50% 0px' });
