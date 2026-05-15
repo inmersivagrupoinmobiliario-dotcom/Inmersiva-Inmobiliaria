@@ -55,21 +55,23 @@
     .nav-btn-gold:hover { opacity: .88; }
 
     /* ── SPLIT LAYOUT ── */
+    /* ── APP SHELL: full-height split ── */
+    body { overflow: hidden; }
     .split-layout {
       display: flex;
-      gap: 20px;
-      align-items: flex-start;
-      max-width: 1500px;
-      margin: 0 auto;
-      padding: 24px 20px 60px;
+      height: calc(100vh - 64px);
+      overflow: hidden;
     }
-    .split-left { flex: 1; min-width: 0; }
+    .split-left {
+      flex: 0 0 50%;
+      overflow-y: auto;
+      padding: 20px 24px 80px;
+      border-right: 1px solid var(--border);
+    }
     .split-right {
-      width: 440px;
-      flex-shrink: 0;
-      position: sticky;
-      top: 80px;
-      max-height: calc(100vh - 96px);
+      flex: 0 0 50%;
+      height: 100%;
+      overflow: hidden;
     }
 
     /* ── DRAFT BANNER ── */
@@ -242,13 +244,10 @@
     /* ── PREVIEW PANEL ── */
     .preview-panel {
       background: var(--card);
-      border-radius: var(--radius);
-      box-shadow: 0 4px 24px rgba(0,0,0,.10);
-      border: 1.5px solid var(--border);
       overflow: hidden;
       display: flex;
       flex-direction: column;
-      height: calc(100vh - 100px);
+      height: 100%;
     }
     .preview-header {
       padding: 14px 18px 0;
@@ -350,17 +349,17 @@
     .preview-refresh:hover { background: rgba(0,0,0,.75); }
 
     /* ── RESPONSIVE ── */
-    @media (max-width: 1100px) {
-      .split-layout { flex-direction: column-reverse; }
-      .split-right { width: 100%; position: static; max-height: none; }
-      .preview-panel { height: 520px; }
+    @media (max-width: 900px) {
+      body { overflow: auto; }
+      .split-layout { flex-direction: column; height: auto; overflow: visible; }
+      .split-left { flex: none; width: 100%; border-right: none; padding: 16px 16px 60px; overflow: visible; }
+      .split-right { flex: none; width: 100%; height: 520px; }
     }
     @media (max-width: 640px) {
-      .split-layout { padding: 12px 12px 60px; gap: 14px; }
+      .split-right { height: 380px; }
       .prop-card-body { flex-direction: column; gap: 14px; }
       .prop-stats { margin-left: 0; }
       .downloads-grid { grid-template-columns: 1fr 1fr; }
-      .preview-panel { height: 420px; }
     }
   </style>
 </head>
