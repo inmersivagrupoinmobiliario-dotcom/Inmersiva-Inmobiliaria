@@ -328,9 +328,6 @@
   <!-- PRECIO -->
   <div class="precio-row">
     <div class="precio-main">{{ listing.precio_str }}</div>
-    {% if listing.precio_minimo_str %}
-    <div class="precio-min">M&iacute;nimo aceptable: {{ listing.precio_minimo_str }}</div>
-    {% endif %}
   </div>
 
   <!-- TWO-COLUMN LAYOUT -->
@@ -372,11 +369,6 @@
         {% if listing.modalidad %}<div class="spec-row"><span class="spec-key">Modalidad</span><span class="spec-val">{{ listing.modalidad }}</span></div>{% endif %}
         {% if listing.forma_pago %}<div class="spec-row"><span class="spec-key">Formas de pago</span><span class="spec-val">{{ listing.forma_pago | join(', ') }}</span></div>{% endif %}
         {% if listing.mantenimiento_mensual %}<div class="spec-row"><span class="spec-key">Mantenimiento</span><span class="spec-val">S/ {{ listing.mantenimiento_mensual }}/mes</span></div>{% endif %}
-        {% if listing.comision %}<div class="spec-row"><span class="spec-key">Comisi&oacute;n</span><span class="spec-val">{{ listing.comision }}</span></div>{% endif %}
-        {% if listing.predial_al_dia %}<div class="spec-row"><span class="spec-key">Predial</span><span class="spec-val">{{ listing.predial_al_dia }}</span></div>{% endif %}
-        {% if listing.arbitrios_al_dia %}<div class="spec-row"><span class="spec-key">Arbitrios</span><span class="spec-val">{{ listing.arbitrios_al_dia }}</span></div>{% endif %}
-        {% if listing.hipoteca and listing.hipoteca == 'No' %}<div class="spec-row"><span class="spec-key">Hipoteca</span><span class="spec-val">Libre de cargas</span></div>{% endif %}
-        {% if listing.exclusividad %}<div class="spec-row"><span class="spec-key">Exclusividad</span><span class="spec-val">{{ listing.exclusividad }}</span></div>{% endif %}
       </div>
 
       {% if listing.tour_360_url %}

@@ -122,6 +122,71 @@
 
     /* ── CONTENT CARD ── */
     .content-card { background: var(--card); border-radius: var(--radius); box-shadow: var(--shadow); border: 1.5px solid var(--border); margin-bottom: 14px; overflow: hidden; }
+
+    /* ── INTERNAL CARD ── */
+    .internal-card {
+      background: #0f1a2e;
+      border: 1.5px solid rgba(201,168,76,.25);
+      border-left: 4px solid var(--gold);
+      border-radius: var(--radius);
+      margin-bottom: 14px;
+      overflow: hidden;
+    }
+    .internal-card-header {
+      padding: 13px 20px 11px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid rgba(255,255,255,.07);
+    }
+    .internal-badge {
+      background: var(--gold);
+      color: var(--navy);
+      font-family: 'Sora', sans-serif;
+      font-size: .62rem;
+      font-weight: 800;
+      letter-spacing: 1.5px;
+      padding: 2px 8px;
+      border-radius: 4px;
+      text-transform: uppercase;
+    }
+    .internal-title {
+      font-family: 'Sora', sans-serif;
+      color: #fff;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .internal-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+      gap: 0;
+      padding: 4px 0;
+    }
+    .irow {
+      padding: 10px 20px;
+      border-bottom: 1px solid rgba(255,255,255,.05);
+      display: flex;
+      flex-direction: column;
+      gap: 3px;
+    }
+    .irow:last-child { border-bottom: none; }
+    .irow-label {
+      font-size: .67rem;
+      font-weight: 700;
+      color: rgba(201,168,76,.7);
+      text-transform: uppercase;
+      letter-spacing: .8px;
+    }
+    .irow-val {
+      font-size: .88rem;
+      color: #e2e8f0;
+      font-weight: 500;
+      line-height: 1.4;
+    }
+    .irow-val.highlight { color: var(--gold); font-weight: 700; font-size: 1rem; }
+    .irow-empty { color: rgba(255,255,255,.25); font-style: italic; font-size: .8rem; }
     .content-card-header { padding: 14px 20px 12px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border); gap: 12px; flex-wrap: wrap; }
     .content-card-label { font-family: 'Sora', sans-serif; font-size: .78rem; font-weight: 800; letter-spacing: 1.5px; text-transform: uppercase; color: var(--navy); display: flex; align-items: center; gap: 6px; }
     .content-card-actions { display: flex; gap: 8px; }
@@ -453,6 +518,148 @@
           <div class="prop-stat"><div class="prop-stat-val">{{ listing.estacionamientos }}</div><div class="prop-stat-lbl">Coch.</div></div>
           {% endif %}
         </div>
+      </div>
+    </div>
+
+    <!-- FICHA INTERNA DEL CORREDOR -->
+    <div class="internal-card">
+      <div class="internal-card-header">
+        <svg width="15" height="15" fill="none" stroke="#C9A84C" stroke-width="2.5" viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        <div class="internal-title">Ficha interna — solo corredor</div>
+        <div class="internal-badge">Confidencial</div>
+      </div>
+      <div class="internal-grid">
+
+        {% if listing.propietario_nombre %}
+        <div class="irow">
+          <div class="irow-label">Propietario</div>
+          <div class="irow-val">{{ listing.propietario_nombre }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.propietario_telefono %}
+        <div class="irow">
+          <div class="irow-label">Teléfono propietario</div>
+          <div class="irow-val">{{ listing.propietario_telefono }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.propietario_email %}
+        <div class="irow">
+          <div class="irow-label">Email propietario</div>
+          <div class="irow-val">{{ listing.propietario_email }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.precio_minimo_str %}
+        <div class="irow">
+          <div class="irow-label">Precio mínimo aceptable</div>
+          <div class="irow-val highlight">{{ listing.precio_minimo_str }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.comision %}
+        <div class="irow">
+          <div class="irow-label">Comisión</div>
+          <div class="irow-val highlight">{{ listing.comision }}{% if listing.comision_paga %} · paga {{ listing.comision_paga }}{% endif %}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.exclusividad %}
+        <div class="irow">
+          <div class="irow-label">Exclusividad</div>
+          <div class="irow-val">{{ listing.exclusividad }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.hipoteca %}
+        <div class="irow">
+          <div class="irow-label">Hipoteca</div>
+          <div class="irow-val">{{ listing.hipoteca }}{% if listing.hipoteca_entidad %} · {{ listing.hipoteca_entidad }}{% endif %}{% if listing.hipoteca_saldo %} ({{ listing.hipoteca_saldo }}){% endif %}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.predial_al_dia %}
+        <div class="irow">
+          <div class="irow-label">Predial al día</div>
+          <div class="irow-val">{{ listing.predial_al_dia }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.arbitrios_al_dia %}
+        <div class="irow">
+          <div class="irow-label">Arbitrios al día</div>
+          <div class="irow-val">{{ listing.arbitrios_al_dia }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.motivo_venta %}
+        <div class="irow" style="grid-column: 1/-1;">
+          <div class="irow-label">Motivo de venta</div>
+          <div class="irow-val">{{ listing.motivo_venta }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.urgencia %}
+        <div class="irow">
+          <div class="irow-label">Urgencia percibida</div>
+          <div class="irow-val highlight">{{ listing.urgencia }} / 5</div>
+        </div>
+        {% endif %}
+
+        {% if listing.plazo_venta %}
+        <div class="irow">
+          <div class="irow-label">Plazo deseado</div>
+          <div class="irow-val">{{ listing.plazo_venta }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.dinero_comprometido %}
+        <div class="irow" style="grid-column: 1/-1;">
+          <div class="irow-label">Dinero comprometido / situación financiera</div>
+          <div class="irow-val">{{ listing.dinero_comprometido }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.num_visitas or listing.num_ofertas or listing.oferta_mas_alta %}
+        <div class="irow">
+          <div class="irow-label">Historial</div>
+          <div class="irow-val">
+            {% if listing.num_visitas %}{{ listing.num_visitas }} visita(s){% endif %}
+            {% if listing.num_ofertas %} · {{ listing.num_ofertas }} oferta(s){% endif %}
+            {% if listing.oferta_mas_alta %} · Mejor oferta: {{ listing.moneda }} {{ listing.oferta_mas_alta | int | format_miles }}{% endif %}
+          </div>
+        </div>
+        {% endif %}
+
+        {% if listing.otros_corredores %}
+        <div class="irow">
+          <div class="irow-label">Otros corredores</div>
+          <div class="irow-val">{{ listing.otros_corredores }}{% if listing.otros_corredores_nombres %}: {{ listing.otros_corredores_nombres }}{% endif %}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.interes_percibido %}
+        <div class="irow">
+          <div class="irow-label">Interés percibido</div>
+          <div class="irow-val highlight">{{ listing.interes_percibido }} / 5</div>
+        </div>
+        {% endif %}
+
+        {% if listing.acuerdo_concreto %}
+        <div class="irow" style="grid-column: 1/-1;">
+          <div class="irow-label">Acuerdo / siguiente paso</div>
+          <div class="irow-val">{{ listing.acuerdo_concreto }}</div>
+        </div>
+        {% endif %}
+
+        {% if listing.proximo_contacto_fecha %}
+        <div class="irow">
+          <div class="irow-label">Próximo contacto</div>
+          <div class="irow-val">{{ listing.proximo_contacto_fecha }}{% if listing.proximo_contacto_hora %} {{ listing.proximo_contacto_hora }}{% endif %}{% if listing.proximo_contacto_canal %} · {{ listing.proximo_contacto_canal }}{% endif %}</div>
+        </div>
+        {% endif %}
+
       </div>
     </div>
 
