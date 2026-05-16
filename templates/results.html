@@ -629,7 +629,7 @@
           <div class="irow-val">
             {% if listing.num_visitas %}{{ listing.num_visitas }} visita(s){% endif %}
             {% if listing.num_ofertas %} · {{ listing.num_ofertas }} oferta(s){% endif %}
-            {% if listing.oferta_mas_alta %} · Mejor oferta: {{ listing.moneda }} {{ listing.oferta_mas_alta | int | format_miles }}{% endif %}
+            {% if listing.oferta_mas_alta %} · Mejor oferta: {{ listing.moneda }} {{ listing.oferta_mas_alta }}{% endif %}
           </div>
         </div>
         {% endif %}
@@ -637,7 +637,7 @@
         {% if listing.otros_corredores %}
         <div class="irow">
           <div class="irow-label">Otros corredores</div>
-          <div class="irow-val">{{ listing.otros_corredores }}{% if listing.otros_corredores_nombres %}: {{ listing.otros_corredores_nombres }}{% endif %}</div>
+          <div class="irow-val">{{ listing.otros_corredores }}</div>
         </div>
         {% endif %}
 
